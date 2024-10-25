@@ -36,7 +36,7 @@ public:
         auto type     = std::type_index(typeid(T));
         auto hModule  = utils::getModuleHandle();
         auto listener = Listener(type, hModule);
-        addListener([=](const Event& event) {
+        addListener(listener, [=](const Event& event) {
             try {
                 T const& ev = dynamic_cast<T const&>(event);
                 callback(ev);
