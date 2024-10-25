@@ -1,0 +1,6 @@
+#include "resource.hpp"
+
+IDI_ICON1 ICON "../resources/icon.ico"
+
+DEFAULT_CONFIG TEXTFILE "../resources/config.json"
+DEFAULT_ZH_CN  TEXTFILE "../resources/zh_CN.lang"

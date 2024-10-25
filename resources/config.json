@@ -1,0 +1,11 @@
+{
+    "ws_url": "ws://127.0.0.1:3001",
+    "token": "",
+    "language": "zh_CN",
+    "logger": {
+        "colorLog": true,
+        "logLevel": 3,
+        "logFile": true,
+        "logFilePath": "./logs/latest.log"
+    }
+}
