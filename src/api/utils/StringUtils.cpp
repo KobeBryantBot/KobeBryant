@@ -41,12 +41,15 @@ std::string toSnakeCase(std::string_view str) {
     return res;
 }
 
-std::wstring toWstring(std::string const& str) {
-    if (str.empty()) return std::wstring();
-    int                  size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
-    std::vector<wchar_t> buf(size_needed);
-    MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &buf[0], size_needed);
-    return std::wstring(buf.begin(), buf.end() - 1);
+std::wstring toWstring(const std::string& utf8) {
+    // 获取所需的缓冲区大小
+    int len = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, nullptr, 0);
+    // 分配缓冲区并进行转换
+    std::wstring utf16(len, L'\0');
+    len = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, &utf16[0], len);
+    // 去除末尾的空字符
+    utf16.resize(len - 1);
+    return utf16;
 }
 
 } // namespace utils

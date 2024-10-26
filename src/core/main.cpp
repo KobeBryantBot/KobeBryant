@@ -1,4 +1,5 @@
 #include "Global.hpp"
+#include "api/utils/StringUtils.hpp"
 #include "modules/CommandManager.hpp"
 #include "modules/EventDispatcher.hpp"
 #include "modules/KobeBryant.hpp"
@@ -39,7 +40,7 @@ int main() {
     // 初始化机器人核心
     auto& bot = KobeBryant::getInstance();
     bot.getLogger().info("bot.main.loadConfig");
-    SetConsoleTitle(L"科比 · 布莱恩特");
+    SetConsoleTitle(utils::toWstring(tr("bot.console.title")).c_str());
     // 创建互斥锁
     HANDLE hMutex = CreateMutex(NULL, FALSE, L"KobeBryantMutex");
     // 检查是否已经有一个实例在运行

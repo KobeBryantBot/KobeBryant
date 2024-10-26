@@ -32,3 +32,4 @@ command.plugins.load.failed=无法从 %s 文件夹加载插件，找不到对应
 command.plugins.load.loaded=插件 %s 已经被加载，无法重复加载！
 bot.error.exist=已有一个实例正在运行，无法重复运行！请关闭已有的实例。
 bot.plugin.nameMismatch=无法加载插件 %1$s！文件夹名称 %2$s 和插件名称 %3$s 不一致！
+bot.console.title=科比 · 布莱恩特
