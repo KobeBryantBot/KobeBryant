@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <iostream>
+#include <optional>
 
 namespace utils {
 
@@ -17,13 +18,16 @@ namespace utils {
     return hModule;
 }
 
-[[nodiscard]] inline std::string readResource(HMODULE hModule, int id, bool isBinary = false) {
-    HRSRC       hRes     = FindResource(hModule, MAKEINTRESOURCE(id), isBinary ? L"BINFILE" : L"TEXTFILE");
-    HGLOBAL     resource = LoadResource(hModule, hRes);
-    void*       data     = LockResource(resource);
-    DWORD       size     = SizeofResource(hModule, hRes);
-    std::string outData(static_cast<const char*>(data), size);
-    return std::move(outData);
+[[nodiscard]] inline std::optional<std::string> readResource(HMODULE hModule, int id, bool isBinary = false) {
+    if (HRSRC hRes = FindResource(hModule, MAKEINTRESOURCE(id), isBinary ? L"BINFILE" : L"TEXTFILE")) {
+        if (HGLOBAL resource = LoadResource(hModule, hRes)) {
+            void*       data = LockResource(resource);
+            DWORD       size = SizeofResource(hModule, hRes);
+            std::string outData(static_cast<const char*>(data), size);
+            return std::move(outData);
+        }
+    }
+    return {};
 }
 
 } // namespace utils

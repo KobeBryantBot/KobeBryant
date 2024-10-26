@@ -9,7 +9,7 @@ std::string tr(std::string const& key, std::vector<std::string> const& params) {
 
 nlohmann::ordered_json loadConfig() {
     auto rawConfig = utils::readResource(NULL, DEFAULT_CONFIG);
-    auto config    = nlohmann::ordered_json::parse(rawConfig, nullptr, true, true);
+    auto config    = nlohmann::ordered_json::parse(*rawConfig, nullptr, true, true);
     if (auto oldConfig = utils::readFile("./config/config.json")) {
         try {
             config.merge_patch(nlohmann::ordered_json::parse(*oldConfig, nullptr, true, true));
@@ -38,7 +38,7 @@ KobeBryant::KobeBryant() {
         // 初始化语言系统
         std::string lang = config["language"];
         mI18n            = std::make_unique<i18n::LangI18n>("./lang", lang);
-        mI18n->updateOrCreateLanguage("zh_CN", utils::readResource(NULL, DEFAULT_ZH_CN));
+        mI18n->updateOrCreateLanguage("zh_CN", *utils::readResource(NULL, DEFAULT_ZH_CN));
         mI18n->loadAllLanguages();
         // 创建客户端
         mUrl      = config["ws_url"];
