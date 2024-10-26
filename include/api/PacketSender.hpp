@@ -35,6 +35,9 @@ public:
         std::optional<std::string> summary = {}
     );
 
+    KobeBryant_API Message&
+    image(std::string const& raw, ImageType type = ImageType::Path, std::optional<std::string> summary = {});
+
     KobeBryant_API Message& record(std::filesystem::path const& path);
 
     KobeBryant_API Message& video(std::filesystem::path const& path);

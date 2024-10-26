@@ -43,15 +43,17 @@ Message& Message::reply(int64_t id) {
 
 Message& Message::image(std::string const& raw, ImageType type, bool flash, std::optional<std::string> summary) {
     try {
-        std::string data = raw;
-        if (type == ImageType::Path && std::filesystem::exists(raw)) {
-            data = *utils::readFile(raw, true);
-        }
-        auto           info = "base64://" + utils::encode(data);
         nlohmann::json json = {
-            {"type", "image"                         },
-            {"data", {{"file", info}, {"subType", 0}}}
+            {"type", "image"         },
+            {"data", {{"subType", 0}}}
         };
+        if (type == ImageType::Binary) {
+            auto info    = "base64://" + utils::encode(raw);
+            json["file"] = info;
+        } else if (type == ImageType::Path) {
+            auto info    = "file://" + std::filesystem::absolute(raw).string();
+            json["file"] = info;
+        }
         if (flash) {
             json["type"] = "flash";
         }
@@ -61,6 +63,10 @@ Message& Message::image(std::string const& raw, ImageType type, bool flash, std:
         mSerializedMessage.push_back(json);
     } catch (...) {}
     return *this;
+}
+
+Message& Message::image(std::string const& raw, ImageType type, std::optional<std::string> summary) {
+    return image(raw, type, false, summary);
 }
 
 Message& Message::record(std::filesystem::path const& path) {
