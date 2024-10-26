@@ -13,6 +13,7 @@ public:
     enum class ImageType : int {
         Path   = 0, // 从文件路径读取
         Binary = 1, // 二进制数据
+        Url    = 2  // 网络URL
     };
 
 public:
