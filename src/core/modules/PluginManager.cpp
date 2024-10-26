@@ -67,13 +67,20 @@ bool PluginManager::loadPlugin(std::filesystem::path const& path) {
         if (fs::exists(path / "manifest.json")) {
             if (auto manifest = PluginManifest::readFrom(path / "manifest.json")) {
                 if (!manifest->mPassive) {
-                    if (auto entry = getDllPath(path.string() + "/" + manifest->mEntry)) {
-                        auto    name          = manifest->mName;
-                        HMODULE hMoudle       = LoadLibrary(entry->c_str());
-                        mPluginsMap1[name]    = hMoudle;
-                        mPluginsMap2[hMoudle] = name;
-                        KobeBryant::getInstance().getLogger().info("bot.plugin.loaded", {name});
-                        return true;
+                    if (path.filename().string() == manifest->mName) {
+                        if (auto entry = getDllPath(path.string() + "/" + manifest->mEntry)) {
+                            auto    name          = manifest->mName;
+                            HMODULE hMoudle       = LoadLibrary(entry->c_str());
+                            mPluginsMap1[name]    = hMoudle;
+                            mPluginsMap2[hMoudle] = name;
+                            KobeBryant::getInstance().getLogger().info("bot.plugin.loaded", {name});
+                            return true;
+                        }
+                    } else {
+                        KobeBryant::getInstance().getLogger().error(
+                            "bot.plugin.nameMismatch",
+                            {manifest->mName, path.filename().string(), manifest->mName}
+                        );
                     }
                 }
             }
