@@ -57,10 +57,14 @@ void EventDispatcher::init() {
                     case utils::doHash("notice"): { // 通知
                         NoticeType                   type = ENUM_CAST(NoticeType, "notice_type");
                         std::optional<NotifySubType> subType;
+                        std::optional<uint64_t>      group;
                         if (packet.contains("sub_type")) {
                             subType = ENUM_CAST(NotifySubType, "sub_type");
                         }
-                        NoticeEvent ev(type, subType, packet);
+                        if (packet.contains("group_id")) {
+                            group = packet["group_id"];
+                        }
+                        NoticeEvent ev(type, subType, group, packet);
                         return eventBus.publish(ev);
                     }
                     case utils::doHash("request"): { // 请求

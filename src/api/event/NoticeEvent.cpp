@@ -1,6 +1,12 @@
 #include "api/event/NoticeEvent.hpp"
 
-NoticeEvent::NoticeEvent(NoticeType type, std::optional<NotifySubType> subType, nlohmann::json packet)
+NoticeEvent::NoticeEvent(
+    NoticeType                   type,
+    std::optional<NotifySubType> subType,
+    std::optional<uint64_t>      group,
+    nlohmann::json               packet
+)
 : PacketEvent(packet),
   mType(type),
-  mSubType(subType) {}
+  mSubType(subType),
+  mGroup(group) {}
