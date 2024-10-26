@@ -181,3 +181,5 @@ bool CommandRegistry::unregisterCommand(HMODULE hModule, std::string const& cmd)
 void CommandRegistry::executeCommand(std::string const& command) {
     CommandManager::getInstance().handleConsoleInput(command);
 }
+
+CommandRegistry::CommandRegistry() {}

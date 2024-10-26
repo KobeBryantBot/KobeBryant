@@ -158,6 +158,8 @@ MessagePacket::MessagePacket(uint64_t target, std::string type, Message const& m
 
 nlohmann::json MessagePacket::serialize() const { return mSerializedPacket; }
 
+PacketSender::PacketSender() {}
+
 PacketSender& PacketSender::getInstance() {
     static std::unique_ptr<PacketSender> instance;
     if (!instance) {

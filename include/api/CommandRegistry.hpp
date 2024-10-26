@@ -7,6 +7,11 @@
 
 class CommandRegistry {
 public:
+    CommandRegistry();
+
+    CommandRegistry(const CommandRegistry&)            = delete;
+    CommandRegistry& operator=(const CommandRegistry&) = delete;
+
     KobeBryant_NDAPI static CommandRegistry& getInstance();
 
     inline bool registerCommand(std::string const& cmd, std::function<void(std::vector<std::string> const&)> callback) {

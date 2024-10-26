@@ -75,6 +75,11 @@ using namespace std::chrono_literals;
 
 class PacketSender {
 public:
+    PacketSender();
+
+    PacketSender(const PacketSender&)            = delete;
+    PacketSender& operator=(const PacketSender&) = delete;
+
     KobeBryant_NDAPI static PacketSender& getInstance();
 
     KobeBryant_API void sendRawPacket(std::string const& rawPacket);

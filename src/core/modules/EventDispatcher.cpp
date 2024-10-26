@@ -58,13 +58,17 @@ void EventDispatcher::init() {
                         NoticeType                   type = ENUM_CAST(NoticeType, "notice_type");
                         std::optional<NotifySubType> subType;
                         std::optional<uint64_t>      group;
+                        std::optional<uint64_t>      sender;
                         if (packet.contains("sub_type")) {
                             subType = ENUM_CAST(NotifySubType, "sub_type");
                         }
                         if (packet.contains("group_id")) {
                             group = packet["group_id"];
                         }
-                        NoticeEvent ev(type, subType, group, packet);
+                        if (packet.contains("user_id")) {
+                            sender = packet["user_id"];
+                        }
+                        NoticeEvent ev(type, subType, group, sender, packet);
                         return eventBus.publish(ev);
                     }
                     case utils::doHash("request"): { // 请求
