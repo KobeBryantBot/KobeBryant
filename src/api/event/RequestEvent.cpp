@@ -10,7 +10,7 @@ RequestEvent::RequestEvent(
     std::optional<uint64_t>       group,
     nlohmann::json                packet
 )
-: Event(packet),
+: PacketEvent(packet),
   mType(type),
   mSubType(mSubType),
   mSender(sender),

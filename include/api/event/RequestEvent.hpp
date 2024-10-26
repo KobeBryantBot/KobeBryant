@@ -1,9 +1,9 @@
 #pragma once
-#include "Event.hpp"
+#include "PacketEvent.hpp"
 #include "api/Enums.hpp"
 #include <optional>
 
-class RequestEvent : public Event {
+class RequestEvent : public PacketEvent {
 public:
     RequestType                   mType;
     std::optional<RequestSubType> mSubType;

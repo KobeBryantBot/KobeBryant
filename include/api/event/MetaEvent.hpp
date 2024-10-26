@@ -1,8 +1,8 @@
 #pragma once
-#include "Event.hpp"
+#include "PacketEvent.hpp"
 #include "api/Enums.hpp"
 
-class MetaEvent : public Event {
+class MetaEvent : public PacketEvent {
 public:
     MetaEventType mType;
 

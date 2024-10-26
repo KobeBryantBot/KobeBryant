@@ -1,4 +1,6 @@
 #include "api/Logger.hpp"
+#include "api/EventBus.hpp"
+#include "api/event/LoggerOutputEvent.hpp"
 #include "core/Global.hpp"
 #include "core/modules/KobeBryant.hpp"
 #include "fmt/base.h"
@@ -53,9 +55,11 @@ void logToFile(std::filesystem::path const& path, std::string const& logStr) {
 
 void Logger::printStr(LogLevel level, std::string const& data) const {
     if (mLogLevel >= level) {
-        auto timeStr = getCurrentTimeFormatted();
-        auto prefix  = getLoggerPrefix(level);
-        auto logStr  = fmt::format("{} {} {} {}", timeStr, prefix, mTitle, data);
+        auto              timeStr = getCurrentTimeFormatted();
+        auto              prefix  = getLoggerPrefix(level);
+        auto              logStr  = fmt::format("{} {} {} {}", timeStr, prefix, mTitle, data);
+        LoggerOutputEvent ev(data, level, mTitle, timeStr);
+        EventBus::getInstance().publish(ev);
         if (auto globalPath = KobeBryant::getInstance().getLogPath()) {
             logToFile(*globalPath, logStr);
         }

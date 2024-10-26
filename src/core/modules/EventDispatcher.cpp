@@ -25,7 +25,7 @@ void EventDispatcher::init() {
             if (KobeBryant::getInstance().hasConnected()) {
                 auto& eventBus = EventBus::getInstance();
                 auto  packet   = nlohmann::json::parse(rawText);
-                auto  event    = Event(packet);
+                auto  event    = PacketEvent(packet);
                 eventBus.publish(event);
                 // 解析事件
                 if (packet.contains("post_type")) {
