@@ -1,5 +1,6 @@
 #include "KobeBryant.hpp"
 #include "api/utils/ModuleUtils.hpp"
+#include "api/utils/StringUtils.hpp"
 
 namespace fs = std::filesystem;
 
@@ -203,4 +204,15 @@ bool KobeBryant::cancelTask(uint64_t id) {
         return true;
     }
     return false;
+}
+
+std::wstring KobeBryant::getProcessMutex() const {
+    std::string result;
+    if (auto key = utils::readFile("./process.key")) {
+        result = *key;
+    } else {
+        result = utils::UUID::random().toString();
+        utils::writeFile("./process.key", result);
+    }
+    return utils::toWstring(result);
 }

@@ -42,7 +42,7 @@ int main() {
     bot.getLogger().info("bot.main.loadConfig");
     SetConsoleTitle(utils::toWstring(tr("bot.console.title")).c_str());
     // 创建互斥锁
-    HANDLE hMutex = CreateMutex(NULL, FALSE, L"KobeBryantMutex");
+    HANDLE hMutex = CreateMutex(NULL, FALSE, bot.getProcessMutex().c_str());
     // 检查是否已经有一个实例在运行
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
         bot.getLogger().error("bot.error.exist");
