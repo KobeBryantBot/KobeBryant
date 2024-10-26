@@ -6,6 +6,7 @@ NoticeEvent::NoticeEvent(
     std::optional<uint64_t>      group,
     std::optional<uint64_t>      sender,
     std::optional<uint64_t>      self,
+    std::optional<uint64_t>      target,
     nlohmann::json               packet
 )
 : PacketEvent(packet),
@@ -13,4 +14,5 @@ NoticeEvent::NoticeEvent(
   mSubType(subType),
   mGroup(group),
   mSelf(self),
+  mTarget(target),
   mSender(sender) {}

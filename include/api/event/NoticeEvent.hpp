@@ -10,6 +10,8 @@ public:
     std::optional<uint64_t>      mGroup;
     std::optional<uint64_t>      mSender;
     std::optional<uint64_t>      mSelf;
+    std::optional<uint64_t>      mTarget;
+
 
     NoticeEvent(
         NoticeType                   type,
@@ -17,6 +19,7 @@ public:
         std::optional<uint64_t>      group,
         std::optional<uint64_t>      sender,
         std::optional<uint64_t>      self,
+        std::optional<uint64_t>      target,
         nlohmann::json               packet
     );
 };
