@@ -44,17 +44,15 @@ Message& Message::reply(int64_t id) {
 Message& Message::image(std::string const& raw, ImageType type, bool flash, std::optional<std::string> summary) {
     try {
         nlohmann::json json = {
-            {"type", "image"         },
-            {"data", {{"subType", 0}}}
+            {"type", "image"},
+            {"data", {}     }
         };
         if (type == ImageType::Binary) {
             auto info            = "base64://" + utils::encode(raw);
             json["data"]["file"] = info;
         } else if (type == ImageType::Path) {
-            if (auto fileData = utils::readFile(raw, true)) {
-                auto info            = "base64://" + utils::encode(*fileData);
-                json["data"]["file"] = info;
-            }
+            auto info            = "file://" + std::filesystem::absolute(raw).string();
+            json["data"]["file"] = info;
         } else if (type == ImageType::Url) {
             auto info = raw;
             if (info.starts_with("http://")) {
