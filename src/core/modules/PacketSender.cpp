@@ -48,11 +48,11 @@ Message& Message::image(std::string const& raw, ImageType type, bool flash, std:
             {"data", {{"subType", 0}}}
         };
         if (type == ImageType::Binary) {
-            auto info    = "base64://" + utils::encode(raw);
-            json["file"] = info;
+            auto info            = "base64://" + utils::encode(raw);
+            json["data"]["file"] = info;
         } else if (type == ImageType::Path) {
-            auto info    = "file://" + std::filesystem::absolute(raw).string();
-            json["file"] = info;
+            auto info            = "file://" + std::filesystem::absolute(raw).string();
+            json["data"]["file"] = info;
         }
         if (flash) {
             json["type"] = "flash";
