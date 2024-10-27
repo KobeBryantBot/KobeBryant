@@ -2,6 +2,7 @@
 #include "Enums.hpp"
 #include "Macros.hpp"
 #include "api/utils/UUID.hpp"
+#include "fmt/format.h"
 #include "nlohmann/json.hpp"
 #include <chrono>
 
@@ -26,6 +27,11 @@ public:
     KobeBryant_API Message& reply(int64_t msgId);
 
     KobeBryant_API Message& text(std::string const& text);
+
+    template <typename... Args>
+    inline Message& text(fmt::format_string<Args...> fmt, Args&&... args) {
+        return text(fmt::vformat(fmt.get(), fmt::make_format_args(args...)));
+    }
 
     KobeBryant_API Message& face(int id);
 
