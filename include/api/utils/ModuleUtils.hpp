@@ -1,4 +1,5 @@
 #pragma once
+#include "Macros.hpp"
 #include <Windows.h>
 #include <iostream>
 #include <optional>
@@ -18,16 +19,11 @@ namespace utils {
     return hModule;
 }
 
-[[nodiscard]] inline std::optional<std::string> readResource(HMODULE hModule, int id, bool isBinary = false) {
-    if (HRSRC hRes = FindResource(hModule, MAKEINTRESOURCE(id), isBinary ? L"BINFILE" : L"TEXTFILE")) {
-        if (HGLOBAL resource = LoadResource(hModule, hRes)) {
-            void*       data = LockResource(resource);
-            DWORD       size = SizeofResource(hModule, hRes);
-            std::string outData(static_cast<const char*>(data), size);
-            return std::move(outData);
-        }
-    }
-    return {};
+KobeBryant_NDAPI std::optional<std::string> readResource(HMODULE hModule, int id, bool isBinary = false);
+
+[[nodiscard]] inline std::optional<std::string> readCurrentResource(int id, bool isBinary = false) {
+    auto hModule = getModuleHandle();
+    return readResource(hModule, id, isBinary);
 }
 
 } // namespace utils
