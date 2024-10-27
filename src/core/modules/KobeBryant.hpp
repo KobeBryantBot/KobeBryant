@@ -59,4 +59,6 @@ public:
     uint64_t addRepeatTask(uint64_t seconds, std::function<void()> const& task);
 
     bool cancelTask(uint64_t id);
+
+    void printVersion();
 };

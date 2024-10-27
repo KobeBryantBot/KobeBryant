@@ -52,6 +52,7 @@ int main() {
         return 1;
     }
     printLogo();
+    bot.printVersion();
     bot.getLogger().info("bot.main.connecting");
     bot.connect();
     // 初始化事件系统
