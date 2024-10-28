@@ -15,7 +15,7 @@
 extern std::atomic<bool> EXIST_FLAG;
 
 #define KOBE_VERSION_MAJOR 0
-#define KOBE_VERSION_MINOR 2
-#define KOBE_VERSION_PATCH 4
+#define KOBE_VERSION_MINOR 3
+#define KOBE_VERSION_PATCH 0
 
 extern std::string tr(std::string const& key, std::vector<std::string> const& params = {});
