@@ -34,7 +34,7 @@ public:
     template <std::derived_from<Event> T>
     inline Listener subscribe(std::function<void(T const&)> callback) {
         auto type     = std::type_index(typeid(T));
-        auto hModule  = utils::getModuleHandle();
+        auto hModule  = utils::getCurrentModuleHandle();
         auto listener = Listener(type, hModule);
         addListener(listener, [=](const Event& event) {
             try {

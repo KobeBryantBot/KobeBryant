@@ -6,11 +6,11 @@
 
 namespace utils {
 
-[[nodiscard]] inline HMODULE getModuleHandle() {
+[[nodiscard]] inline HMODULE getCurrentModuleHandle() {
     HMODULE hModule = NULL;
     if (GetModuleHandleEx(
             GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-            (LPCTSTR)getModuleHandle,
+            (LPCTSTR)getCurrentModuleHandle,
             &hModule
         )
         == FALSE) {
@@ -22,7 +22,7 @@ namespace utils {
 KobeBryant_NDAPI std::optional<std::string> readResource(HMODULE hModule, int id, bool isBinary = false);
 
 [[nodiscard]] inline std::optional<std::string> readCurrentResource(int id, bool isBinary = false) {
-    auto hModule = getModuleHandle();
+    auto hModule = getCurrentModuleHandle();
     return readResource(hModule, id, isBinary);
 }
 

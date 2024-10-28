@@ -15,7 +15,7 @@ public:
     KobeBryant_NDAPI static CommandRegistry& getInstance();
 
     inline bool registerCommand(std::string const& cmd, std::function<void(std::vector<std::string> const&)> callback) {
-        return registerCommand(utils::getModuleHandle(), cmd, callback);
+        return registerCommand(utils::getCurrentModuleHandle(), cmd, callback);
     }
 
     KobeBryant_NDAPI bool registerCommand(
@@ -24,7 +24,9 @@ public:
         std::function<void(std::vector<std::string> const&)> callback
     );
 
-    inline bool unregisterCommand(std::string const& cmd) { return unregisterCommand(utils::getModuleHandle(), cmd); }
+    inline bool unregisterCommand(std::string const& cmd) {
+        return unregisterCommand(utils::getCurrentModuleHandle(), cmd);
+    }
 
     KobeBryant_NDAPI bool unregisterCommand(HMODULE hModule, std::string const& cmd);
 
