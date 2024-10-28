@@ -22,6 +22,7 @@ class EventBus {
 protected:
     KobeBryant_API void addListener(Listener const&, std::function<void(Event const&)>);
     KobeBryant_API void forEachListener(std::function<void(Listener const&, std::function<void(Event const&)> const&)>);
+    KobeBryant_API void printException(std::string const& ex);
 
 public:
     EventBus();
@@ -38,9 +39,13 @@ public:
         auto listener = Listener(type, hModule);
         addListener(listener, [=](const Event& event) {
             try {
-                T const& ev = dynamic_cast<T const&>(event);
-                callback(ev);
-            } catch (...) {}
+                if (callback) {
+                    T const& ev = dynamic_cast<T const&>(event);
+                    callback(ev);
+                }
+            } catch (const std::exception& e) {
+                printException(e.what());
+            }
         });
         return listener;
     }
