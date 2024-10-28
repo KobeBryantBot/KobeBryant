@@ -91,11 +91,12 @@ bool PluginManager::loadPlugin(std::filesystem::path const& path, int& count) {
                                 }
                             }
                             if (!hasPlugin(name)) {
-                                HMODULE hMoudle       = LoadLibrary(entry->c_str());
-                                mPluginsMap1[name]    = hMoudle;
-                                mPluginsMap2[hMoudle] = name;
-                                logger.info("bot.plugin.loaded", {name});
-                                return true;
+                                if (HMODULE hMoudle = LoadLibrary(entry->c_str())) {
+                                    mPluginsMap1[name]    = hMoudle;
+                                    mPluginsMap2[hMoudle] = name;
+                                    logger.info("bot.plugin.loaded", {name});
+                                    return true;
+                                }
                             }
                         }
                     } else {
