@@ -2,9 +2,11 @@
 #include "core/Global.hpp"
 
 struct PluginManifest {
-    std::string mName;
-    std::string mEntry;
-    bool        mPassive = false;
+    std::string              mName;
+    std::string              mEntry;
+    bool                     mPassive            = false;
+    std::vector<std::string> mDependence         = {};
+    std::vector<std::string> mOptionalDependence = {};
 
     static std::optional<PluginManifest> readFrom(std::filesystem::path const& path);
 };
@@ -23,7 +25,7 @@ public:
 
     bool loadPlugin(std::string const& folderName);
 
-    bool loadPlugin(std::filesystem::path const& path);
+    bool loadPlugin(std::filesystem::path const& path, int& count);
 
     bool unloadPlugin(std::string const& name);
 

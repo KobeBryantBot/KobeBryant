@@ -13,6 +13,7 @@ bot.main.connected=已成功登陆到QQ: %s。牢大已经登机，开始处理�
 bot.plugins.loadingAll=正在加载插件...
 bot.plugins.loadedAll=插件加载结束，已成功加载 %s 个插件。
 bot.plugin.loaded=已加载插件 %s
+bot.plugin.dependenceMiss=无法加载前置插件 %1$s，插件 %2$s 将不会加载！
 bot.plugins.unloadingAll=正在卸载所有插件...
 bot.plugin.unloaded=已卸载插件 %s
 bot.plugins.unloadedAll=所有插件已全部卸载。
