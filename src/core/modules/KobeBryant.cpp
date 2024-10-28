@@ -16,7 +16,8 @@ nlohmann::ordered_json loadConfig() {
     if (auto oldConfig = utils::readFile("./config/config.json")) {
         try {
             config.merge_patch(nlohmann::ordered_json::parse(*oldConfig, nullptr, true, true));
-        } catch (...) {}
+        }
+        CATCH
     }
     utils::writeFile("./config/config.json", config.dump(4));
     return config;
@@ -106,7 +107,8 @@ KobeBryant::KobeBryant() {
                 }
             }
         }).detach();
-    } catch (...) {}
+    }
+    CATCH
 }
 
 void KobeBryant::subscribeLogin(std::function<void(bool, nlohmann::json)> const& callback) {
@@ -122,7 +124,8 @@ void KobeBryant::subscribeLogin(std::function<void(bool, nlohmann::json)> const&
                     callback(true, json);
                 }
             }
-        } catch (...) {}
+        }
+        CATCH
     });
 }
 

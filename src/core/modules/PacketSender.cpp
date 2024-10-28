@@ -67,7 +67,8 @@ Message& Message::image(std::string const& raw, ImageType type, bool flash, std:
             json["data"]["summary"] = *summary;
         }
         mSerializedMessage.push_back(json);
-    } catch (...) {}
+    }
+    CATCH
     return *this;
 }
 
@@ -455,7 +456,8 @@ void PacketSender::getFriendsList(
                     }
                     callback(list);
                 }
-            } catch (...) {}
+            }
+            CATCH
         },
         timeoutCallback,
         seconds
@@ -545,7 +547,8 @@ void PacketSender::getGroupMembersList(
                     }
                     callback(list);
                 }
-            } catch (...) {}
+            }
+            CATCH
         },
         timeoutCallback,
         seconds
@@ -592,7 +595,8 @@ void PacketSender::getGroupsList(
                     }
                     callback(list);
                 }
-            } catch (...) {}
+            }
+            CATCH
         },
         timeoutCallback,
         seconds

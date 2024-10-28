@@ -62,3 +62,8 @@ public:
 
     void printVersion();
 };
+
+#define CATCH                                                                                                          \
+    catch (const std::exception& e) {                                                                                  \
+        KobeBryant::getInstance().getLogger().error("bot.catch.exception", {e.what()});                                \
+    }

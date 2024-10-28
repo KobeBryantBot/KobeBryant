@@ -85,7 +85,8 @@ bool PluginManager::loadPlugin(std::filesystem::path const& path) {
                 }
             }
         }
-    } catch (...) {}
+    }
+    CATCH
     return false;
 }
 
@@ -128,7 +129,8 @@ bool PluginManager::unloadPlugin(HMODULE hModule) {
             mPluginsMap2.erase(hModule);
             return true;
         }
-    } catch (...) {}
+    }
+    CATCH
     return false;
 }
 

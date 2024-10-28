@@ -110,7 +110,8 @@ void EventDispatcher::init() {
                                 std::string error_message = packet["message"];
                                 KobeBryant::getInstance().getLogger().error("bot.main.retError", {error_message});
                             }
-                        } catch (...) {}
+                        }
+                        CATCH
                     }
                     if (packet.contains("echo")) {
                         try {
@@ -122,7 +123,8 @@ void EventDispatcher::init() {
                                 }
                                 mCallbacks.erase(uuid);
                             }
-                        } catch (...) {}
+                        }
+                        CATCH
                     }
                 }
             }
