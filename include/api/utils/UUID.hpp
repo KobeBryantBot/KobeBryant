@@ -6,11 +6,11 @@ namespace utils {
 
 class UUID {
 public:
-    uint64_t mFirst;
-    uint64_t mSecond;
+    uint64_t mHigh;
+    uint64_t mLow;
 
     KobeBryant_NDAPI UUID();
-    KobeBryant_NDAPI UUID(uint64_t first, uint64_t second);
+    KobeBryant_NDAPI UUID(uint64_t high, uint64_t low);
 
     KobeBryant_NDAPI static UUID random();
 
@@ -24,7 +24,7 @@ public:
 
     KobeBryant_NDAPI bool isValid() const;
 
-    KobeBryant_NDAPI bool operator==(const UUID& rhs) const;
+    KobeBryant_NDAPI bool operator==(const UUID&) const;
 
     static const UUID INVALID;
 };
@@ -34,9 +34,6 @@ public:
 namespace std {
 template <>
 struct hash<utils::UUID> {
-    using argument_type = utils::UUID;
-    using result_type   = std::size_t;
-
-    KobeBryant_NDAPI result_type operator()(const argument_type& obj) const;
+    KobeBryant_NDAPI std::size_t operator()(const utils::UUID&) const;
 };
 } // namespace std

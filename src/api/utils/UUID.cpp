@@ -18,24 +18,24 @@ std::string ulltohex(uint64_t num) {
     return hex;
 }
 
-UUID::UUID() : mFirst(0), mSecond(0) {}
+UUID::UUID() : mHigh(0), mLow(0) {}
 
-UUID::UUID(uint64_t a, uint64_t b) : mFirst(a), mSecond(b) {}
+UUID::UUID(uint64_t a, uint64_t b) : mHigh(a), mLow(b) {}
 
 UUID UUID::random() {
     UUID                                    uuid;
     std::random_device                      rd;
     std::mt19937_64                         eng(rd());
     std::uniform_int_distribution<uint64_t> distr;
-    uuid.mFirst  = distr(eng);
-    uuid.mSecond = distr(eng);
+    uuid.mHigh = distr(eng);
+    uuid.mLow  = distr(eng);
     return uuid;
 }
 
 std::string UUID::toString() const {
     std::string uuid      = "";
-    std::string part1_hex = ulltohex(mFirst);
-    std::string part2_hex = ulltohex(mSecond);
+    std::string part1_hex = ulltohex(mHigh);
+    std::string part2_hex = ulltohex(mLow);
     // UUID format: 8-4-4-4-12
     uuid += part1_hex.substr(0, 8); // first 8 characters
     uuid += "-";
@@ -60,18 +60,18 @@ UUID UUID::fromString(std::string const& str) {
         std::string part3 = str.substr(14, 4);
         std::string part4 = str.substr(19, 4);
         std::string part5 = str.substr(24);
-        result.mFirst     = std::stoull(part1, nullptr, 16) << 32 | std::stoull(part2 + part3, nullptr, 16);
-        result.mSecond    = std::stoull(part4 + part5, nullptr, 16);
+        result.mHigh      = std::stoull(part1, nullptr, 16) << 32 | std::stoull(part2 + part3, nullptr, 16);
+        result.mLow       = std::stoull(part4 + part5, nullptr, 16);
     }
     CATCH
     return result;
 }
 
 bool UUID::isValid() const {
-    return mFirst != std::numeric_limits<uint64_t>::max() || mSecond != std::numeric_limits<uint64_t>::max();
+    return mHigh != std::numeric_limits<uint64_t>::max() || mLow != std::numeric_limits<uint64_t>::max();
 }
 
-bool UUID::operator==(const UUID& rhs) const { return (mFirst == rhs.mFirst) && (mSecond == rhs.mSecond); }
+bool UUID::operator==(const UUID& rhs) const { return (mHigh == rhs.mHigh) && (mLow == rhs.mLow); }
 
 UUID UUID::fromBinary(std::string const& str) {
     auto first  = *reinterpret_cast<const uint64_t*>(str.data());
@@ -81,8 +81,8 @@ UUID UUID::fromBinary(std::string const& str) {
 
 std::string UUID::toBinary() const {
     std::string result(16, '\0');
-    memcpy(result.data(), &mFirst, 8);
-    memcpy(result.data() + 8, &mSecond, 8);
+    memcpy(result.data(), &mHigh, 8);
+    memcpy(result.data() + 8, &mLow, 8);
     return result;
 }
 
@@ -91,8 +91,8 @@ const UUID UUID::INVALID = UUID{std::numeric_limits<uint64_t>::max(), std::numer
 } // namespace utils
 
 size_t std::hash<utils::UUID>::operator()(const utils::UUID& obj) const {
-    std::size_t hash1  = std::hash<uint64_t>{}(obj.mFirst);
-    std::size_t hash2  = std::hash<uint64_t>{}(obj.mSecond);
+    std::size_t hash1  = std::hash<uint64_t>{}(obj.mHigh);
+    std::size_t hash2  = std::hash<uint64_t>{}(obj.mLow);
     hash1             ^= hash2 + 0x9e3779b9 + (hash1 << 6) + (hash1 >> 2);
     hash2             ^= hash1 + 0x9e3779b9 + (hash2 << 6) + (hash2 >> 2);
     return hash1 ^ hash2;
