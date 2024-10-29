@@ -53,32 +53,13 @@ UUID UUID::fromString(std::string const& str) {
     if (str.length() != 36 || str[8] != '-' || str[13] != '-' || str[18] != '-' || str[23] != '-') {
         return UUID::INVALID;
     }
-    std::istringstream ss(str.substr(0, 8), std::istringstream::hex);
-    unsigned int       highPart;
-    ss >> highPart;
-    result.mFirst = static_cast<uint64_t>(highPart) << 32;
-
-    ss.clear();
-    ss.str(std::string(str, 9, 4));
-    unsigned int lowPart;
-    ss >> lowPart;
-    result.mFirst |= lowPart;
-
-    ss.clear();
-    ss.str(std::string(str, 14, 4));
-    ss >> highPart;
-    result.mSecond = static_cast<uint64_t>(highPart) << 48;
-
-    ss.clear();
-    ss.str(std::string(str, 19, 4));
-    ss >> lowPart;
-    result.mSecond |= static_cast<uint64_t>(lowPart) << 16;
-
-    ss.clear();
-    ss.str(std::string(str, 24, 12));
-    ss >> lowPart;
-    result.mSecond |= lowPart;
-
+    std::string part1 = str.substr(0, 8);
+    std::string part2 = str.substr(9, 4);
+    std::string part3 = str.substr(14, 4);
+    std::string part4 = str.substr(19, 4);
+    std::string part5 = str.substr(24);
+    result.mFirst     = std::stoull(part1, nullptr, 16) << 32 | std::stoull(part2 + part3, nullptr, 16);
+    result.mSecond    = std::stoull(part4 + part5, nullptr, 16);
     return result;
 }
 
