@@ -23,9 +23,9 @@ public:
 
     void unloadAllPlugins();
 
-    bool loadPlugin(std::string const& folderName);
+    bool loadPlugin(std::string const& folderName, bool forceLoad = false);
 
-    bool loadPlugin(std::filesystem::path const& path, int& count);
+    bool loadPlugin(std::filesystem::path const& path, int& count, bool forceLoad = false);
 
     bool unloadPlugin(std::string const& name);
 

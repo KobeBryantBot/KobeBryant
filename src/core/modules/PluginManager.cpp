@@ -39,10 +39,9 @@ std::optional<PluginManifest> PluginManifest::readFrom(std::filesystem::path con
                 return result;
             }
         }
-        return {};
-    } catch (const std::exception& e) {
-        return {};
     }
+    CATCH
+    return {};
 }
 
 PluginManager& PluginManager::getInstance() {
@@ -77,43 +76,47 @@ std::string getErrorReason(unsigned long errorCode) {
     return {};
 }
 
-bool PluginManager::loadPlugin(std::filesystem::path const& path, int& count) {
+bool PluginManager::loadPlugin(std::filesystem::path const& path, int& count, bool forceLoad) {
     try {
         auto& logger = KobeBryant::getInstance().getLogger();
         if (fs::exists(path / "manifest.json")) {
             if (auto manifest = PluginManifest::readFrom(path / "manifest.json")) {
-                if (!manifest->mPassive) {
+                if (!manifest->mPassive || forceLoad) {
                     auto name = manifest->mName;
-                    if (path.filename().string() == name) {
-                        if (auto entry = getDllPath(path.string() + "/" + manifest->mEntry)) {
-                            for (auto& depe : manifest->mDependence) {
-                                if (loadPlugin(depe)) {
-                                    count++;
-                                } else {
-                                    logger.error("bot.plugin.dependenceMiss", {depe, name});
-                                    return false;
+                    if (fs::exists(path / manifest->mEntry)) {
+                        if (path.filename().string() == name) {
+                            if (auto entry = getDllPath(path.string() + "/" + manifest->mEntry)) {
+                                for (auto& depe : manifest->mDependence) {
+                                    if (loadPlugin(depe, true)) {
+                                        count++;
+                                    } else {
+                                        logger.error("bot.plugin.dependenceMiss", {depe, name});
+                                        return false;
+                                    }
+                                }
+                                for (auto& opde : manifest->mOptionalDependence) {
+                                    if (loadPlugin(opde, true)) {
+                                        count++;
+                                    }
+                                }
+                                if (!hasPlugin(name)) {
+                                    if (HMODULE hMoudle = LoadLibrary(entry->c_str())) {
+                                        mPluginsMap1[name]    = hMoudle;
+                                        mPluginsMap2[hMoudle] = name;
+                                        logger.info("bot.plugin.loaded", {name});
+                                        return true;
+                                    } else {
+                                        DWORD errorCode = GetLastError();
+                                        auto  reason    = getErrorReason(errorCode);
+                                        logger.error("bot.plugin.load.fail", {name, S(errorCode), reason});
+                                    }
                                 }
                             }
-                            for (auto& opde : manifest->mOptionalDependence) {
-                                if (loadPlugin(opde)) {
-                                    count++;
-                                }
-                            }
-                            if (!hasPlugin(name)) {
-                                if (HMODULE hMoudle = LoadLibrary(entry->c_str())) {
-                                    mPluginsMap1[name]    = hMoudle;
-                                    mPluginsMap2[hMoudle] = name;
-                                    logger.info("bot.plugin.loaded", {name});
-                                    return true;
-                                } else {
-                                    DWORD errorCode = GetLastError();
-                                    auto  reason    = getErrorReason(errorCode);
-                                    logger.error("bot.plugin.load.fail", {name, S(errorCode), reason});
-                                }
-                            }
+                        } else {
+                            logger.error("bot.plugin.nameMismatch", {name, path.filename().string(), name});
                         }
                     } else {
-                        logger.error("bot.plugin.nameMismatch", {name, path.filename().string(), name});
+                        logger.error("bot.plugin.noEntry", {name, manifest->mEntry});
                     }
                 }
             }
@@ -123,11 +126,11 @@ bool PluginManager::loadPlugin(std::filesystem::path const& path, int& count) {
     return false;
 }
 
-bool PluginManager::loadPlugin(std::string const& folderName) {
+bool PluginManager::loadPlugin(std::string const& folderName, bool forceLoad) {
     auto path  = std::filesystem::path("./plugins");
     path      /= folderName;
     int count  = 0;
-    return loadPlugin(path, count);
+    return loadPlugin(path, count, forceLoad);
 }
 
 void PluginManager::unloadAllPlugins() {
