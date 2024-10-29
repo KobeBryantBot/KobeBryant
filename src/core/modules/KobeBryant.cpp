@@ -212,13 +212,14 @@ bool KobeBryant::cancelTask(uint64_t id) {
 }
 
 std::wstring KobeBryant::getProcessMutex() const {
-    std::string result;
     if (auto key = utils::readFile("./process.key")) {
-        result = *key;
-    } else {
-        result = utils::UUID::random().toString();
-        utils::writeFile("./process.key", result);
+        if (key->size() == 36) {
+            auto result = *key;
+            return utils::toWstring(result);
+        }
     }
+    auto result = utils::UUID::random().toString();
+    utils::writeFile("./process.key", result);
     return utils::toWstring(result);
 }
 
