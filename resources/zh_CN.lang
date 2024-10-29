@@ -36,3 +36,6 @@ bot.plugin.nameMismatch=无法加载插件 %1$s！文件夹名称 %2$s 和插件
 bot.console.title=科比 · 布莱恩特
 bot.main.start=牢大已启动，当前版本
 bot.catch.exception=捕获到异常错误：%s
+bot.plugin.load.fail=无法加载插件 %1$s，错误码[%2$s] %3$s
+bot.errorCode.126=找不到指定的模块！
+bot.errorCode.127=找不到指定的程序！

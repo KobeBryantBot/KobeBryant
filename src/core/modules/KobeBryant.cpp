@@ -234,5 +234,5 @@ void KobeBryant::printVersion() {
             )
         )
     );
-    getLogger().info("Copyright (C) 2024 KobeBryantBot. All rights reserved.");
+    getLogger().info("Copyright © 2024 KobeBryantBot. All rights reserved.");
 }

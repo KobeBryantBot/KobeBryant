@@ -68,6 +68,15 @@ void PluginManager::loadAllPlugins() {
     KobeBryant::getInstance().getLogger().info("bot.plugins.loadedAll", {S(count)});
 }
 
+std::string getErrorReason(unsigned long errorCode) {
+    if (errorCode == 126) {
+        return tr("bot.errorCode.126");
+    } else if (errorCode == 127) {
+        return tr("bot.errorCode.127");
+    }
+    return {};
+}
+
 bool PluginManager::loadPlugin(std::filesystem::path const& path, int& count) {
     try {
         auto& logger = KobeBryant::getInstance().getLogger();
@@ -96,6 +105,10 @@ bool PluginManager::loadPlugin(std::filesystem::path const& path, int& count) {
                                     mPluginsMap2[hMoudle] = name;
                                     logger.info("bot.plugin.loaded", {name});
                                     return true;
+                                } else {
+                                    DWORD errorCode = GetLastError();
+                                    auto  reason    = getErrorReason(errorCode);
+                                    logger.error("bot.plugin.load.fail", {name, S(errorCode), reason});
                                 }
                             }
                         }
