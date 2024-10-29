@@ -1,4 +1,5 @@
 #include "api/utils/UUID.hpp"
+#include "core/modules/KobeBryant.hpp"
 #include <iomanip>
 #include <iostream>
 #include <random>
@@ -50,16 +51,19 @@ std::string UUID::toString() const {
 
 UUID UUID::fromString(std::string const& str) {
     auto result = UUID();
-    if (str.length() != 36 || str[8] != '-' || str[13] != '-' || str[18] != '-' || str[23] != '-') {
-        return UUID::INVALID;
+    try {
+        if (str.length() != 36 || str[8] != '-' || str[13] != '-' || str[18] != '-' || str[23] != '-') {
+            return UUID::INVALID;
+        }
+        std::string part1 = str.substr(0, 8);
+        std::string part2 = str.substr(9, 4);
+        std::string part3 = str.substr(14, 4);
+        std::string part4 = str.substr(19, 4);
+        std::string part5 = str.substr(24);
+        result.mFirst     = std::stoull(part1, nullptr, 16) << 32 | std::stoull(part2 + part3, nullptr, 16);
+        result.mSecond    = std::stoull(part4 + part5, nullptr, 16);
     }
-    std::string part1 = str.substr(0, 8);
-    std::string part2 = str.substr(9, 4);
-    std::string part3 = str.substr(14, 4);
-    std::string part4 = str.substr(19, 4);
-    std::string part5 = str.substr(24);
-    result.mFirst     = std::stoull(part1, nullptr, 16) << 32 | std::stoull(part2 + part3, nullptr, 16);
-    result.mSecond    = std::stoull(part4 + part5, nullptr, 16);
+    CATCH
     return result;
 }
 
