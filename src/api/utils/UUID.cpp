@@ -82,11 +82,24 @@ UUID UUID::fromString(std::string const& str) {
     return result;
 }
 
-bool UUID::isInvalid() const {
-    return mFirst == std::numeric_limits<uint64_t>::max() && mSecond == std::numeric_limits<uint64_t>::max();
+bool UUID::isValid() const {
+    return mFirst != std::numeric_limits<uint64_t>::max() || mSecond != std::numeric_limits<uint64_t>::max();
 }
 
 bool UUID::operator==(const UUID& rhs) const { return (mFirst == rhs.mFirst) && (mSecond == rhs.mSecond); }
+
+UUID UUID::fromBinary(std::string const& str) {
+    auto first  = *reinterpret_cast<const uint64_t*>(str.data());
+    auto second = *reinterpret_cast<const uint64_t*>(str.data() + 8);
+    return UUID(first, second);
+}
+
+std::string UUID::toBinary() const {
+    std::string result(16, '\0');
+    memcpy(result.data(), &mFirst, 8);
+    memcpy(result.data() + 8, &mSecond, 8);
+    return result;
+}
 
 const UUID UUID::INVALID = UUID{std::numeric_limits<uint64_t>::max(), std::numeric_limits<uint64_t>::max()};
 
