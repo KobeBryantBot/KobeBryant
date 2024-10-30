@@ -1,6 +1,7 @@
 #include "core/modules/PluginManager.hpp"
 #include "CommandManager.hpp"
 #include "KobeBryant.hpp"
+#include "ScheduleManager.hpp"
 #include "core/Global.hpp"
 #include "core/modules/EventBusImpl.hpp"
 
@@ -141,6 +142,7 @@ void PluginManager::unloadAllPlugins() {
     }
     EventBusImpl::getInstance().removeAllListeners();
     CommandManager::getInstance().unregisterAllCommands();
+    ScheduleManager::getInstance().removeAllTasks();
     mPluginsMap1.clear();
     mPluginsMap2.clear();
     logger.info("bot.plugins.unloadedAll");
@@ -160,6 +162,7 @@ bool PluginManager::unloadPlugin(HMODULE hModule) {
             auto name = mPluginsMap2[hModule];
             EventBusImpl::getInstance().removePluginListeners(hModule);
             CommandManager::getInstance().unregisterPluginCommands(hModule);
+            ScheduleManager::getInstance().removePluginTasks(hModule);
             FreeLibrary(hModule);
             KobeBryant::getInstance().getLogger().info("bot.plugin.unloaded", {name});
             mPluginsMap1.erase(name);

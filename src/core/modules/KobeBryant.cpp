@@ -117,7 +117,9 @@ KobeBryant::KobeBryant() {
                 // Notify the main thread to execute the collected tasks
                 lock.unlock();
                 for (auto& task : readyTasks) {
-                    task(); // Execute the task in the main thread
+                    if (task) {
+                        task(); // Execute the task in the main thread
+                    }
                 }
             }
             mCv.notify_all();
