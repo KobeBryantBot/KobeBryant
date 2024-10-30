@@ -2,6 +2,7 @@
 #include "CommandManager.hpp"
 #include "KobeBryant.hpp"
 #include "ScheduleManager.hpp"
+#include "ServiceManager.hpp"
 #include "core/Global.hpp"
 #include "core/modules/EventBusImpl.hpp"
 
@@ -143,6 +144,7 @@ void PluginManager::unloadAllPlugins() {
     EventBusImpl::getInstance().removeAllListeners();
     CommandManager::getInstance().unregisterAllCommands();
     ScheduleManager::getInstance().removeAllTasks();
+    ServiceManager::getInstance().removeAllFunc();
     mPluginsMap1.clear();
     mPluginsMap2.clear();
     logger.info("bot.plugins.unloadedAll");
@@ -163,6 +165,7 @@ bool PluginManager::unloadPlugin(HMODULE hModule) {
             EventBusImpl::getInstance().removePluginListeners(hModule);
             CommandManager::getInstance().unregisterPluginCommands(hModule);
             ScheduleManager::getInstance().removePluginTasks(hModule);
+            ServiceManager::getInstance().removePluginFunc(hModule);
             FreeLibrary(hModule);
             KobeBryant::getInstance().getLogger().info("bot.plugin.unloaded", {name});
             mPluginsMap1.erase(name);
@@ -183,3 +186,5 @@ std::vector<std::string> PluginManager::getAllPlugins() {
 }
 
 bool PluginManager::hasPlugin(std::string const& name) { return mPluginsMap1.contains(name); }
+
+std::string PluginManager::getPluginName(HMODULE hModule) { return mPluginsMap2[hModule]; }

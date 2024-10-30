@@ -34,4 +34,6 @@ public:
     std::vector<std::string> getAllPlugins();
 
     bool hasPlugin(std::string const& name);
+
+    std::string getPluginName(HMODULE hModule);
 };
