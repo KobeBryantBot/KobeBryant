@@ -187,4 +187,4 @@ std::vector<std::string> PluginManager::getAllPlugins() {
 
 bool PluginManager::hasPlugin(std::string const& name) { return mPluginsMap1.contains(name); }
 
-std::string PluginManager::getPluginName(HMODULE hModule) { return mPluginsMap2[hModule]; }
+HMODULE PluginManager::getPluginHandle(std::string const& name) { return mPluginsMap1[name]; }

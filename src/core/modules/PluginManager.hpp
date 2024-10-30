@@ -35,5 +35,5 @@ public:
 
     bool hasPlugin(std::string const& name);
 
-    std::string getPluginName(HMODULE hModule);
+    HMODULE getPluginHandle(std::string const& name);
 };

@@ -9,32 +9,33 @@ ServiceManager& ServiceManager::getInstance() {
 }
 
 bool ServiceManager::exportFuncPtr(std::string const& funcName, HMODULE hModule, FARPROC func) {
-    auto pluginName = PluginManager::getInstance().getPluginName(hModule);
-    auto keyName    = pluginName + "::" + funcName;
-    if (!mExportedFunctions.contains(keyName)) {
-        mExportedFunctions[keyName] = func;
-        mPluginFunctions[hModule].insert(keyName);
+    auto key = ServiceFuncKey(hModule, funcName);
+    if (!mExportedFunctions.contains(key)) {
+        mExportedFunctions[key] = func;
+        mPluginFunctions[hModule].insert(key);
         return true;
     }
     return false;
 }
 
 FARPROC ServiceManager::importFuncPtr(std::string const& pluginName, std::string const& funcName) {
-    auto keyName = pluginName + "::" + funcName;
-    if (mExportedFunctions.contains(keyName)) {
-        return mExportedFunctions[keyName];
+    auto handle = PluginManager::getInstance().getPluginHandle(pluginName);
+    auto key    = ServiceFuncKey(handle, funcName);
+    if (mExportedFunctions.contains(key)) {
+        return mExportedFunctions[key];
     }
     return nullptr;
 }
 
 bool ServiceManager::hasFunc(std::string const& pluginName, std::string const& funcName) {
-    auto keyName = pluginName + "::" + funcName;
-    return mExportedFunctions.contains(keyName);
+    auto handle = PluginManager::getInstance().getPluginHandle(pluginName);
+    auto key    = ServiceFuncKey(handle, funcName);
+    return mExportedFunctions.contains(key);
 }
 
 void ServiceManager::removePluginFunc(HMODULE hModule) {
-    for (auto& name : mPluginFunctions[hModule]) {
-        mExportedFunctions.erase(name);
+    for (auto& key : mPluginFunctions[hModule]) {
+        mExportedFunctions.erase(key);
     }
     mPluginFunctions.erase(hModule);
 }
