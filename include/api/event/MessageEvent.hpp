@@ -1,9 +1,9 @@
 #pragma once
-#include "Event.hpp"
+#include "PacketEvent.hpp"
 #include "api/Enums.hpp"
 #include <optional>
 
-class MessageEvent : public Event {
+class MessageEvent : public PacketEvent {
 public:
     MessageType             mType;
     MessageSubType          mSubType;

@@ -2,6 +2,7 @@
 #include "LightWebSocketClient/WebSocketClient.h"
 #include "api/i18n/LangI18n.hpp"
 #include "api/utils/FileUtils.hpp"
+#include "api/utils/UUID.hpp"
 #include "core/Global.hpp"
 #include "resource.hpp"
 #include <mutex>
@@ -22,6 +23,7 @@ class KobeBryant {
     std::unordered_map<uint64_t, int64_t>                       mTaskDelay;
     std::unordered_map<uint64_t, int64_t>                       mTaskRepeat;
     std::mutex                                                  mMutex;
+    utils::UUID                                                 mProcessId;
 
 public:
     KobeBryant();
@@ -33,6 +35,8 @@ public:
     std::optional<std::filesystem::path> getLogPath() const;
 
     static KobeBryant& getInstance();
+
+    std::wstring getProcessMutex() const;
 
     Logger& getLogger();
 
@@ -55,4 +59,11 @@ public:
     uint64_t addRepeatTask(uint64_t seconds, std::function<void()> const& task);
 
     bool cancelTask(uint64_t id);
+
+    void printVersion();
 };
+
+#define CATCH                                                                                                          \
+    catch (const std::exception& e) {                                                                                  \
+        KobeBryant::getInstance().getLogger().error("bot.catch.exception", {e.what()});                                \
+    }

@@ -1,4 +1,6 @@
 #include "api/Logger.hpp"
+#include "api/EventBus.hpp"
+#include "api/event/LoggerOutputEvent.hpp"
 #include "core/Global.hpp"
 #include "core/modules/KobeBryant.hpp"
 #include "fmt/base.h"
@@ -52,38 +54,43 @@ void logToFile(std::filesystem::path const& path, std::string const& logStr) {
 }
 
 void Logger::printStr(LogLevel level, std::string const& data) const {
-    if (mLogLevel >= level) {
-        auto timeStr = getCurrentTimeFormatted();
-        auto prefix  = getLoggerPrefix(level);
-        auto logStr  = fmt::format("{} {} {} {}", timeStr, prefix, mTitle, data);
-        if (auto globalPath = KobeBryant::getInstance().getLogPath()) {
-            logToFile(*globalPath, logStr);
-        }
-        if (mFilePath) {
-            logToFile(*mFilePath, logStr);
-        }
-        if (!KobeBryant::getInstance().shouldColorLog()) {
-            return fmt::print("{} {} {} {}\n", timeStr, prefix, mTitle, data);
-        }
-        auto time = COLOR(fmt::color::light_blue, timeStr);
-        switch (level) {
-        case LogLevel::Fatal: {
-            return fmt::print("{} \x1b[31m{} {} {}\x1b[0m\n", time, prefix, mTitle, data);
-        }
-        case LogLevel::Error: {
-            return fmt::print("{} \x1b[91m{} {} {}\x1b[0m\n", time, prefix, mTitle, data);
-        }
-        case LogLevel::Warn: {
-            return fmt::print("{} \x1b[93m{} {} {}\x1b[0m\n", time, prefix, mTitle, data);
-        }
-        case LogLevel::Debug: {
-            return fmt::print("{} \x1b[90m{} {} {}\x1b[0m\n", time, prefix, mTitle, data);
-        }
-        default: {
-            return fmt::print("{} {} {} {}\n", time, COLOR(fmt::color::light_sea_green, prefix), mTitle, data);
-        }
+    try {
+        if (mLogLevel >= level) {
+            auto              timeStr = getCurrentTimeFormatted();
+            auto              prefix  = getLoggerPrefix(level);
+            auto              logStr  = fmt::format("{} {} {} {}", timeStr, prefix, mTitle, data);
+            LoggerOutputEvent ev(data, level, mTitle, timeStr);
+            EventBus::getInstance().publish(ev);
+            if (auto globalPath = KobeBryant::getInstance().getLogPath()) {
+                logToFile(*globalPath, logStr);
+            }
+            if (mFilePath) {
+                logToFile(*mFilePath, logStr);
+            }
+            if (!KobeBryant::getInstance().shouldColorLog()) {
+                return fmt::print("{} {} {} {}\n", timeStr, prefix, mTitle, data);
+            }
+            auto time = COLOR(fmt::color::light_blue, timeStr);
+            switch (level) {
+            case LogLevel::Fatal: {
+                return fmt::print("{} \x1b[31m{} {} {}\x1b[0m\n", time, prefix, mTitle, data);
+            }
+            case LogLevel::Error: {
+                return fmt::print("{} \x1b[91m{} {} {}\x1b[0m\n", time, prefix, mTitle, data);
+            }
+            case LogLevel::Warn: {
+                return fmt::print("{} \x1b[93m{} {} {}\x1b[0m\n", time, prefix, mTitle, data);
+            }
+            case LogLevel::Debug: {
+                return fmt::print("{} \x1b[90m{} {} {}\x1b[0m\n", time, prefix, mTitle, data);
+            }
+            default: {
+                return fmt::print("{} {} {} {}\n", time, COLOR(fmt::color::light_sea_green, prefix), mTitle, data);
+            }
+            }
         }
     }
+    CATCH
 }
 
 std::string Logger::translate(std::string const& data, std::vector<std::string> const& params) const {

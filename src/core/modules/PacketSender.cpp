@@ -43,15 +43,23 @@ Message& Message::reply(int64_t id) {
 
 Message& Message::image(std::string const& raw, ImageType type, bool flash, std::optional<std::string> summary) {
     try {
-        std::string data = raw;
-        if (type == ImageType::Path && std::filesystem::exists(raw)) {
-            data = *utils::readFile(raw, true);
-        }
-        auto           info = "base64://" + utils::encode(data);
         nlohmann::json json = {
-            {"type", "image"                         },
-            {"data", {{"file", info}, {"subType", 0}}}
+            {"type", "image"},
+            {"data", {}     }
         };
+        if (type == ImageType::Binary) {
+            auto info            = "base64://" + utils::encode(raw);
+            json["data"]["file"] = info;
+        } else if (type == ImageType::Path) {
+            auto info            = "file://" + std::filesystem::absolute(raw).string();
+            json["data"]["file"] = info;
+        } else if (type == ImageType::Url) {
+            auto info = raw;
+            if (info.starts_with("http://")) {
+                info = "http://" + info;
+            }
+            json["data"]["file"] = info;
+        }
         if (flash) {
             json["type"] = "flash";
         }
@@ -59,8 +67,13 @@ Message& Message::image(std::string const& raw, ImageType type, bool flash, std:
             json["data"]["summary"] = *summary;
         }
         mSerializedMessage.push_back(json);
-    } catch (...) {}
+    }
+    CATCH
     return *this;
+}
+
+Message& Message::image(std::string const& raw, ImageType type, std::optional<std::string> summary) {
+    return image(raw, type, false, summary);
 }
 
 Message& Message::record(std::filesystem::path const& path) {
@@ -157,6 +170,8 @@ MessagePacket::MessagePacket(uint64_t target, std::string type, Message const& m
 }
 
 nlohmann::json MessagePacket::serialize() const { return mSerializedPacket; }
+
+PacketSender::PacketSender() {}
 
 PacketSender& PacketSender::getInstance() {
     static std::unique_ptr<PacketSender> instance;
@@ -441,7 +456,8 @@ void PacketSender::getFriendsList(
                     }
                     callback(list);
                 }
-            } catch (...) {}
+            }
+            CATCH
         },
         timeoutCallback,
         seconds
@@ -531,7 +547,8 @@ void PacketSender::getGroupMembersList(
                     }
                     callback(list);
                 }
-            } catch (...) {}
+            }
+            CATCH
         },
         timeoutCallback,
         seconds
@@ -578,7 +595,8 @@ void PacketSender::getGroupsList(
                     }
                     callback(list);
                 }
-            } catch (...) {}
+            }
+            CATCH
         },
         timeoutCallback,
         seconds

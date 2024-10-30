@@ -10,7 +10,7 @@ MessageEvent::MessageEvent(
     int64_t                 messageId,
     nlohmann::json          packet
 )
-: Event(packet),
+: PacketEvent(packet),
   mType(type),
   mSubType(subType),
   mSelf(self),

@@ -95,7 +95,7 @@ void CommandManager::handleCommand(
                 auto plugin = params[2];
                 if (params[1] == "load") {
                     if (!manager.hasPlugin(plugin)) {
-                        if (auto result = manager.loadPlugin(plugin)) {
+                        if (manager.loadPlugin(plugin)) {
                             return logger.info("command.plugins.load.success", {plugin});
                         }
                         return logger.error("command.plugins.load.failed", {plugin});
@@ -103,12 +103,22 @@ void CommandManager::handleCommand(
                     return logger.error("command.plugins.load.loaded", {plugin});
                 } else if (params[1] == "unload") {
                     if (manager.hasPlugin(plugin)) {
-                        if (auto result = manager.unloadPlugin(plugin)) {
+                        if (manager.unloadPlugin(plugin)) {
                             return logger.info("command.plugins.unload.success", {plugin});
                         }
                         return logger.error("command.plugins.unload.failed", {plugin});
                     }
-                    return logger.error("command.plugins.unload.notFound", {plugin});
+                    return logger.error("command.plugins.notFound", {plugin});
+                } else if (params[1] == "reload") {
+                    if (manager.hasPlugin(plugin)) {
+                        if (manager.unloadPlugin(plugin)) {
+                            if (manager.loadPlugin(plugin)) {
+                                return logger.info("command.plugins.reload.success", {plugin});
+                            }
+                        }
+                        return logger.error("command.plugins.reload.failed", {plugin});
+                    }
+                    return logger.error("command.plugins.notFound", {plugin});
                 }
             }
             return logger.error("command.wrongArguments", {">>" + raw + "<<"});
@@ -171,3 +181,5 @@ bool CommandRegistry::unregisterCommand(HMODULE hModule, std::string const& cmd)
 void CommandRegistry::executeCommand(std::string const& command) {
     CommandManager::getInstance().handleConsoleInput(command);
 }
+
+CommandRegistry::CommandRegistry() {}

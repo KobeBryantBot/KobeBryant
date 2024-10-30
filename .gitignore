@@ -5,3 +5,5 @@
 /out
 /CMakeSettings.json
 /.vs
+/sdk
+sdk.zip

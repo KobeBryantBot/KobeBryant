@@ -2,6 +2,7 @@
 #include "Enums.hpp"
 #include "Macros.hpp"
 #include "api/utils/UUID.hpp"
+#include "fmt/format.h"
 #include "nlohmann/json.hpp"
 #include <chrono>
 
@@ -13,6 +14,7 @@ public:
     enum class ImageType : int {
         Path   = 0, // 从文件路径读取
         Binary = 1, // 二进制数据
+        Url    = 2  // 网络URL
     };
 
 public:
@@ -26,14 +28,18 @@ public:
 
     KobeBryant_API Message& text(std::string const& text);
 
+    template <typename... Args>
+    inline Message& text(fmt::format_string<Args...> fmt, Args&&... args) {
+        return text(fmt::vformat(fmt.get(), fmt::make_format_args(args...)));
+    }
+
     KobeBryant_API Message& face(int id);
 
-    KobeBryant_API Message& image(
-        std::string const&         raw,
-        ImageType                  type    = ImageType::Path,
-        bool                       flash   = false,
-        std::optional<std::string> summary = {}
-    );
+    KobeBryant_API Message&
+    image(std::string const& raw, ImageType type, bool flash, std::optional<std::string> summary = {});
+
+    KobeBryant_API Message&
+    image(std::string const& raw, ImageType type = ImageType::Path, std::optional<std::string> summary = {});
 
     KobeBryant_API Message& record(std::filesystem::path const& path);
 
@@ -75,6 +81,11 @@ using namespace std::chrono_literals;
 
 class PacketSender {
 public:
+    PacketSender();
+
+    PacketSender(const PacketSender&)            = delete;
+    PacketSender& operator=(const PacketSender&) = delete;
+
     KobeBryant_NDAPI static PacketSender& getInstance();
 
     KobeBryant_API void sendRawPacket(std::string const& rawPacket);

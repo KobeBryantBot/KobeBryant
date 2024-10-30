@@ -25,7 +25,7 @@ void EventDispatcher::init() {
             if (KobeBryant::getInstance().hasConnected()) {
                 auto& eventBus = EventBus::getInstance();
                 auto  packet   = nlohmann::json::parse(rawText);
-                auto  event    = Event(packet);
+                auto  event    = PacketEvent(packet);
                 eventBus.publish(event);
                 // 解析事件
                 if (packet.contains("post_type")) {
@@ -57,10 +57,26 @@ void EventDispatcher::init() {
                     case utils::doHash("notice"): { // 通知
                         NoticeType                   type = ENUM_CAST(NoticeType, "notice_type");
                         std::optional<NotifySubType> subType;
+                        std::optional<uint64_t>      group;
+                        std::optional<uint64_t>      sender;
+                        std::optional<uint64_t>      self;
+                        std::optional<uint64_t>      target;
                         if (packet.contains("sub_type")) {
                             subType = ENUM_CAST(NotifySubType, "sub_type");
                         }
-                        NoticeEvent ev(type, subType, packet);
+                        if (packet.contains("group_id")) {
+                            group = packet["group_id"];
+                        }
+                        if (packet.contains("user_id")) {
+                            sender = packet["user_id"];
+                        }
+                        if (packet.contains("self_id")) {
+                            self = packet["self_id"];
+                        }
+                        if (packet.contains("target_id")) {
+                            target = packet["target_id"];
+                        }
+                        NoticeEvent ev(type, subType, group, sender, self, target, packet);
                         return eventBus.publish(ev);
                     }
                     case utils::doHash("request"): { // 请求
@@ -94,7 +110,8 @@ void EventDispatcher::init() {
                                 std::string error_message = packet["message"];
                                 KobeBryant::getInstance().getLogger().error("bot.main.retError", {error_message});
                             }
-                        } catch (...) {}
+                        }
+                        CATCH
                     }
                     if (packet.contains("echo")) {
                         try {
@@ -106,7 +123,8 @@ void EventDispatcher::init() {
                                 }
                                 mCallbacks.erase(uuid);
                             }
-                        } catch (...) {}
+                        }
+                        CATCH
                     }
                 }
             }

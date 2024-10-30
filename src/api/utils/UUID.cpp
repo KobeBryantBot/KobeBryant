@@ -1,4 +1,5 @@
 #include "api/utils/UUID.hpp"
+#include "core/modules/KobeBryant.hpp"
 #include <iomanip>
 #include <iostream>
 #include <random>
@@ -50,43 +51,40 @@ std::string UUID::toString() const {
 
 UUID UUID::fromString(std::string const& str) {
     auto result = UUID();
-    if (str.length() != 36 || str[8] != '-' || str[13] != '-' || str[18] != '-' || str[23] != '-') {
-        return UUID::INVALID;
+    try {
+        if (str.length() != 36 || str[8] != '-' || str[13] != '-' || str[18] != '-' || str[23] != '-') {
+            return UUID::INVALID;
+        }
+        std::string part1 = str.substr(0, 8);
+        std::string part2 = str.substr(9, 4);
+        std::string part3 = str.substr(14, 4);
+        std::string part4 = str.substr(19, 4);
+        std::string part5 = str.substr(24);
+        result.mFirst     = std::stoull(part1, nullptr, 16) << 32 | std::stoull(part2 + part3, nullptr, 16);
+        result.mSecond    = std::stoull(part4 + part5, nullptr, 16);
     }
-    std::istringstream ss(str.substr(0, 8), std::istringstream::hex);
-    unsigned int       highPart;
-    ss >> highPart;
-    result.mFirst = static_cast<uint64_t>(highPart) << 32;
-
-    ss.clear();
-    ss.str(std::string(str, 9, 4));
-    unsigned int lowPart;
-    ss >> lowPart;
-    result.mFirst |= lowPart;
-
-    ss.clear();
-    ss.str(std::string(str, 14, 4));
-    ss >> highPart;
-    result.mSecond = static_cast<uint64_t>(highPart) << 48;
-
-    ss.clear();
-    ss.str(std::string(str, 19, 4));
-    ss >> lowPart;
-    result.mSecond |= static_cast<uint64_t>(lowPart) << 16;
-
-    ss.clear();
-    ss.str(std::string(str, 24, 12));
-    ss >> lowPart;
-    result.mSecond |= lowPart;
-
+    CATCH
     return result;
 }
 
-bool UUID::isInvalid() const {
-    return mFirst == std::numeric_limits<uint64_t>::max() && mSecond == std::numeric_limits<uint64_t>::max();
+bool UUID::isValid() const {
+    return mFirst != std::numeric_limits<uint64_t>::max() || mSecond != std::numeric_limits<uint64_t>::max();
 }
 
 bool UUID::operator==(const UUID& rhs) const { return (mFirst == rhs.mFirst) && (mSecond == rhs.mSecond); }
+
+UUID UUID::fromBinary(std::string const& str) {
+    auto first  = *reinterpret_cast<const uint64_t*>(str.data());
+    auto second = *reinterpret_cast<const uint64_t*>(str.data() + 8);
+    return UUID(first, second);
+}
+
+std::string UUID::toBinary() const {
+    std::string result(16, '\0');
+    memcpy(result.data(), &mFirst, 8);
+    memcpy(result.data() + 8, &mSecond, 8);
+    return result;
+}
 
 const UUID UUID::INVALID = UUID{std::numeric_limits<uint64_t>::max(), std::numeric_limits<uint64_t>::max()};
 

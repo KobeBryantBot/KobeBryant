@@ -16,9 +16,13 @@ public:
 
     KobeBryant_NDAPI static UUID fromString(std::string const& str);
 
+    KobeBryant_NDAPI static UUID fromBinary(std::string const& str);
+
     KobeBryant_NDAPI std::string toString() const;
 
-    KobeBryant_NDAPI bool isInvalid() const;
+    KobeBryant_NDAPI std::string toBinary() const;
+
+    KobeBryant_NDAPI bool isValid() const;
 
     KobeBryant_NDAPI bool operator==(const UUID& rhs) const;
 

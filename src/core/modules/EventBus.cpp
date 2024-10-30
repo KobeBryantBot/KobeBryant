@@ -1,3 +1,4 @@
+#include "KobeBryant.hpp"
 #include "api/Logger.hpp"
 #include "core/modules/EventBusImpl.hpp"
 
@@ -62,3 +63,7 @@ void EventBusImpl::removePluginListeners(HMODULE hModule) {
 }
 
 void EventBusImpl::removeAllListeners() { mCallbacks.clear(); }
+
+void EventBus::printException(std::string const& ex) {
+    return KobeBryant::getInstance().getLogger().error("bot.catch.exception", {ex});
+}

@@ -1,14 +1,16 @@
 #pragma once
+#include "Macros.hpp"
 #include <Windows.h>
 #include <iostream>
+#include <optional>
 
 namespace utils {
 
-[[nodiscard]] inline HMODULE getModuleHandle() {
+[[nodiscard]] inline HMODULE getCurrentModuleHandle() {
     HMODULE hModule = NULL;
     if (GetModuleHandleEx(
             GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-            (LPCTSTR)getModuleHandle,
+            (LPCTSTR)getCurrentModuleHandle,
             &hModule
         )
         == FALSE) {
@@ -17,13 +19,11 @@ namespace utils {
     return hModule;
 }
 
-[[nodiscard]] inline std::string readResource(HMODULE hModule, int id, bool isBinary = false) {
-    HRSRC       hRes     = FindResource(hModule, MAKEINTRESOURCE(id), isBinary ? L"BINFILE" : L"TEXTFILE");
-    HGLOBAL     resource = LoadResource(hModule, hRes);
-    void*       data     = LockResource(resource);
-    DWORD       size     = SizeofResource(hModule, hRes);
-    std::string outData(static_cast<const char*>(data), size);
-    return std::move(outData);
+KobeBryant_NDAPI std::optional<std::string> readResource(HMODULE hModule, int id, bool isBinary = false);
+
+[[nodiscard]] inline std::optional<std::string> readCurrentResource(int id, bool isBinary = false) {
+    auto hModule = getCurrentModuleHandle();
+    return readResource(hModule, id, isBinary);
 }
 
 } // namespace utils
