@@ -8,6 +8,30 @@
 #include <mutex>
 
 class KobeBryant {
+public:
+    using TaskID = size_t;
+    using Task   = std::function<void()>;
+
+private:
+    struct TaskInfo {
+        TaskID                                id;
+        Task                                  task;
+        std::chrono::steady_clock::time_point runTime;
+        std::chrono::milliseconds             interval;
+        std::atomic<bool>                     cancelled{false};
+
+        TaskInfo(
+            TaskID                                id,
+            Task                                  task,
+            std::chrono::steady_clock::time_point runTime,
+            std::chrono::milliseconds             interval
+        )
+        : id(id),
+          task(std::move(task)),
+          runTime(runTime),
+          interval(interval) {}
+    };
+
     std::unique_ptr<WebSocketClient>                            mWsClient;
     Logger                                                      mLogger{BOT_NAME};
     std::unique_ptr<i18n::LangI18n>                             mI18n;
@@ -18,12 +42,11 @@ class KobeBryant {
     std::map<uint64_t, std::function<void(std::string const&)>> mPacketCallback;
     bool                                                        mColorLog = true;
     std::optional<std::filesystem::path>                        mLogPath;
-    uint64_t                                                    mNextTaskId = 0;
-    std::unordered_map<uint64_t, std::function<void()>>         mTasks;
-    std::unordered_map<uint64_t, int64_t>                       mTaskDelay;
-    std::unordered_map<uint64_t, int64_t>                       mTaskRepeat;
-    std::mutex                                                  mMutex;
-    utils::UUID                                                 mProcessId;
+    std::mutex                                                  mMtx;
+    std::condition_variable                                     mCv;
+    std::vector<std::shared_ptr<TaskInfo>>                      mTasks;
+    std::unordered_map<TaskID, size_t>                          mTaskIndexMap; // Map from task ID to task index
+    TaskID                                                      mNextTaskID{0};
 
 public:
     KobeBryant();
@@ -54,11 +77,11 @@ public:
 
     bool unsubscribeReceiveRawPacket(uint64_t id);
 
-    uint64_t addDelayTask(uint64_t seconds, std::function<void()> const& task);
+    TaskID addDelayTask(std::chrono::milliseconds delay, Task const& task);
 
-    uint64_t addRepeatTask(uint64_t seconds, std::function<void()> const& task);
+    TaskID addRepeatTask(std::chrono::milliseconds delay, Task const& task);
 
-    bool cancelTask(uint64_t id);
+    bool cancelTask(TaskID id);
 
     void printVersion();
 };

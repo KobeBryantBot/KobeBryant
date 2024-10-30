@@ -141,7 +141,7 @@ void EventDispatcher::addCallback(
     uint64_t                                          seconds
 ) {
     mCallbacks[uuid] = std::move(callback);
-    KobeBryant::getInstance().addDelayTask(seconds, [this, uuid, timeoutCallback] {
+    KobeBryant::getInstance().addDelayTask(std::chrono::milliseconds(1000 * seconds), [this, uuid, timeoutCallback] {
         std::lock_guard lock{mMutex};
         if (mCallbacks.contains(uuid) && timeoutCallback) {
             timeoutCallback();

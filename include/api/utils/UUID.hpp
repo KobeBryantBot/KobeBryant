@@ -34,6 +34,6 @@ public:
 namespace std {
 template <>
 struct hash<utils::UUID> {
-    KobeBryant_NDAPI std::size_t operator()(const utils::UUID&) const;
+    KobeBryant_NDAPI size_t operator()(const utils::UUID&) const;
 };
 } // namespace std
