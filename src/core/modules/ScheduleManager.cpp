@@ -31,10 +31,33 @@ ScheduleManager::addRepeatTask(HMODULE hModule, std::chrono::milliseconds interv
     return id;
 }
 
+size_t ScheduleManager::addRepeatTask(
+    HMODULE                      hModule,
+    std::chrono::milliseconds    interval,
+    std::function<void()> const& task,
+    uint64_t                     times
+) {
+
+    size_t id      = KobeBryant::getInstance().addRepeatTask(interval, [=] {
+        if (task) {
+            task();
+        }
+        mTaskTimes[id]--;
+        if (mTaskTimes[id] <= 0) {
+            ScheduleManager::getInstance().cancelTask(id);
+        }
+    });
+    mTaskTimes[id] = times;
+    mPluginTasks[hModule].insert(id);
+    mTaskIdMap[id] = hModule;
+    return id;
+}
+
 bool ScheduleManager::cancelTask(size_t id) {
     if (auto hModule = getTaskOwner(id)) {
         mPluginTasks[hModule].erase(id);
         mTaskIdMap.erase(id);
+        mTaskTimes.erase(id);
     }
     return KobeBryant::getInstance().cancelTask(id);
 }
@@ -52,4 +75,5 @@ void ScheduleManager::removeAllTasks() {
     }
     mTaskIdMap.clear();
     mPluginTasks.clear();
+    mTaskTimes.clear();
 }
