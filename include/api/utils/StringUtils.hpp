@@ -29,4 +29,6 @@ KobeBryant_NDAPI std::string toSnakeCase(std::string_view str);
 
 KobeBryant_NDAPI std::wstring toWstring(std::string const& str);
 
+KobeBryant_NDAPI std::string getTimeStringFormatted(std::string const& format = "%Y-%m-%d %H:%M:%S");
+
 } // namespace utils

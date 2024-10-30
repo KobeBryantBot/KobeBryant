@@ -1,4 +1,6 @@
 #include "api/utils/StringUtils.hpp"
+#include <ctime>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -50,6 +52,15 @@ std::wstring toWstring(const std::string& utf8) {
     // 去除末尾的空字符
     utf16.resize(len - 1);
     return utf16;
+}
+
+std::string getTimeStringFormatted(std::string const& format) {
+    time_t    time_s = time(0);
+    struct tm now_tm;
+    localtime_s(&now_tm, &time_s);
+    std::stringstream ss;
+    ss << std::put_time(&now_tm, format.c_str());
+    return ss.str();
 }
 
 } // namespace utils
