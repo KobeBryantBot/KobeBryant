@@ -1,5 +1,6 @@
 #pragma once
 #include "core/Global.hpp"
+#include <unordered_set>
 
 struct PluginManifest {
     std::string              mName;
@@ -13,8 +14,9 @@ struct PluginManifest {
 
 class PluginManager {
 private:
-    std::unordered_map<std::string, HMODULE> mPluginsMap1;
-    std::unordered_map<HMODULE, std::string> mPluginsMap2;
+    std::unordered_map<std::string, HMODULE>                         mPluginsMap1;
+    std::unordered_map<HMODULE, std::string>                         mPluginsMap2;
+    std::unordered_map<std::string, std::unordered_set<std::string>> mPluginRely;
 
 public:
     static PluginManager& getInstance();
@@ -27,9 +29,9 @@ public:
 
     bool loadPlugin(std::filesystem::path const& path, int& count, bool forceLoad = false);
 
-    bool unloadPlugin(std::string const& name);
+    bool unloadPlugin(std::string const& name, bool force = false);
 
-    bool unloadPlugin(HMODULE hModule);
+    bool unloadPlugin(HMODULE hModule, bool force = false);
 
     std::vector<std::string> getAllPlugins();
 

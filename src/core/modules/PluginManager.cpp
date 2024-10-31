@@ -91,6 +91,7 @@ bool PluginManager::loadPlugin(std::filesystem::path const& path, int& count, bo
                                 for (auto& depe : manifest->mDependence) {
                                     if (loadPlugin(depe, true)) {
                                         count++;
+                                        mPluginRely[name].insert(depe);
                                     } else {
                                         logger.error("bot.plugin.dependenceMiss", {depe, name});
                                         return false;
@@ -139,7 +140,7 @@ void PluginManager::unloadAllPlugins() {
     auto& logger = KobeBryant::getInstance().getLogger();
     logger.info("bot.plugins.unloadingAll");
     for (auto& [name, hMoudle] : mPluginsMap1) {
-        unloadPlugin(hMoudle);
+        unloadPlugin(hMoudle, true);
     }
     EventBusImpl::getInstance().removeAllListeners();
     CommandManager::getInstance().unregisterAllCommands();
@@ -150,27 +151,48 @@ void PluginManager::unloadAllPlugins() {
     logger.info("bot.plugins.unloadedAll");
 }
 
-bool PluginManager::unloadPlugin(std::string const& name) {
+bool PluginManager::unloadPlugin(std::string const& name, bool force) {
     if (mPluginsMap1.contains(name)) {
         auto hModule = mPluginsMap1[name];
-        return unloadPlugin(hModule);
+        return unloadPlugin(hModule, force);
     }
     return false;
 }
 
-bool PluginManager::unloadPlugin(HMODULE hModule) {
+bool PluginManager::unloadPlugin(HMODULE hModule, bool force) {
     try {
+        auto& logger = KobeBryant::getInstance().getLogger();
         if (mPluginsMap2.contains(hModule)) {
             auto name = mPluginsMap2[hModule];
-            EventBusImpl::getInstance().removePluginListeners(hModule);
-            CommandManager::getInstance().unregisterPluginCommands(hModule);
-            ScheduleManager::getInstance().removePluginTasks(hModule);
-            ServiceManager::getInstance().removePluginFunc(hModule);
-            FreeLibrary(hModule);
-            KobeBryant::getInstance().getLogger().info("bot.plugin.unloaded", {name});
-            mPluginsMap1.erase(name);
-            mPluginsMap2.erase(hModule);
-            return true;
+            if (force && !mPluginRely.empty()) {
+                for (auto& rely : mPluginRely[name]) {
+                    unloadPlugin(rely, true);
+                }
+            }
+            if (mPluginRely[name].empty()) {
+                EventBusImpl::getInstance().removePluginListeners(hModule);
+                CommandManager::getInstance().unregisterPluginCommands(hModule);
+                ScheduleManager::getInstance().removePluginTasks(hModule);
+                ServiceManager::getInstance().removePluginFunc(hModule);
+                if (FreeLibrary(hModule)) {
+                    logger.info("bot.plugin.unloaded", {name});
+                    mPluginsMap1.erase(name);
+                    mPluginsMap2.erase(hModule);
+                    for (auto& [plugin, relys] : mPluginRely) {
+                        relys.erase(name);
+                    }
+                    return true;
+                } else {
+                    logger.error("bot.plugin.unload.error", {name});
+                }
+            } else {
+                std::string relylist;
+                for (auto& rely : mPluginRely[name]) {
+                    relylist.append(rely + ", ");
+                }
+                relylist.erase(relylist.size() - 2);
+                logger.error("bot.plugin.unload.dependence", {name, relylist});
+            }
         }
     }
     CATCH
