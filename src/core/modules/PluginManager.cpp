@@ -3,23 +3,11 @@
 #include "KobeBryant.hpp"
 #include "ScheduleManager.hpp"
 #include "ServiceManager.hpp"
+#include "api/utils/StringUtils.hpp"
 #include "core/Global.hpp"
 #include "core/modules/EventBusImpl.hpp"
 
 namespace fs = std::filesystem;
-
-std::optional<std::wstring> getDllPath(std::string const str) {
-    int numChars = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, NULL, 0);
-    if (numChars > 0) {
-        std::vector<wchar_t> wideChars(numChars);
-        int                  numConverted = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, &wideChars[0], numChars);
-        if (numConverted > 0) {
-            std::wstring wideString(wideChars.begin(), wideChars.end() - 1);
-            return wideString;
-        }
-    }
-    return {};
-}
 
 std::optional<PluginManifest> PluginManifest::readFrom(std::filesystem::path const& path) {
     try {
@@ -29,6 +17,12 @@ std::optional<PluginManifest> PluginManifest::readFrom(std::filesystem::path con
                 PluginManifest result;
                 result.mName  = data["name"];
                 result.mEntry = data["entry"];
+                if (result.mName.empty() || result.mEntry.empty()) {
+                    return {};
+                }
+                if (data.contains("type")) {
+                    result.mType = data["type"];
+                }
                 if (data.contains("passive")) {
                     result.mPassive = data["passive"];
                 }
@@ -87,32 +81,31 @@ bool PluginManager::loadPlugin(std::filesystem::path const& path, int& count, bo
                     auto name = manifest->mName;
                     if (fs::exists(path / manifest->mEntry)) {
                         if (path.filename().string() == name) {
-                            if (auto entry = getDllPath(path.string() + "/" + manifest->mEntry)) {
-                                for (auto& depe : manifest->mDependence) {
-                                    if (loadPlugin(depe, true)) {
-                                        count++;
-                                        mPluginRely[name].insert(depe);
-                                    } else {
-                                        logger.error("bot.plugin.dependenceMiss", {depe, name});
-                                        return false;
-                                    }
+                            auto entry = utils::toWstring(path.string() + "/" + manifest->mEntry);
+                            for (auto& depe : manifest->mDependence) {
+                                if (loadPlugin(depe, true)) {
+                                    count++;
+                                    mPluginRely[name].insert(depe);
+                                } else {
+                                    logger.error("bot.plugin.dependenceMiss", {depe, name});
+                                    return false;
                                 }
-                                for (auto& opde : manifest->mOptionalDependence) {
-                                    if (loadPlugin(opde, true)) {
-                                        count++;
-                                    }
+                            }
+                            for (auto& opde : manifest->mOptionalDependence) {
+                                if (loadPlugin(opde, true)) {
+                                    count++;
                                 }
-                                if (!hasPlugin(name)) {
-                                    if (HMODULE hMoudle = LoadLibrary(entry->c_str())) {
-                                        mPluginsMap1[name]    = hMoudle;
-                                        mPluginsMap2[hMoudle] = name;
-                                        logger.info("bot.plugin.loaded", {name});
-                                        return true;
-                                    } else {
-                                        DWORD errorCode = GetLastError();
-                                        auto  reason    = getErrorReason(errorCode);
-                                        logger.error("bot.plugin.load.fail", {name, S(errorCode), reason});
-                                    }
+                            }
+                            if (!hasPlugin(name)) {
+                                if (HMODULE hMoudle = LoadLibrary(entry.c_str())) {
+                                    mPluginsMap1[name]    = hMoudle;
+                                    mPluginsMap2[hMoudle] = name;
+                                    logger.info("bot.plugin.loaded", {name});
+                                    return true;
+                                } else {
+                                    DWORD errorCode = GetLastError();
+                                    auto  reason    = getErrorReason(errorCode);
+                                    logger.error("bot.plugin.load.fail", {name, S(errorCode), reason});
                                 }
                             }
                         } else {
