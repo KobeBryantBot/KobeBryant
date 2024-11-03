@@ -130,25 +130,31 @@ bool PluginManager::loadPlugin(std::string const& folderName, bool forceLoad) {
 }
 
 void PluginManager::unloadAllPlugins() {
-    auto& logger = KobeBryant::getInstance().getLogger();
-    logger.info("bot.plugins.unloadingAll");
-    for (auto& [name, hMoudle] : mPluginsMap1) {
-        unloadPlugin(hMoudle, true);
+    try {
+        auto& logger = KobeBryant::getInstance().getLogger();
+        logger.info("bot.plugins.unloadingAll");
+        for (auto& [name, hMoudle] : mPluginsMap1) {
+            unloadPlugin(hMoudle, true);
+        }
+        EventBusImpl::getInstance().removeAllListeners();
+        CommandManager::getInstance().unregisterAllCommands();
+        ScheduleManager::getInstance().removeAllTasks();
+        ServiceManager::getInstance().removeAllFunc();
+        mPluginsMap1.clear();
+        mPluginsMap2.clear();
+        logger.info("bot.plugins.unloadedAll");
     }
-    EventBusImpl::getInstance().removeAllListeners();
-    CommandManager::getInstance().unregisterAllCommands();
-    ScheduleManager::getInstance().removeAllTasks();
-    ServiceManager::getInstance().removeAllFunc();
-    mPluginsMap1.clear();
-    mPluginsMap2.clear();
-    logger.info("bot.plugins.unloadedAll");
+    CATCH
 }
 
 bool PluginManager::unloadPlugin(std::string const& name, bool force) {
-    if (mPluginsMap1.contains(name)) {
-        auto hModule = mPluginsMap1[name];
-        return unloadPlugin(hModule, force);
+    try {
+        if (mPluginsMap1.contains(name)) {
+            auto hModule = mPluginsMap1[name];
+            return unloadPlugin(hModule, force);
+        }
     }
+    CATCH
     return false;
 }
 
