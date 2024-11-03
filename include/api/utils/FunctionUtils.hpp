@@ -2,7 +2,7 @@
 #include "Macros.hpp"
 #include <Windows.h>
 #include <functional>
-#include <optional>
+#include <stdexcept>
 
 namespace utils {
 
@@ -30,19 +30,19 @@ inline FunctionPtr<RetType, Args...> GetFunctionPtr(LPCWSTR dllName, LPCSTR func
 }
 
 template <typename RetType, typename... Args>
-inline std::optional<RetType> CallFunction(LPCSTR funcName, Args... args) {
+inline RetType CallFunction(LPCSTR funcName, Args... args) {
     if (auto func = GetFunctionPtr<RetType, Args...>(funcName); func) {
         return func(std::forward<Args>(args)...);
     }
-    return {};
+    throw std::runtime_error("Failed to call function: " + funcName);
 }
 
 template <typename RetType, typename... Args>
-inline std::optional<RetType> CallFunction(LPCWSTR dllName, LPCSTR funcName, Args... args) {
+inline RetType CallFunction(LPCWSTR dllName, LPCSTR funcName, Args... args) {
     if (auto func = GetFunctionPtr<RetType, Args...>(dllName, funcName); func) {
         return func(std::forward<Args>(args)...);
     }
-    return {};
+    throw std::runtime_error("Failed to call function: " + funcName);
 }
 
 } // namespace utils

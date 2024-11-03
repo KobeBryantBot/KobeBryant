@@ -12,3 +12,7 @@ FARPROC Service::importFuncPtr(std::string const& pluginName, std::string const&
 bool Service::hasFunc(std::string const& pluginName, std::string const& funcName) {
     return ServiceManager::getInstance().hasFunc(pluginName, funcName);
 }
+
+bool Service::removeFuncPtr(HMODULE hModule, std::string const& funcName) {
+    return ServiceManager::getInstance().removeFuncPtr(hModule, funcName);
+}

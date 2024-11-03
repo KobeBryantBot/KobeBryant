@@ -45,6 +45,16 @@ void ServiceManager::removeAllFunc() {
     mExportedFunctions.clear();
 }
 
+bool ServiceManager::removeFuncPtr(HMODULE hModule, std::string const& funcName) {
+    auto key = ServiceFuncKey(hModule, funcName);
+    if (mExportedFunctions.contains(key)) {
+        mExportedFunctions.erase(key);
+        mPluginFunctions[hModule].erase(key);
+        return true;
+    }
+    return false;
+}
+
 bool ServiceFuncKey::operator==(const ServiceFuncKey& rhs) const {
     return (mHandle == rhs.mHandle) && (mName == rhs.mName);
 }

@@ -31,6 +31,8 @@ public:
 
     bool hasFunc(std::string const& pluginName, std::string const& funcName);
 
+    bool removeFuncPtr(HMODULE hModule, std::string const& funcName);
+
     void removePluginFunc(HMODULE hModule);
 
     void removeAllFunc();
