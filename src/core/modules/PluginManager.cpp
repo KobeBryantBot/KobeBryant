@@ -5,6 +5,8 @@
 #include "NativePluginEngine.hpp"
 #include "ScheduleManager.hpp"
 #include "ServiceManager.hpp"
+#include "api/plugin/PluginEngineRegistry.hpp"
+#include "api/utils/StringUtils.hpp"
 
 namespace fs = std::filesystem;
 
@@ -100,7 +102,6 @@ bool PluginManager::loadPlugin(PluginManifest const& manifest, std::string const
             if (isValidType(type)) {
                 if (mTypesMap[type]->loadPlugin(name)) {
                     mPluginsMap[name] = type;
-                    logger.info("bot.plugin.loaded", {name});
                     return true;
                 } else {
                     logger.error("bot.plugin.load.fail", {name});
@@ -146,7 +147,6 @@ bool PluginManager::unloadPlugin(std::string const& name, bool force) {
             if (mPluginRely[name].empty()) {
                 auto type = mPluginsMap[name];
                 if (mTypesMap[type]->unloadPlugin(name)) {
-                    logger.info("bot.plugin.unloaded", {name});
                     mPluginsMap.erase(name);
                     for (auto& [plugin, relys] : mPluginRely) {
                         relys.erase(name);
@@ -179,4 +179,46 @@ std::vector<std::string> PluginManager::getAllPlugins() {
 
 NativePluginEngine& PluginManager::getNativePluginEngine() {
     return *static_cast<NativePluginEngine*>(mTypesMap["native"].get());
+}
+
+void PluginManager::loadPluginEngines() {
+    auto  paths  = utils::getAllFileDirectories("./plugins");
+    auto& logger = KobeBryant::getInstance().getLogger();
+    for (auto& path : paths) {
+        if (fs::exists(path / "manifest.json")) {
+            if (auto manifest = PluginManifest::readFrom(path / "manifest.json")) {
+                if (manifest->mType == "engine") {
+                    auto name = manifest->mName;
+                    if (path.filename().string() == name) {
+                        auto entry = utils::stringtoWstring("./plugins/" + name + "/" + manifest->mEntry);
+                        if (HMODULE hMoudle = LoadLibrary(entry.c_str())) {
+                            mEngineHandle[name] = hMoudle;
+                            logger.info("bot.pluginEngine.loaded", {name});
+                        }
+                    } else {
+                        logger.error("bot.pluginEngine.nameMismatch", {name, path.filename().string(), name});
+                    }
+                }
+            }
+        }
+    }
+}
+
+bool PluginManager::registerPluginEngine(std::shared_ptr<IPluginEngine> engine) {
+    auto type = engine->getPluginType();
+    if (!isValidType(type)) {
+        mTypesMap[type] = engine;
+        mPluginEngines.push_back(engine);
+    }
+    return false;
+}
+
+bool PluginEngineRegistry::registerPluginEngine(std::shared_ptr<IPluginEngine> engine) {
+    return PluginManager::getInstance().registerPluginEngine(std::move(engine));
+}
+
+void PluginManager::unloadPluginEngines() {
+    for (auto& [en, handle] : mEngineHandle) {
+        FreeLibrary(handle);
+    }
 }

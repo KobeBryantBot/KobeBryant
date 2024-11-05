@@ -20,6 +20,7 @@ void CommandManager::init() {
             if (input == "stop") {
                 EXIST_FLAG = false;
                 PluginManager::getInstance().unloadAllPlugins();
+                PluginManager::getInstance().unloadPluginEngines();
                 KobeBryant::getInstance().getLogger().info("bot.main.stopping");
                 KobeBryant::getInstance().getWsClient().Close();
                 PRINT(tr("bot.main.exit"));

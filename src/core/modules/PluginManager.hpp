@@ -12,6 +12,7 @@ private:
     std::unordered_map<std::string, std::shared_ptr<IPluginEngine>>  mTypesMap;
     std::vector<std::shared_ptr<IPluginEngine>>                      mPluginEngines;
     std::unordered_map<std::string, std::unordered_set<std::string>> mPluginRely;
+    std::unordered_map<std::string, HMODULE>                         mEngineHandle;
 
 public:
     static PluginManager& getInstance();
@@ -21,6 +22,10 @@ public:
     bool isValidType(std::string const& type) const;
 
     void loadPluginEngines();
+
+    void unloadPluginEngines();
+
+    bool registerPluginEngine(std::shared_ptr<IPluginEngine> engine);
 
     void loadAllPlugins();
 

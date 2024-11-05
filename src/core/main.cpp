@@ -59,6 +59,7 @@ int main() {
     // 初始化事件系统
     EventDispatcher::getInstance().init();
     // 初始化插件
+    PluginManager::getInstance().loadPluginEngines();
     PluginManager::getInstance().loadAllPlugins();
     // 初始化命令系统
     CommandManager::getInstance().init();

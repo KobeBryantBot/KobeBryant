@@ -31,6 +31,7 @@ bool NativePluginEngine::loadPlugin(std::string const& pluginName) {
                     if (HMODULE hMoudle = LoadLibrary(entry.c_str())) {
                         mPluginsMap1[name]    = hMoudle;
                         mPluginsMap2[hMoudle] = name;
+                        logger.info("bot.nativePlugin.loaded", {name});
                         return true;
                     } else {
                         DWORD errorCode = GetLastError();
@@ -67,6 +68,7 @@ bool NativePluginEngine::unloadPlugin(HMODULE hModule) {
             if (FreeLibrary(hModule)) {
                 mPluginsMap1.erase(name);
                 mPluginsMap2.erase(hModule);
+                KobeBryant::getInstance().getLogger().info("bot.nativePlugin.unloaded", {name});
                 return true;
             }
         }
