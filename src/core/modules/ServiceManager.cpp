@@ -1,4 +1,5 @@
 #include "ServiceManager.hpp"
+#include "PluginManager.hpp"
 
 ServiceManager& ServiceManager::getInstance() {
     static std::unique_ptr<ServiceManager> instance;
@@ -19,7 +20,7 @@ bool ServiceManager::exportFuncPtr(std::string const& funcName, HMODULE hModule,
 }
 
 FARPROC ServiceManager::importFuncPtr(std::string const& pluginName, std::string const& funcName) {
-    auto handle = PluginManager::getInstance().getPluginHandle(pluginName);
+    auto handle = PluginManager::getInstance().getNativePluginEngine().getPluginHandle(pluginName);
     auto key    = ServiceFuncKey(handle, funcName);
     if (mExportedFunctions.contains(key)) {
         return mExportedFunctions[key];
@@ -28,7 +29,7 @@ FARPROC ServiceManager::importFuncPtr(std::string const& pluginName, std::string
 }
 
 bool ServiceManager::hasFunc(std::string const& pluginName, std::string const& funcName) {
-    auto handle = PluginManager::getInstance().getPluginHandle(pluginName);
+    auto handle = PluginManager::getInstance().getNativePluginEngine().getPluginHandle(pluginName);
     auto key    = ServiceFuncKey(handle, funcName);
     return mExportedFunctions.contains(key);
 }

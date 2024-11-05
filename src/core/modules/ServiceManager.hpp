@@ -1,4 +1,4 @@
-#include "core/modules/PluginManager.hpp"
+#include "api/utils/ModuleUtils.hpp"
 #include <unordered_map>
 #include <unordered_set>
 
