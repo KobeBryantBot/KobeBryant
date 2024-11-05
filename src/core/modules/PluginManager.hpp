@@ -1,7 +1,7 @@
 #pragma once
 #include "NativePluginEngine.hpp"
+#include "PluginManifest.hpp"
 #include "api/plugin/IPluginEngine.hpp"
-#include "api/plugin/PluginManifest.hpp"
 #include <iostream>
 #include <unordered_map>
 #include <unordered_set>

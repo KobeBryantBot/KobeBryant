@@ -210,6 +210,8 @@ bool PluginManager::registerPluginEngine(std::shared_ptr<IPluginEngine> engine) 
     if (!isValidType(type)) {
         mTypesMap[type] = engine;
         mPluginEngines.push_back(engine);
+        KobeBryant::getInstance().getLogger().info("bot.pluginEngine.registered", {engine->getPluginType()});
+        return true;
     }
     return false;
 }

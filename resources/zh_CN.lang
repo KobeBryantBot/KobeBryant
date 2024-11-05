@@ -37,6 +37,7 @@ bot.error.exist=已有一个实例正在运行，无法重复运行！请关闭�
 bot.plugin.nameMismatch=无法加载插件 %1$s！文件夹名称 %2$s 和插件名称 %3$s 不一致！
 bot.pluginEngine.nameMismatch=无法加载插件引擎 %1$s！文件夹名称 %2$s 和插件名称 %3$s 不一致！
 bot.pluginEngine.loaded=已成功加载插件引擎 %s
+bot.pluginEngine.registered=插件引擎已成功注册插件类型 %s
 bot.console.title=科比 · 布莱恩特
 bot.main.start=牢大已启动，当前版本
 bot.catch.exception=捕获到异常错误：%s

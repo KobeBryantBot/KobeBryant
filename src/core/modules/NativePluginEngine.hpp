@@ -1,6 +1,6 @@
 #pragma once
+#include "PluginManifest.hpp"
 #include "api/plugin/IPluginEngine.hpp"
-#include "api/plugin/PluginManifest.hpp"
 #include "core/Global.hpp"
 #include <unordered_set>
 
