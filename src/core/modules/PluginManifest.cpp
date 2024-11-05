@@ -1,4 +1,4 @@
-#include "api/plugin/PluginManifest.hpp"
+#include "PluginManifest.hpp"
 #include "api/utils/FileUtils.hpp"
 #include "core/modules/KobeBryant.hpp"
 #include "nlohmann/json.hpp"
