@@ -1,37 +1,15 @@
 #pragma once
-#include "LightWebSocketClient/WebSocketClient.h"
+#include "api/ThreadPool.hpp"
 #include "api/i18n/LangI18n.hpp"
 #include "api/utils/FileUtils.hpp"
 #include "api/utils/UUID.hpp"
 #include "core/Global.hpp"
+#include "lightwebsocketclient/WebSocketClient.h"
 #include "resource.hpp"
 #include <mutex>
 
 class KobeBryant {
-public:
-    using TaskID = size_t;
-    using Task   = std::function<void()>;
-
 private:
-    struct TaskInfo {
-        TaskID                                id;
-        Task                                  task;
-        std::chrono::steady_clock::time_point runTime;
-        std::chrono::milliseconds             interval;
-        std::atomic<bool>                     cancelled{false};
-
-        TaskInfo(
-            TaskID                                id,
-            Task                                  task,
-            std::chrono::steady_clock::time_point runTime,
-            std::chrono::milliseconds             interval
-        )
-        : id(id),
-          task(std::move(task)),
-          runTime(runTime),
-          interval(interval) {}
-    };
-
     std::unique_ptr<WebSocketClient>                            mWsClient;
     Logger                                                      mLogger{BOT_NAME};
     std::unique_ptr<i18n::LangI18n>                             mI18n;
@@ -42,14 +20,12 @@ private:
     std::map<uint64_t, std::function<void(std::string const&)>> mPacketCallback;
     bool                                                        mColorLog = true;
     std::optional<std::filesystem::path>                        mLogPath;
-    std::mutex                                                  mMtx;
-    std::condition_variable                                     mCv;
-    std::vector<std::shared_ptr<TaskInfo>>                      mTasks;
-    std::unordered_map<TaskID, size_t>                          mTaskIndexMap; // Map from task ID to task index
-    TaskID                                                      mNextTaskID{0};
+    std::optional<ThreadPool<>>                                 mThreadPool;
 
 public:
     KobeBryant();
+
+    void init();
 
     bool hasConnected() const;
 
@@ -77,13 +53,9 @@ public:
 
     bool unsubscribeReceiveRawPacket(uint64_t id);
 
-    TaskID addDelayTask(std::chrono::milliseconds delay, Task const& task);
-
-    TaskID addRepeatTask(std::chrono::milliseconds delay, Task const& task);
-
-    bool cancelTask(TaskID id);
-
     void printVersion();
+
+    ThreadPool<>& getThreadPool();
 };
 
 #define CATCH                                                                                                          \

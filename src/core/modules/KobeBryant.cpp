@@ -1,4 +1,5 @@
 #include "KobeBryant.hpp"
+#include "ScheduleManager.hpp"
 #include "api/utils/ModuleUtils.hpp"
 #include "api/utils/StringUtils.hpp"
 #include "fmt/color.h"
@@ -48,7 +49,14 @@ KobeBryant::KobeBryant() {
         mUrl      = config["ws_url"];
         mToken    = config["token"];
         mWsClient = std::make_unique<WebSocketClient>();
-        // 处理数据包
+        // 初始化线程池
+        mThreadPool.emplace(4);
+    }
+    CATCH
+}
+
+void KobeBryant::init() {
+    try { // 处理数据包
         getWsClient().OnTextReceived([&](WebSocketClient& client, std::string text) {
             for (auto& [id, callback] : mPacketCallback) {
                 if (callback) {
@@ -67,7 +75,7 @@ KobeBryant::KobeBryant() {
                     getLogger().error("bot.error.lostConnection", {S(code)});
                 }
                 mConnected = false;
-                addDelayTask(std::chrono::milliseconds(10000), [&] {
+                Scheduler::getInstance().addDelayTask(std::chrono::milliseconds(10000), [&] {
                     getLogger().info("bot.main.reconnecting");
                     connect();
                 });
@@ -86,44 +94,6 @@ KobeBryant::KobeBryant() {
                 getLogger().error("bot.error.connect", {reason});
             }
         });
-        std::thread([&] {
-            while (EXIST_FLAG) {
-                std::unique_lock<std::mutex> lock(mMtx);
-                mCv.wait(lock, [this] { return !mTasks.empty(); });
-
-                auto              now = std::chrono::high_resolution_clock::now();
-                std::vector<Task> readyTasks;
-
-                // Collect all tasks that are ready to run
-                for (size_t i = 0; i < mTasks.size(); ++i) {
-                    auto& taskPtr = mTasks[i];
-                    if (taskPtr->cancelled.load()) {
-                        mTaskIndexMap.erase(taskPtr->id);
-                        continue;
-                    }
-
-                    if (taskPtr->runTime <= now) {
-                        readyTasks.push_back(taskPtr->task);
-                        if (taskPtr->interval.count() > 0) {
-                            taskPtr->runTime = now + taskPtr->interval;
-                        } else {
-                            mTaskIndexMap.erase(taskPtr->id);
-                            mTasks.erase(mTasks.begin() + i);
-                            --i; // Adjust index after erase
-                        }
-                    }
-                }
-
-                // Notify the main thread to execute the collected tasks
-                lock.unlock();
-                for (auto& task : readyTasks) {
-                    if (task) {
-                        task(); // Execute the task in the main thread
-                    }
-                }
-            }
-            mCv.notify_all();
-        }).detach();
     }
     CATCH
 }
@@ -155,15 +125,17 @@ KobeBryant& KobeBryant::getInstance() {
 }
 
 void KobeBryant::connect() {
-    try {
-        getWsClient().Connect(mUrl, mToken);
-    } catch (const std::exception& ex) {
-        getLogger().error("bot.error.connect", {ex.what()});
-        addDelayTask(std::chrono::milliseconds(10000), [&] {
-            getLogger().info("bot.main.reconnecting");
-            connect();
-        });
-    }
+    getThreadPool().enqueue([&] {
+        try {
+            getWsClient().Connect(mUrl, mToken);
+        } catch (const std::exception& ex) {
+            getLogger().error("bot.error.connect", {ex.what()});
+            Scheduler::getInstance().addDelayTask(std::chrono::milliseconds(10000), [&] {
+                getLogger().info("bot.main.reconnecting");
+                connect();
+            });
+        }
+    });
 }
 
 Logger& KobeBryant::getLogger() { return mLogger; }
@@ -200,42 +172,6 @@ bool KobeBryant::shouldColorLog() const { return mColorLog; }
 
 std::optional<std::filesystem::path> KobeBryant::getLogPath() const { return mLogPath; }
 
-KobeBryant::TaskID KobeBryant::addDelayTask(std::chrono::milliseconds delay, Task const& task) {
-    std::lock_guard<std::mutex> lock(mMtx);
-    TaskID                      id       = mNextTaskID++;
-    auto                        taskInfo = std::make_shared<TaskInfo>(
-        id,
-        std::move(task),
-        std::chrono::steady_clock::now() + delay,
-        std::chrono::milliseconds(0)
-    );
-    mTasks.push_back(taskInfo);
-    mTaskIndexMap[id] = mTasks.size() - 1;
-    mCv.notify_one();
-    return id;
-}
-
-KobeBryant::TaskID KobeBryant::addRepeatTask(std::chrono::milliseconds interval, Task const& task) {
-    std::lock_guard<std::mutex> lock(mMtx);
-    TaskID                      id = mNextTaskID++;
-    auto                        taskInfo =
-        std::make_shared<TaskInfo>(id, std::move(task), std::chrono::steady_clock::now() + interval, interval);
-    mTasks.push_back(taskInfo);
-    mTaskIndexMap[id] = mTasks.size() - 1;
-    mCv.notify_one();
-    return id;
-}
-
-bool KobeBryant::cancelTask(TaskID id) {
-    std::lock_guard<std::mutex> lock(mMtx);
-    auto                        it = mTaskIndexMap.find(id);
-    if (it != mTaskIndexMap.end()) {
-        mTasks[it->second]->cancelled.store(true);
-        return true;
-    }
-    return false;
-}
-
 std::wstring KobeBryant::getProcessMutex() const {
     if (auto key = utils::readFile("./process.key", true)) {
         if (key->size() == 16) {
@@ -261,3 +197,5 @@ void KobeBryant::printVersion() {
     );
     getLogger().info("Copyright © 2024 KobeBryantBot. All rights reserved.");
 }
+
+ThreadPool<>& KobeBryant::getThreadPool() { return *mThreadPool; }

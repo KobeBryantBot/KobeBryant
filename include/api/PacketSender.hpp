@@ -77,8 +77,6 @@ public:
     KobeBryant_NDAPI nlohmann::json serialize() const;
 };
 
-using namespace std::chrono_literals;
-
 class PacketSender {
 public:
     PacketSender();

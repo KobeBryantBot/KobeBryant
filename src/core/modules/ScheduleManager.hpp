@@ -2,6 +2,48 @@
 #include "KobeBryant.hpp"
 #include <unordered_set>
 
+class Scheduler {
+public:
+    using TaskID = size_t;
+    using Task   = std::function<void()>;
+
+private:
+    struct TaskInfo {
+        TaskID                                id;
+        Task                                  task;
+        std::chrono::steady_clock::time_point runTime;
+        std::chrono::milliseconds             interval;
+        std::atomic<bool>                     cancelled{false};
+
+        TaskInfo(
+            TaskID                                id,
+            Task                                  task,
+            std::chrono::steady_clock::time_point runTime,
+            std::chrono::milliseconds             interval
+        )
+        : id(id),
+          task(std::move(task)),
+          runTime(runTime),
+          interval(interval) {}
+    };
+
+protected:
+    std::mutex                             mMtx;
+    std::condition_variable                mCv;
+    std::vector<std::shared_ptr<TaskInfo>> mTasks;
+    std::unordered_map<TaskID, size_t>     mTaskIndexMap;
+    TaskID                                 mNextTaskID = 0;
+
+public:
+    static Scheduler& getInstance();
+
+    TaskID addDelayTask(std::chrono::milliseconds delay, Task const& task);
+
+    TaskID addRepeatTask(std::chrono::milliseconds delay, Task const& task);
+
+    bool cancelTask(TaskID id);
+};
+
 class ScheduleManager {
 private:
     std::unordered_map<HMODULE, std::unordered_set<size_t>> mPluginTasks;
