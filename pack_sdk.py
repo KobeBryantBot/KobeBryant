@@ -16,3 +16,4 @@ lib_folder_path = os.path.join(current_dir, "lib")
 
 shutil.copytree(include_folder_path, os.path.join(sdk_folder_path, "include"))
 shutil.copytree(lib_folder_path, os.path.join(sdk_folder_path, "lib"))
+shutil.copy("./bin/MinSizeRel/KobeBryant.lib", "./sdk/lib/KobeBryant.lib")
