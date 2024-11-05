@@ -144,7 +144,8 @@ bool PluginManager::unloadPlugin(std::string const& name, bool force) {
                 }
             }
             if (mPluginRely[name].empty()) {
-                if (mTypesMap[name]->unloadPlugin(name)) {
+                auto type = mPluginsMap[name];
+                if (mTypesMap[type]->unloadPlugin(name)) {
                     logger.info("bot.plugin.unloaded", {name});
                     mPluginsMap.erase(name);
                     for (auto& [plugin, relys] : mPluginRely) {

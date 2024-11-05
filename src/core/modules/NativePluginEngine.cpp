@@ -58,7 +58,6 @@ bool NativePluginEngine::unloadPlugin(std::string const& name) {
 
 bool NativePluginEngine::unloadPlugin(HMODULE hModule) {
     try {
-        auto& logger = KobeBryant::getInstance().getLogger();
         if (mPluginsMap2.contains(hModule)) {
             auto name = mPluginsMap2[hModule];
             EventBusImpl::getInstance().removePluginListeners(hModule);
@@ -66,12 +65,9 @@ bool NativePluginEngine::unloadPlugin(HMODULE hModule) {
             ScheduleManager::getInstance().removePluginTasks(hModule);
             ServiceManager::getInstance().removePluginFunc(hModule);
             if (FreeLibrary(hModule)) {
-                logger.info("bot.plugin.unloaded", {name});
                 mPluginsMap1.erase(name);
                 mPluginsMap2.erase(hModule);
                 return true;
-            } else {
-                logger.error("bot.plugin.unload.error", {name});
             }
         }
     }
