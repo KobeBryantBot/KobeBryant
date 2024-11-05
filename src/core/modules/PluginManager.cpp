@@ -81,10 +81,11 @@ bool PluginManager::loadPlugin(std::string const& name, bool force) {
 
 bool PluginManager::loadPlugin(PluginManifest const& manifest, std::string const& type, int& count, bool force) {
     if ((!manifest.mPassive || force)) {
-        auto  type   = manifest.mType;
-        auto  name   = manifest.mName;
-        auto& logger = KobeBryant::getInstance().getLogger();
-        if (fs::exists("./plugins/" + name + "/" + manifest.mEntry)) {
+        auto                  type      = manifest.mType;
+        auto                  name      = manifest.mName;
+        auto&                 logger    = KobeBryant::getInstance().getLogger();
+        std::filesystem::path entryPath = "./plugins/" + name + "/" + manifest.mEntry;
+        if (fs::exists(entryPath)) {
             for (auto& depe : manifest.mDependence) {
                 if (loadPlugin(depe, true)) {
                     count++;
@@ -100,7 +101,7 @@ bool PluginManager::loadPlugin(PluginManifest const& manifest, std::string const
                 }
             }
             if (isValidType(type)) {
-                if (mTypesMap[type]->loadPlugin(name)) {
+                if (mTypesMap[type]->loadPlugin(name, entryPath)) {
                     mPluginsMap[name] = type;
                     return true;
                 } else {

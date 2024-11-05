@@ -12,7 +12,7 @@ private:
 public:
     std::string getPluginType() const override;
 
-    bool loadPlugin(std::string const& name) override;
+    bool loadPlugin(std::string const& name, std::filesystem::path const& entry) override;
 
     bool unloadPlugin(std::string const& name) override;
 

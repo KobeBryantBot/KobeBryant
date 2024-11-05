@@ -20,26 +20,19 @@ std::string getErrorReason(unsigned long errorCode) {
     return {};
 }
 
-bool NativePluginEngine::loadPlugin(std::string const& pluginName) {
+bool NativePluginEngine::loadPlugin(std::string const& name, std::filesystem::path const& entry) {
     try {
         auto& logger = KobeBryant::getInstance().getLogger();
-        if (fs::exists("./plugins/" + pluginName + "/manifest.json")) {
-            if (auto manifest = PluginManifest::readFrom("./plugins/" + pluginName + "/manifest.json")) {
-                if (manifest->mType == getPluginType()) {
-                    auto name  = manifest->mName;
-                    auto entry = utils::stringtoWstring("./plugins/" + pluginName + "/" + manifest->mEntry);
-                    if (HMODULE hMoudle = LoadLibrary(entry.c_str())) {
-                        mPluginsMap1[name]    = hMoudle;
-                        mPluginsMap2[hMoudle] = name;
-                        logger.info("bot.nativePlugin.loaded", {name});
-                        return true;
-                    } else {
-                        DWORD errorCode = GetLastError();
-                        auto  reason    = getErrorReason(errorCode);
-                        logger.error("bot.nativePlugin.load.fail", {name, S(errorCode), reason});
-                    }
-                }
-            }
+        auto  wpath  = utils::stringtoWstring(entry.string());
+        if (HMODULE hMoudle = LoadLibrary(wpath.c_str())) {
+            mPluginsMap1[name]    = hMoudle;
+            mPluginsMap2[hMoudle] = name;
+            logger.info("bot.nativePlugin.loaded", {name});
+            return true;
+        } else {
+            DWORD errorCode = GetLastError();
+            auto  reason    = getErrorReason(errorCode);
+            logger.error("bot.nativePlugin.load.fail", {name, S(errorCode), reason});
         }
     }
     CATCH
