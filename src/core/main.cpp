@@ -54,7 +54,7 @@ int main() {
     printLogo();
     bot.printVersion();
     bot.getLogger().info("bot.main.connecting");
-    
+    bot.init();
     bot.connect();
     // 初始化事件系统
     EventDispatcher::getInstance().init();
