@@ -1,4 +1,5 @@
 #include "api/utils/ModuleUtils.hpp"
+#include "api/utils/StringUtils.hpp"
 
 namespace utils {
 
@@ -12,6 +13,13 @@ std::optional<std::string> readResource(HMODULE hModule, int id, bool isBinary) 
         }
     }
     return {};
+}
+
+std::optional<std::vector<uint8_t>> readBinaryResource(HMODULE hModule, int id) {
+    if (auto data = readResource(hModule, id, true)) {
+        return utils::toBinaryArray(data.value());
+    }
+    return std::nullopt;
 }
 
 } // namespace utils

@@ -84,4 +84,8 @@ KobeBryant_NDAPI std::string getTimeStringFormatted(std::string const& format = 
 
 KobeBryant_NDAPI std::string trimString(std::string const& str);
 
+KobeBryant_NDAPI std::string toBinaryString(std::vector<uint8_t> const& binary);
+
+KobeBryant_NDAPI std::vector<uint8_t> toBinaryArray(std::string const& binary);
+
 } // namespace utils
