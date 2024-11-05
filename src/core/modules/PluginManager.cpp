@@ -81,7 +81,7 @@ bool PluginManager::loadPlugin(std::filesystem::path const& path, int& count, bo
                     auto name = manifest->mName;
                     if (fs::exists(path / manifest->mEntry)) {
                         if (path.filename().string() == name) {
-                            auto entry = utils::toWstring(path.string() + "/" + manifest->mEntry);
+                            auto entry = utils::stringtoWstring(path.string() + "/" + manifest->mEntry);
                             for (auto& depe : manifest->mDependence) {
                                 if (loadPlugin(depe, true)) {
                                     count++;
@@ -133,13 +133,13 @@ void PluginManager::unloadAllPlugins() {
     try {
         auto& logger = KobeBryant::getInstance().getLogger();
         logger.info("bot.plugins.unloadingAll");
-        for (auto& [name, hMoudle] : mPluginsMap1) {
-            unloadPlugin(hMoudle, true);
-        }
         EventBusImpl::getInstance().removeAllListeners();
         CommandManager::getInstance().unregisterAllCommands();
         ScheduleManager::getInstance().removeAllTasks();
         ServiceManager::getInstance().removeAllFunc();
+        for (auto& [name, hMoudle] : mPluginsMap1) {
+            unloadPlugin(hMoudle, true);
+        }
         mPluginsMap1.clear();
         mPluginsMap2.clear();
         logger.info("bot.plugins.unloadedAll");

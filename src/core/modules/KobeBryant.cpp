@@ -50,7 +50,7 @@ KobeBryant::KobeBryant() {
         mToken    = config["token"];
         mWsClient = std::make_unique<WebSocketClient>();
         // 初始化线程池
-        mThreadPool.emplace(4);
+        mThreadPool.emplace(3);
     }
     CATCH
 }
@@ -176,12 +176,12 @@ std::wstring KobeBryant::getProcessMutex() const {
     if (auto key = utils::readFile("./process.key", true)) {
         if (key->size() == 16) {
             auto uuid = utils::UUID::fromBinary(*key);
-            return utils::toWstring(uuid.toString());
+            return utils::stringtoWstring(uuid.toString());
         }
     }
     auto uuid = utils::UUID::random();
     utils::writeFile("./process.key", uuid.toBinary(), true);
-    return utils::toWstring(uuid.toString());
+    return utils::stringtoWstring(uuid.toString());
 }
 
 void KobeBryant::printVersion() {
