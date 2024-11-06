@@ -37,7 +37,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 # copy target EXE to output(bin) directory
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${PROJECT_SOURCE_DIR}/output/bin
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${PROJECT_SOURCE_DIR}/output
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${PROJECT_SOURCE_DIR}/output/bin/KobeBryant.exe
     COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/scripts/after_build.py
     COMMENT "Copying ${PROJECT_NAME}.exe to ${PROJECT_SOURCE_DIR}/output/bin directory and packing sdk to ${PROJECT_SOURCE_DIR}/output/sdk directory"
