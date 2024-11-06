@@ -12,7 +12,6 @@ public:
     std::optional<uint64_t>      mSelf;
     std::optional<uint64_t>      mTarget;
 
-
     NoticeEvent(
         NoticeType                   type,
         std::optional<NotifySubType> subType,
