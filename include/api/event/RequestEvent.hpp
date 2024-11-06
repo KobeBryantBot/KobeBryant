@@ -13,6 +13,7 @@ public:
     std::string                   mFlag;
     std::optional<uint64_t>       mGroup;
 
+
     RequestEvent(
         RequestType                   type,
         std::optional<RequestSubType> subType,
