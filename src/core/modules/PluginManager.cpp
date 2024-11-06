@@ -23,9 +23,6 @@ PluginManager& PluginManager::getInstance() {
 
 void PluginManager::loadAllPlugins() {
     try {
-        if (!fs::exists("./plugins")) {
-            fs::create_directories("./plugins");
-        }
         auto& logger = KobeBryant::getInstance().getLogger();
         logger.info("bot.plugins.loadingAll");
         int count = 0;
@@ -39,79 +36,88 @@ void PluginManager::loadAllPlugins() {
 }
 
 void PluginManager::loadAllPlugins(std::weak_ptr<IPluginEngine> engine, int& count) {
-    auto  paths  = utils::getAllFileDirectories("./plugins");
-    auto  type   = engine.lock()->getPluginType();
-    auto& logger = KobeBryant::getInstance().getLogger();
-    for (auto& path : paths) {
-        if (fs::exists(path / "manifest.json")) {
-            if (auto manifest = PluginManifest::readFrom(path / "manifest.json")) {
-                if (manifest->mType == type) {
-                    auto name = manifest->mName;
-                    if (path.filename().string() == name) {
-                        if (loadPlugin(manifest.value(), type, count)) {
-                            count++;
+    try {
+        auto  paths  = utils::getAllFileDirectories("./plugins");
+        auto  type   = engine.lock()->getPluginType();
+        auto& logger = KobeBryant::getInstance().getLogger();
+        for (auto& path : paths) {
+            if (fs::exists(path / "manifest.json")) {
+                if (auto manifest = PluginManifest::readFrom(path / "manifest.json")) {
+                    if (manifest->mType == type) {
+                        auto name = manifest->mName;
+                        if (path.filename().string() == name) {
+                            if (loadPlugin(manifest.value(), type, count)) {
+                                count++;
+                            }
+                        } else {
+                            logger.error("bot.plugin.nameMismatch", {name, path.filename().string(), name});
                         }
-                    } else {
-                        logger.error("bot.plugin.nameMismatch", {name, path.filename().string(), name});
                     }
                 }
             }
         }
     }
+    CATCH
 }
 
 bool PluginManager::loadPlugin(std::string const& name, bool force) {
-    if (!hasPlugin(name)) {
-        if (fs::exists("./plugins/" + name + "/manifest.json")) {
-            if (auto manifest = PluginManifest::readFrom("./plugins/" + name + "/manifest.json")) {
-                if (name == manifest->mName) {
-                    int temp = 0;
-                    return loadPlugin(*manifest, manifest->mType, temp, force);
-                } else {
-                    KobeBryant::getInstance().getLogger().error(
-                        "bot.plugin.nameMismatch",
-                        {manifest->mName, name, manifest->mName}
-                    );
+    try {
+        if (!hasPlugin(name)) {
+            if (fs::exists("./plugins/" + name + "/manifest.json")) {
+                if (auto manifest = PluginManifest::readFrom("./plugins/" + name + "/manifest.json")) {
+                    if (name == manifest->mName) {
+                        int temp = 0;
+                        return loadPlugin(*manifest, manifest->mType, temp, force);
+                    } else {
+                        KobeBryant::getInstance().getLogger().error(
+                            "bot.plugin.nameMismatch",
+                            {manifest->mName, name, manifest->mName}
+                        );
+                    }
                 }
             }
         }
     }
+    CATCH
     return false;
 }
 
 bool PluginManager::loadPlugin(PluginManifest const& manifest, std::string const& type, int& count, bool force) {
-    if ((!manifest.mPassive || force)) {
-        auto                  type      = manifest.mType;
-        auto                  name      = manifest.mName;
-        auto&                 logger    = KobeBryant::getInstance().getLogger();
-        std::filesystem::path entryPath = "./plugins/" + name + "/" + manifest.mEntry;
-        if (fs::exists(entryPath)) {
-            for (auto& depe : manifest.mDependence) {
-                if (loadPlugin(depe, true)) {
-                    count++;
-                    mPluginRely[name].insert(depe);
-                } else {
-                    logger.error("bot.plugin.dependenceMiss", {depe, name});
-                    return false;
+    try {
+        if ((!manifest.mPassive || force)) {
+            auto                  type      = manifest.mType;
+            auto                  name      = manifest.mName;
+            auto&                 logger    = KobeBryant::getInstance().getLogger();
+            std::filesystem::path entryPath = "./plugins/" + name + "/" + manifest.mEntry;
+            if (fs::exists(entryPath)) {
+                for (auto& depe : manifest.mDependence) {
+                    if (loadPlugin(depe, true)) {
+                        count++;
+                        mPluginRely[name].insert(depe);
+                    } else {
+                        logger.error("bot.plugin.dependenceMiss", {depe, name});
+                        return false;
+                    }
                 }
-            }
-            for (auto& opde : manifest.mOptionalDependence) {
-                if (loadPlugin(opde, true)) {
-                    count++;
+                for (auto& opde : manifest.mOptionalDependence) {
+                    if (loadPlugin(opde, true)) {
+                        count++;
+                    }
                 }
-            }
-            if (isValidType(type)) {
-                if (mTypesMap[type]->loadPlugin(name, entryPath)) {
-                    mPluginsMap[name] = type;
-                    return true;
-                } else {
-                    logger.error("bot.plugin.load.fail", {name});
+                if (isValidType(type)) {
+                    if (mTypesMap[type]->loadPlugin(name, entryPath)) {
+                        mPluginsMap[name] = type;
+                        return true;
+                    } else {
+                        logger.error("bot.plugin.load.fail", {name});
+                    }
                 }
+            } else {
+                logger.error("bot.plugin.noEntry", {name, manifest.mEntry});
             }
-        } else {
-            logger.error("bot.plugin.noEntry", {name, manifest.mEntry});
         }
     }
+    CATCH
     return false;
 }
 
@@ -183,26 +189,32 @@ NativePluginEngine& PluginManager::getNativePluginEngine() {
 }
 
 void PluginManager::loadPluginEngines() {
-    auto  paths  = utils::getAllFileDirectories("./plugins");
-    auto& logger = KobeBryant::getInstance().getLogger();
-    for (auto& path : paths) {
-        if (fs::exists(path / "manifest.json")) {
-            if (auto manifest = PluginManifest::readFrom(path / "manifest.json")) {
-                if (manifest->mType == "engine") {
-                    auto name = manifest->mName;
-                    if (path.filename().string() == name) {
-                        auto entry = utils::stringtoWstring("./plugins/" + name + "/" + manifest->mEntry);
-                        if (HMODULE hMoudle = LoadLibrary(entry.c_str())) {
-                            mEngineHandle[name] = hMoudle;
-                            logger.info("bot.pluginEngine.loaded", {name});
+    try {
+        if (!fs::exists("./plugins")) {
+            fs::create_directories("./plugins");
+        }
+        auto  paths  = utils::getAllFileDirectories("./plugins");
+        auto& logger = KobeBryant::getInstance().getLogger();
+        for (auto& path : paths) {
+            if (fs::exists(path / "manifest.json")) {
+                if (auto manifest = PluginManifest::readFrom(path / "manifest.json")) {
+                    if (manifest->mType == "engine") {
+                        auto name = manifest->mName;
+                        if (path.filename().string() == name) {
+                            auto entry = utils::stringtoWstring("./plugins/" + name + "/" + manifest->mEntry);
+                            if (HMODULE hMoudle = LoadLibrary(entry.c_str())) {
+                                mEngineHandle[name] = hMoudle;
+                                logger.info("bot.pluginEngine.loaded", {name});
+                            }
+                        } else {
+                            logger.error("bot.pluginEngine.nameMismatch", {name, path.filename().string(), name});
                         }
-                    } else {
-                        logger.error("bot.pluginEngine.nameMismatch", {name, path.filename().string(), name});
                     }
                 }
             }
         }
     }
+    CATCH
 }
 
 bool PluginManager::registerPluginEngine(std::shared_ptr<IPluginEngine> engine) {
