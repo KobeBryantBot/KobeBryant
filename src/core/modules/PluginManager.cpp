@@ -45,12 +45,14 @@ void PluginManager::loadAllPlugins(std::weak_ptr<IPluginEngine> engine, int& cou
                 if (auto manifest = PluginManifest::readFrom(path / "manifest.json")) {
                     if (manifest->mType == type) {
                         auto name = manifest->mName;
-                        if (path.filename().string() == name) {
-                            if (loadPlugin(manifest.value(), type, count)) {
-                                count++;
+                        if (!hasPlugin(name)) {
+                            if (path.filename().string() == name) {
+                                if (loadPlugin(manifest.value(), type, count)) {
+                                    count++;
+                                }
+                            } else {
+                                logger.error("bot.plugin.nameMismatch", {name, path.filename().string(), name});
                             }
-                        } else {
-                            logger.error("bot.plugin.nameMismatch", {name, path.filename().string(), name});
                         }
                     }
                 }
@@ -91,12 +93,14 @@ bool PluginManager::loadPlugin(PluginManifest const& manifest, std::string const
             std::filesystem::path entryPath = "./plugins/" + name + "/" + manifest.mEntry;
             if (fs::exists(entryPath)) {
                 for (auto& depe : manifest.mDependence) {
-                    if (loadPlugin(depe, true)) {
-                        count++;
-                        mPluginRely[name].insert(depe);
-                    } else {
-                        logger.error("bot.plugin.dependenceMiss", {depe, name});
-                        return false;
+                    if (!hasPlugin(depe)) {
+                        if (loadPlugin(depe, true)) {
+                            count++;
+                            mPluginRely[name].insert(depe);
+                        } else {
+                            logger.error("bot.plugin.dependenceMiss", {depe, name});
+                            return false;
+                        }
                     }
                 }
                 for (auto& opde : manifest.mOptionalDependence) {
