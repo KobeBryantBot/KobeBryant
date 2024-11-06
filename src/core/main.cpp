@@ -40,7 +40,7 @@ int main() {
     // 初始化机器人核心
     auto& bot = KobeBryant::getInstance();
     bot.getLogger().info("bot.main.loadConfig");
-    SetConsoleTitle(utils::toWstring(tr("bot.console.title")).c_str());
+    SetConsoleTitle(utils::stringtoWstring(tr("bot.console.title")).c_str());
     // 创建互斥锁
     HANDLE hMutex = CreateMutex(NULL, FALSE, bot.getProcessMutex().c_str());
     // 检查是否已经有一个实例在运行
@@ -54,10 +54,12 @@ int main() {
     printLogo();
     bot.printVersion();
     bot.getLogger().info("bot.main.connecting");
+    bot.init();
     bot.connect();
     // 初始化事件系统
     EventDispatcher::getInstance().init();
     // 初始化插件
+    PluginManager::getInstance().loadPluginEngines();
     PluginManager::getInstance().loadAllPlugins();
     // 初始化命令系统
     CommandManager::getInstance().init();

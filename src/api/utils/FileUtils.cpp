@@ -1,4 +1,5 @@
 #include "api/utils/FileUtils.hpp"
+#include "api/utils/StringUtils.hpp"
 #include <filesystem>
 
 namespace utils {
@@ -34,6 +35,18 @@ bool writeFile(fs::path const& filePath, std::string_view content, bool isBinary
     fWrite << content;
     fWrite.close();
     return true;
+}
+
+std::optional<std::vector<uint8_t>> readBinaryFile(std::filesystem::path const& filePath) {
+    if (auto data = readFile(filePath, true)) {
+        return utils::toBinaryArray(data.value());
+    }
+    return std::nullopt;
+}
+
+bool writeBinaryFile(std::filesystem::path const& filePath, std::vector<uint8_t> const& content) {
+    auto binary = utils::toBinaryString(content);
+    return writeFile(filePath, binary, true);
 }
 
 std::vector<std::string> getAllFileFullNameInDirectory(std::filesystem::path const& path) {

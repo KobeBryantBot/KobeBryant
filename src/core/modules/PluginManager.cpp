@@ -1,122 +1,78 @@
-#include "core/modules/PluginManager.hpp"
+#include "PluginManager.hpp"
 #include "CommandManager.hpp"
+#include "EventBusImpl.hpp"
 #include "KobeBryant.hpp"
-#include "core/Global.hpp"
-#include "core/modules/EventBusImpl.hpp"
+#include "NativePluginEngine.hpp"
+#include "ScheduleManager.hpp"
+#include "ServiceManager.hpp"
+#include "api/plugin/PluginEngineRegistry.hpp"
+#include "api/utils/StringUtils.hpp"
 
 namespace fs = std::filesystem;
-
-std::optional<std::wstring> getDllPath(std::string const str) {
-    int numChars = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, NULL, 0);
-    if (numChars > 0) {
-        std::vector<wchar_t> wideChars(numChars);
-        int                  numConverted = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, &wideChars[0], numChars);
-        if (numConverted > 0) {
-            std::wstring wideString(wideChars.begin(), wideChars.end() - 1);
-            return wideString;
-        }
-    }
-    return {};
-}
-
-std::optional<PluginManifest> PluginManifest::readFrom(std::filesystem::path const& path) {
-    try {
-        if (auto file = utils::readFile(path)) {
-            auto data = nlohmann::json::parse(*file, nullptr, true, true);
-            if (data.contains("name") && data.contains("entry")) {
-                PluginManifest result;
-                result.mName  = data["name"];
-                result.mEntry = data["entry"];
-                if (data.contains("passive")) {
-                    result.mPassive = data["passive"];
-                }
-                if (data.contains("dependence")) {
-                    result.mDependence = data["dependence"];
-                }
-                if (data.contains("optional_dependence")) {
-                    result.mOptionalDependence = data["optional_dependence"];
-                }
-                return result;
-            }
-        }
-    }
-    CATCH
-    return {};
-}
 
 PluginManager& PluginManager::getInstance() {
     static std::unique_ptr<PluginManager> instance;
     if (!instance) {
-        instance = std::make_unique<PluginManager>();
+        instance          = std::make_unique<PluginManager>();
+        auto nativeEngine = std::make_shared<NativePluginEngine>();
+        instance->mPluginEngines.push_back(nativeEngine);
+        instance->mTypesMap["native"] = nativeEngine;
     }
     return *instance;
 }
 
 void PluginManager::loadAllPlugins() {
-    if (!fs::exists("./plugins")) {
-        fs::create_directories("./plugins");
-    }
-    KobeBryant::getInstance().getLogger().info("bot.plugins.loadingAll");
-    int  count = 0;
-    auto paths = utils::getAllFileDirectories("./plugins");
-    for (auto& path : paths) {
-        if (loadPlugin(path, count)) {
-            count++;
-        }
-    }
-    KobeBryant::getInstance().getLogger().info("bot.plugins.loadedAll", {S(count)});
-}
-
-std::string getErrorReason(unsigned long errorCode) {
-    if (errorCode == 126) {
-        return tr("bot.errorCode.126");
-    } else if (errorCode == 127) {
-        return tr("bot.errorCode.127");
-    }
-    return {};
-}
-
-bool PluginManager::loadPlugin(std::filesystem::path const& path, int& count, bool forceLoad) {
     try {
         auto& logger = KobeBryant::getInstance().getLogger();
-        if (fs::exists(path / "manifest.json")) {
-            if (auto manifest = PluginManifest::readFrom(path / "manifest.json")) {
-                if (!manifest->mPassive || forceLoad) {
-                    auto name = manifest->mName;
-                    if (fs::exists(path / manifest->mEntry)) {
+        logger.info("bot.plugins.loadingAll");
+        int count = 0;
+        for (auto& enginePtr : mPluginEngines) {
+            auto engine = std::weak_ptr<IPluginEngine>(enginePtr);
+            loadAllPlugins(engine, count);
+        }
+        logger.info("bot.plugins.loadedAll", {S(count)});
+    }
+    CATCH
+}
+
+void PluginManager::loadAllPlugins(std::weak_ptr<IPluginEngine> engine, int& count) {
+    try {
+        auto  paths  = utils::getAllFileDirectories("./plugins");
+        auto  type   = engine.lock()->getPluginType();
+        auto& logger = KobeBryant::getInstance().getLogger();
+        for (auto& path : paths) {
+            if (fs::exists(path / "manifest.json")) {
+                if (auto manifest = PluginManifest::readFrom(path / "manifest.json")) {
+                    if (manifest->mType == type) {
+                        auto name = manifest->mName;
                         if (path.filename().string() == name) {
-                            if (auto entry = getDllPath(path.string() + "/" + manifest->mEntry)) {
-                                for (auto& depe : manifest->mDependence) {
-                                    if (loadPlugin(depe, true)) {
-                                        count++;
-                                    } else {
-                                        logger.error("bot.plugin.dependenceMiss", {depe, name});
-                                        return false;
-                                    }
-                                }
-                                for (auto& opde : manifest->mOptionalDependence) {
-                                    if (loadPlugin(opde, true)) {
-                                        count++;
-                                    }
-                                }
-                                if (!hasPlugin(name)) {
-                                    if (HMODULE hMoudle = LoadLibrary(entry->c_str())) {
-                                        mPluginsMap1[name]    = hMoudle;
-                                        mPluginsMap2[hMoudle] = name;
-                                        logger.info("bot.plugin.loaded", {name});
-                                        return true;
-                                    } else {
-                                        DWORD errorCode = GetLastError();
-                                        auto  reason    = getErrorReason(errorCode);
-                                        logger.error("bot.plugin.load.fail", {name, S(errorCode), reason});
-                                    }
-                                }
+                            if (loadPlugin(manifest.value(), type, count)) {
+                                count++;
                             }
                         } else {
                             logger.error("bot.plugin.nameMismatch", {name, path.filename().string(), name});
                         }
+                    }
+                }
+            }
+        }
+    }
+    CATCH
+}
+
+bool PluginManager::loadPlugin(std::string const& name, bool force) {
+    try {
+        if (!hasPlugin(name)) {
+            if (fs::exists("./plugins/" + name + "/manifest.json")) {
+                if (auto manifest = PluginManifest::readFrom("./plugins/" + name + "/manifest.json")) {
+                    if (name == manifest->mName) {
+                        int temp = 0;
+                        return loadPlugin(*manifest, manifest->mType, temp, force);
                     } else {
-                        logger.error("bot.plugin.noEntry", {name, manifest->mEntry});
+                        KobeBryant::getInstance().getLogger().error(
+                            "bot.plugin.nameMismatch",
+                            {manifest->mName, name, manifest->mName}
+                        );
                     }
                 }
             }
@@ -126,45 +82,94 @@ bool PluginManager::loadPlugin(std::filesystem::path const& path, int& count, bo
     return false;
 }
 
-bool PluginManager::loadPlugin(std::string const& folderName, bool forceLoad) {
-    auto path  = std::filesystem::path("./plugins");
-    path      /= folderName;
-    int count  = 0;
-    return loadPlugin(path, count, forceLoad);
-}
-
-void PluginManager::unloadAllPlugins() {
-    auto& logger = KobeBryant::getInstance().getLogger();
-    logger.info("bot.plugins.unloadingAll");
-    for (auto& [name, hMoudle] : mPluginsMap1) {
-        unloadPlugin(hMoudle);
+bool PluginManager::loadPlugin(PluginManifest const& manifest, std::string const& type, int& count, bool force) {
+    try {
+        if ((!manifest.mPassive || force)) {
+            auto                  type      = manifest.mType;
+            auto                  name      = manifest.mName;
+            auto&                 logger    = KobeBryant::getInstance().getLogger();
+            std::filesystem::path entryPath = "./plugins/" + name + "/" + manifest.mEntry;
+            if (fs::exists(entryPath)) {
+                for (auto& depe : manifest.mDependence) {
+                    if (loadPlugin(depe, true)) {
+                        count++;
+                        mPluginRely[name].insert(depe);
+                    } else {
+                        logger.error("bot.plugin.dependenceMiss", {depe, name});
+                        return false;
+                    }
+                }
+                for (auto& opde : manifest.mOptionalDependence) {
+                    if (loadPlugin(opde, true)) {
+                        count++;
+                    }
+                }
+                if (isValidType(type)) {
+                    if (mTypesMap[type]->loadPlugin(name, entryPath)) {
+                        mPluginsMap[name] = type;
+                        return true;
+                    } else {
+                        logger.error("bot.plugin.load.fail", {name});
+                    }
+                }
+            } else {
+                logger.error("bot.plugin.noEntry", {name, manifest.mEntry});
+            }
+        }
     }
-    EventBusImpl::getInstance().removeAllListeners();
-    CommandManager::getInstance().unregisterAllCommands();
-    mPluginsMap1.clear();
-    mPluginsMap2.clear();
-    logger.info("bot.plugins.unloadedAll");
-}
-
-bool PluginManager::unloadPlugin(std::string const& name) {
-    if (mPluginsMap1.contains(name)) {
-        auto hModule = mPluginsMap1[name];
-        return unloadPlugin(hModule);
-    }
+    CATCH
     return false;
 }
 
-bool PluginManager::unloadPlugin(HMODULE hModule) {
+bool PluginManager::hasPlugin(std::string const& name) const { return mPluginsMap.contains(name); }
+
+bool PluginManager::isValidType(std::string const& name) const { return mTypesMap.contains(name); }
+
+void PluginManager::unloadAllPlugins() {
     try {
-        if (mPluginsMap2.contains(hModule)) {
-            auto name = mPluginsMap2[hModule];
-            EventBusImpl::getInstance().removePluginListeners(hModule);
-            CommandManager::getInstance().unregisterPluginCommands(hModule);
-            FreeLibrary(hModule);
-            KobeBryant::getInstance().getLogger().info("bot.plugin.unloaded", {name});
-            mPluginsMap1.erase(name);
-            mPluginsMap2.erase(hModule);
-            return true;
+        EventBusImpl::getInstance().removeAllListeners();
+        CommandManager::getInstance().unregisterAllCommands();
+        ScheduleManager::getInstance().removeAllTasks();
+        ServiceManager::getInstance().removeAllFunc();
+        auto& logger = KobeBryant::getInstance().getLogger();
+        logger.info("bot.plugins.unloadingAll");
+        for (auto& [name, type] : mPluginsMap) {
+            unloadPlugin(name, true);
+        }
+        mPluginsMap.clear();
+        logger.info("bot.plugins.unloadedAll");
+    }
+    CATCH
+}
+
+bool PluginManager::unloadPlugin(std::string const& name, bool force) {
+    try {
+        auto& logger = KobeBryant::getInstance().getLogger();
+        if (hasPlugin(name)) {
+            if (force && !mPluginRely.empty()) {
+                for (auto& rely : mPluginRely[name]) {
+                    unloadPlugin(rely, true);
+                }
+            }
+            if (mPluginRely[name].empty()) {
+                auto type = mPluginsMap[name];
+                if (mTypesMap[type]->unloadPlugin(name)) {
+                    mPluginsMap.erase(name);
+                    for (auto& [plugin, relys] : mPluginRely) {
+                        relys.erase(name);
+                    }
+                    return true;
+                } else {
+                    logger.error("bot.plugin.unload.error", {name});
+                }
+            } else {
+                std::string relylist;
+                for (auto& rely : mPluginRely[name]) {
+                    relylist.append(rely + ", ");
+                }
+                relylist.erase(relylist.size() - 2);
+                logger.error("bot.plugin.unload.dependence", {name, relylist});
+            }
         }
     }
     CATCH
@@ -173,10 +178,62 @@ bool PluginManager::unloadPlugin(HMODULE hModule) {
 
 std::vector<std::string> PluginManager::getAllPlugins() {
     std::vector<std::string> result;
-    for (auto& [name, hModule] : mPluginsMap1) {
+    for (auto& [name, type] : mPluginsMap) {
         result.push_back(name);
     }
     return result;
 }
 
-bool PluginManager::hasPlugin(std::string const& name) { return mPluginsMap1.contains(name); }
+NativePluginEngine& PluginManager::getNativePluginEngine() {
+    return *static_cast<NativePluginEngine*>(mTypesMap["native"].get());
+}
+
+void PluginManager::loadPluginEngines() {
+    try {
+        if (!fs::exists("./plugins")) {
+            fs::create_directories("./plugins");
+        }
+        auto  paths  = utils::getAllFileDirectories("./plugins");
+        auto& logger = KobeBryant::getInstance().getLogger();
+        for (auto& path : paths) {
+            if (fs::exists(path / "manifest.json")) {
+                if (auto manifest = PluginManifest::readFrom(path / "manifest.json")) {
+                    if (manifest->mType == "engine") {
+                        auto name = manifest->mName;
+                        if (path.filename().string() == name) {
+                            auto entry = utils::stringtoWstring("./plugins/" + name + "/" + manifest->mEntry);
+                            if (HMODULE hMoudle = LoadLibrary(entry.c_str())) {
+                                mEngineHandle[name] = hMoudle;
+                                logger.info("bot.pluginEngine.loaded", {name});
+                            }
+                        } else {
+                            logger.error("bot.pluginEngine.nameMismatch", {name, path.filename().string(), name});
+                        }
+                    }
+                }
+            }
+        }
+    }
+    CATCH
+}
+
+bool PluginManager::registerPluginEngine(std::shared_ptr<IPluginEngine> engine) {
+    auto type = engine->getPluginType();
+    if (!isValidType(type)) {
+        mTypesMap[type] = engine;
+        mPluginEngines.push_back(engine);
+        KobeBryant::getInstance().getLogger().info("bot.pluginEngine.registered", {engine->getPluginType()});
+        return true;
+    }
+    return false;
+}
+
+bool PluginEngineRegistry::registerPluginEngine(std::shared_ptr<IPluginEngine> engine) {
+    return PluginManager::getInstance().registerPluginEngine(std::move(engine));
+}
+
+void PluginManager::unloadPluginEngines() {
+    for (auto& [en, handle] : mEngineHandle) {
+        FreeLibrary(handle);
+    }
+}

@@ -1,37 +1,45 @@
 #pragma once
-#include "core/Global.hpp"
-
-struct PluginManifest {
-    std::string              mName;
-    std::string              mEntry;
-    bool                     mPassive            = false;
-    std::vector<std::string> mDependence         = {};
-    std::vector<std::string> mOptionalDependence = {};
-
-    static std::optional<PluginManifest> readFrom(std::filesystem::path const& path);
-};
+#include "NativePluginEngine.hpp"
+#include "PluginManifest.hpp"
+#include "api/plugin/IPluginEngine.hpp"
+#include <iostream>
+#include <unordered_map>
+#include <unordered_set>
 
 class PluginManager {
 private:
-    std::unordered_map<std::string, HMODULE> mPluginsMap1;
-    std::unordered_map<HMODULE, std::string> mPluginsMap2;
+    std::unordered_map<std::string, std::string>                     mPluginsMap;
+    std::unordered_map<std::string, std::shared_ptr<IPluginEngine>>  mTypesMap;
+    std::vector<std::shared_ptr<IPluginEngine>>                      mPluginEngines;
+    std::unordered_map<std::string, std::unordered_set<std::string>> mPluginRely;
+    std::unordered_map<std::string, HMODULE>                         mEngineHandle;
 
 public:
     static PluginManager& getInstance();
 
+    bool hasPlugin(std::string const& name) const;
+
+    bool isValidType(std::string const& type) const;
+
+    void loadPluginEngines();
+
+    void unloadPluginEngines();
+
+    bool registerPluginEngine(std::shared_ptr<IPluginEngine> engine);
+
     void loadAllPlugins();
+
+    void loadAllPlugins(std::weak_ptr<IPluginEngine> engine, int& count);
+
+    bool loadPlugin(std::string const& name, bool force = false);
+
+    bool loadPlugin(PluginManifest const& manifest, std::string const& type, int& count, bool force = false);
 
     void unloadAllPlugins();
 
-    bool loadPlugin(std::string const& folderName, bool forceLoad = false);
-
-    bool loadPlugin(std::filesystem::path const& path, int& count, bool forceLoad = false);
-
-    bool unloadPlugin(std::string const& name);
-
-    bool unloadPlugin(HMODULE hModule);
+    bool unloadPlugin(std::string const& name, bool force = false);
 
     std::vector<std::string> getAllPlugins();
 
-    bool hasPlugin(std::string const& name);
+    NativePluginEngine& getNativePluginEngine();
 };

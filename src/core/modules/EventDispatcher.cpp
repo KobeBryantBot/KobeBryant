@@ -1,5 +1,6 @@
 #include "EventDispatcher.hpp"
 #include "KobeBryant.hpp"
+#include "ScheduleManager.hpp"
 #include "api/EventBus.hpp"
 #include "api/event/MessageEvent.hpp"
 #include "api/event/MetaEvent.hpp"
@@ -141,7 +142,7 @@ void EventDispatcher::addCallback(
     uint64_t                                          seconds
 ) {
     mCallbacks[uuid] = std::move(callback);
-    KobeBryant::getInstance().addDelayTask(seconds, [this, uuid, timeoutCallback] {
+    Scheduler::getInstance().addDelayTask(std::chrono::milliseconds(1000 * seconds), [this, uuid, timeoutCallback] {
         std::lock_guard lock{mMutex};
         if (mCallbacks.contains(uuid) && timeoutCallback) {
             timeoutCallback();

@@ -2,6 +2,7 @@
 /.xmake
 /.vscode
 /bin
+/output
 /out
 /CMakeSettings.json
 /.vs

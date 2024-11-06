@@ -1,4 +1,5 @@
 #include "KobeBryant.hpp"
+#include "ScheduleManager.hpp"
 #include "api/utils/ModuleUtils.hpp"
 #include "api/utils/StringUtils.hpp"
 #include "fmt/color.h"
@@ -48,7 +49,14 @@ KobeBryant::KobeBryant() {
         mUrl      = config["ws_url"];
         mToken    = config["token"];
         mWsClient = std::make_unique<WebSocketClient>();
-        // 处理数据包
+        // 初始化线程池
+        mThreadPool.emplace(3);
+    }
+    CATCH
+}
+
+void KobeBryant::init() {
+    try { // 处理数据包
         getWsClient().OnTextReceived([&](WebSocketClient& client, std::string text) {
             for (auto& [id, callback] : mPacketCallback) {
                 if (callback) {
@@ -67,7 +75,7 @@ KobeBryant::KobeBryant() {
                     getLogger().error("bot.error.lostConnection", {S(code)});
                 }
                 mConnected = false;
-                addDelayTask(10, [&] {
+                Scheduler::getInstance().addDelayTask(std::chrono::milliseconds(10000), [&] {
                     getLogger().info("bot.main.reconnecting");
                     connect();
                 });
@@ -86,27 +94,6 @@ KobeBryant::KobeBryant() {
                 getLogger().error("bot.error.connect", {reason});
             }
         });
-        std::thread([&] {
-            while (EXIST_FLAG) {
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-                for (auto& [id, delay] : mTaskDelay) {
-                    delay--;
-                    if (delay <= 0) {
-                        if (auto& func = mTasks[id]) {
-                            func();
-                            if (mTaskRepeat.contains(id)) {
-                                delay = mTaskRepeat[id];
-                            } else {
-                                mTaskDelay.erase(id);
-                                mTasks.erase(id);
-                            }
-                        } else {
-                            mTasks.erase(id);
-                        }
-                    }
-                }
-            }
-        }).detach();
     }
     CATCH
 }
@@ -138,15 +125,17 @@ KobeBryant& KobeBryant::getInstance() {
 }
 
 void KobeBryant::connect() {
-    try {
-        getWsClient().Connect(mUrl, mToken);
-    } catch (const std::exception& ex) {
-        getLogger().error("bot.error.connect", {ex.what()});
-        addDelayTask(10, [&] {
-            getLogger().info("bot.main.reconnecting");
-            connect();
-        });
-    }
+    getThreadPool().enqueue([&] {
+        try {
+            getWsClient().Connect(mUrl, mToken);
+        } catch (const std::exception& ex) {
+            getLogger().error("bot.error.connect", {ex.what()});
+            Scheduler::getInstance().addDelayTask(std::chrono::milliseconds(10000), [&] {
+                getLogger().info("bot.main.reconnecting");
+                connect();
+            });
+        }
+    });
 }
 
 Logger& KobeBryant::getLogger() { return mLogger; }
@@ -183,44 +172,16 @@ bool KobeBryant::shouldColorLog() const { return mColorLog; }
 
 std::optional<std::filesystem::path> KobeBryant::getLogPath() const { return mLogPath; }
 
-uint64_t KobeBryant::addDelayTask(uint64_t seconds, std::function<void()> const& task) {
-    mNextTaskId++;
-    auto id        = mNextTaskId;
-    mTasks[id]     = std::move(task);
-    mTaskDelay[id] = seconds;
-    return id;
-}
-
-uint64_t KobeBryant::addRepeatTask(uint64_t seconds, std::function<void()> const& task) {
-    mNextTaskId++;
-    auto id         = mNextTaskId;
-    mTasks[id]      = std::move(task);
-    mTaskRepeat[id] = seconds;
-    mTaskDelay[id]  = seconds;
-    return id;
-}
-
-bool KobeBryant::cancelTask(uint64_t id) {
-    std::lock_guard lock{mMutex};
-    if (mTaskDelay.contains(id)) {
-        mTasks.erase(id);
-        mTaskRepeat.erase(id);
-        mTaskDelay.erase(id);
-        return true;
-    }
-    return false;
-}
-
 std::wstring KobeBryant::getProcessMutex() const {
     if (auto key = utils::readFile("./process.key", true)) {
         if (key->size() == 16) {
             auto uuid = utils::UUID::fromBinary(*key);
-            return utils::toWstring(uuid.toString());
+            return utils::stringtoWstring(uuid.toString());
         }
     }
     auto uuid = utils::UUID::random();
     utils::writeFile("./process.key", uuid.toBinary(), true);
-    return utils::toWstring(uuid.toString());
+    return utils::stringtoWstring(uuid.toString());
 }
 
 void KobeBryant::printVersion() {
@@ -236,3 +197,5 @@ void KobeBryant::printVersion() {
     );
     getLogger().info("Copyright © 2024 KobeBryantBot. All rights reserved.");
 }
+
+ThreadPool<>& KobeBryant::getThreadPool() { return *mThreadPool; }

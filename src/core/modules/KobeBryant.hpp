@@ -1,13 +1,15 @@
 #pragma once
-#include "LightWebSocketClient/WebSocketClient.h"
+#include "api/ThreadPool.hpp"
 #include "api/i18n/LangI18n.hpp"
 #include "api/utils/FileUtils.hpp"
 #include "api/utils/UUID.hpp"
 #include "core/Global.hpp"
+#include "lightwebsocketclient/WebSocketClient.h"
 #include "resource.hpp"
 #include <mutex>
 
 class KobeBryant {
+private:
     std::unique_ptr<WebSocketClient>                            mWsClient;
     Logger                                                      mLogger{BOT_NAME};
     std::unique_ptr<i18n::LangI18n>                             mI18n;
@@ -18,15 +20,12 @@ class KobeBryant {
     std::map<uint64_t, std::function<void(std::string const&)>> mPacketCallback;
     bool                                                        mColorLog = true;
     std::optional<std::filesystem::path>                        mLogPath;
-    uint64_t                                                    mNextTaskId = 0;
-    std::unordered_map<uint64_t, std::function<void()>>         mTasks;
-    std::unordered_map<uint64_t, int64_t>                       mTaskDelay;
-    std::unordered_map<uint64_t, int64_t>                       mTaskRepeat;
-    std::mutex                                                  mMutex;
-    utils::UUID                                                 mProcessId;
+    std::optional<ThreadPool<>>                                 mThreadPool;
 
 public:
     KobeBryant();
+
+    void init();
 
     bool hasConnected() const;
 
@@ -54,13 +53,9 @@ public:
 
     bool unsubscribeReceiveRawPacket(uint64_t id);
 
-    uint64_t addDelayTask(uint64_t seconds, std::function<void()> const& task);
-
-    uint64_t addRepeatTask(uint64_t seconds, std::function<void()> const& task);
-
-    bool cancelTask(uint64_t id);
-
     void printVersion();
+
+    ThreadPool<>& getThreadPool();
 };
 
 #define CATCH                                                                                                          \

@@ -1,6 +1,7 @@
 #include "api/Logger.hpp"
 #include "api/EventBus.hpp"
 #include "api/event/LoggerOutputEvent.hpp"
+#include "api/utils/StringUtils.hpp"
 #include "core/Global.hpp"
 #include "core/modules/KobeBryant.hpp"
 #include "fmt/base.h"
@@ -12,15 +13,6 @@
 #include <string>
 
 #define COLOR(color, data) fmt::format(fg(color), fmt::runtime(data))
-
-std::string getCurrentTimeFormatted() {
-    time_t    time_s = time(0);
-    struct tm now_tm;
-    localtime_s(&now_tm, &time_s);
-    std::stringstream ss;
-    ss << std::put_time(&now_tm, "[%Y-%m-%d %H:%M:%S]");
-    return ss.str();
-}
 
 std::string getLoggerPrefix(Logger::LogLevel level) {
     static std::vector<std::string> map = {"[FATAL]", "[ERROR]", "[WARN]", "[INFO]", "[DEBUG]"};
@@ -56,7 +48,7 @@ void logToFile(std::filesystem::path const& path, std::string const& logStr) {
 void Logger::printStr(LogLevel level, std::string const& data) const {
     try {
         if (mLogLevel >= level) {
-            auto              timeStr = getCurrentTimeFormatted();
+            auto              timeStr = utils::getTimeStringFormatted("[%Y-%m-%d %H:%M:%S]");
             auto              prefix  = getLoggerPrefix(level);
             auto              logStr  = fmt::format("{} {} {} {}", timeStr, prefix, mTitle, data);
             LoggerOutputEvent ev(data, level, mTitle, timeStr);
