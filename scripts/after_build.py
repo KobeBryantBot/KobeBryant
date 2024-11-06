@@ -1,8 +1,6 @@
 import os
 import shutil
 
-current_dir = os.getcwd()
-
 if os.path.exists("../output/sdk"):
     shutil.rmtree("../output/sdk")
 
