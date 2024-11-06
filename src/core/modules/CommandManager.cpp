@@ -23,7 +23,7 @@ void CommandManager::init() {
                 PluginManager::getInstance().unloadPluginEngines();
                 KobeBryant::getInstance().getLogger().info("bot.main.stopping");
                 KobeBryant::getInstance().getWsClient().Close();
-                PRINT(tr("bot.main.exit"));
+                fmt::print("{}\n", tr("bot.main.exit"));
                 _getch();
                 return;
             } else if (input == "reload") {
