@@ -21,6 +21,11 @@ jobs:
           cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=MinSizeRel
         shell: cmd
 
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12.6'
+
       - name: Build all
         run: |
           cmake --build ${{github.workspace}}/build --config MinSizeRel
