@@ -21,6 +21,11 @@ jobs:
           cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=MinSizeRel
         shell: cmd
 
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12.6'
+
       - name: Build all
         run: |
           cmake --build ${{github.workspace}}/build --config MinSizeRel
@@ -38,7 +43,7 @@ jobs:
           echo ${{secrets.DEPLOY_KEY}} >> ~/.ssh/id_rsa
           echo "-----END OPENSSH PRIVATE KEY-----" >> ~/.ssh/id_rsa
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "186297309+github-actions[bot]@users.noreply.github.com"
           cd scripts
           cmd //c "UpdateSDK.cmd action"
         shell: bash
