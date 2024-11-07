@@ -96,7 +96,7 @@ bool PluginManager::loadPlugin(PluginManifest const& manifest, std::string const
                     if (!hasPlugin(depe)) {
                         if (loadPlugin(depe, true)) {
                             count++;
-                            mPluginRely[name].insert(depe);
+                            mPluginRely[depe].insert(name);
                         } else {
                             logger.error("bot.plugin.dependenceMiss", {depe, name});
                             return false;
@@ -142,15 +142,14 @@ void PluginManager::unloadAllPlugins() {
         }
         mPluginsMap.clear();
         logger.info("bot.plugins.unloadedAll");
-    }
-    CATCH
+    } catch (...) {}
 }
 
 bool PluginManager::unloadPlugin(std::string const& name, bool force) {
     try {
         auto& logger = KobeBryant::getInstance().getLogger();
         if (hasPlugin(name)) {
-            if (force && !mPluginRely.empty()) {
+            if (force && !mPluginRely[name].empty()) {
                 for (auto& rely : mPluginRely[name]) {
                     unloadPlugin(rely, true);
                 }
