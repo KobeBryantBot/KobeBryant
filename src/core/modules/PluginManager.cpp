@@ -236,9 +236,13 @@ bool PluginEngineRegistry::registerPluginEngine(std::shared_ptr<IPluginEngine> e
 }
 
 void PluginManager::unloadPluginEngines() {
-    mEngineHandle.clear();
-    mPluginEngines.clear();
-    for (auto& [en, handle] : mEngineHandle) {
-        FreeLibrary(handle);
+    try {
+        mPluginEngines.clear();
+        mTypesMap.clear();
+        for (auto& [en, handle] : mEngineHandle) {
+            FreeLibrary(handle);
+        }
+        mEngineHandle.clear();
     }
+    CATCH
 }
