@@ -47,3 +47,5 @@ bot.errorCode.127=找不到指定的程序！
 bot.plugin.noEntry=无法加载插件 %1$s，找不到插件入口文件 %2$s
 bot.nativePlugin.load.fail=无法加载原生插件 %1$s，错误码[%2$s] %3$s
 bot.catch.unknownEception=捕获到未知的 SEH 异常
+bot.nativePlugin.unloading=正在卸载原生插件 %s
+bot.nativePlugin.loading=正在加载原生插件 %s

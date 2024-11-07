@@ -23,7 +23,8 @@ std::string getErrorReason(unsigned long errorCode) {
 bool NativePluginEngine::loadPlugin(std::string const& name, std::filesystem::path const& entry) {
     try {
         auto& logger = KobeBryant::getInstance().getLogger();
-        auto  wpath  = utils::stringtoWstring(entry.string());
+        logger.info("bot.nativePlugin.loading", {name});
+        auto wpath = utils::stringtoWstring(entry.string());
         if (HMODULE hMoudle = LoadLibrary(wpath.c_str())) {
             mPluginsMap1[name]    = hMoudle;
             mPluginsMap2[hMoudle] = name;
@@ -54,6 +55,7 @@ bool NativePluginEngine::unloadPlugin(HMODULE hModule) {
     try {
         if (mPluginsMap2.contains(hModule)) {
             auto name = mPluginsMap2[hModule];
+            KobeBryant::getInstance().getLogger().info("bot.nativePlugin.unloading", {name});
             EventBusImpl::getInstance().removePluginListeners(hModule);
             CommandManager::getInstance().unregisterPluginCommands(hModule);
             ScheduleManager::getInstance().removePluginTasks(hModule);
