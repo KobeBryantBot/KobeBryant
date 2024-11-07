@@ -61,4 +61,12 @@ public:
 #define CATCH                                                                                                          \
     catch (const std::exception& e) {                                                                                  \
         KobeBryant::getInstance().getLogger().error("bot.catch.exception", {e.what()});                                \
+    }                                                                                                                  \
+    catch (...) {                                                                                                      \
+        KobeBryant::getInstance().getLogger().error("bot.catch.unknownEception");                                      \
+    }
+
+#define CATCH_END                                                                                                      \
+    catch (...) {                                                                                                      \
+        KobeBryant::getInstance().getLogger().error("bot.catch.unknownEception");                                      \
     }

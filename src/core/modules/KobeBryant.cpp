@@ -65,6 +65,7 @@ void KobeBryant::init() {
                     } catch (const std::exception& ex) {
                         getLogger().error("bot.error.callback", {ex.what()});
                     }
+                    CATCH_END
                 }
             }
         });
@@ -82,6 +83,7 @@ void KobeBryant::init() {
             } catch (const std::exception& ex) {
                 getLogger().error("bot.error.reconnecting", {ex.what()});
             }
+            CATCH_END
         });
         // 登录
         subscribeLogin([&](bool success, nlohmann::json data) {
@@ -135,6 +137,7 @@ void KobeBryant::connect() {
                 connect();
             });
         }
+        CATCH_END
     });
 }
 
@@ -150,6 +153,7 @@ void KobeBryant::sendRawPacket(std::string const& input) {
     } catch (const std::exception& ex) {
         getLogger().error("bot.error.send", {ex.what()});
     }
+    CATCH_END
 }
 
 bool KobeBryant::hasConnected() const { return mConnected; }

@@ -46,3 +46,4 @@ bot.errorCode.126=找不到指定的模块！
 bot.errorCode.127=找不到指定的程序！
 bot.plugin.noEntry=无法加载插件 %1$s，找不到插件入口文件 %2$s
 bot.nativePlugin.load.fail=无法加载原生插件 %1$s，错误码[%2$s] %3$s
+bot.catch.unknownEception=捕获到未知的 SEH 异常

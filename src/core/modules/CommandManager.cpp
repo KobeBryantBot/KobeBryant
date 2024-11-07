@@ -124,9 +124,8 @@ void CommandManager::handleCommand(
                 }
             }
             return logger.error("command.wrongArguments", {">>" + raw + "<<"});
-        } catch (...) {
-            return logger.error("command.wrongArguments", {">>" + raw + "<<"});
         }
+        CATCH
     } else {
         if (auto callback = mCallbacks[cmd]) {
             try {
@@ -134,6 +133,7 @@ void CommandManager::handleCommand(
             } catch (const std::exception& e) {
                 logger.error("command.exception", {e.what()});
             }
+            CATCH_END
         }
     }
 }

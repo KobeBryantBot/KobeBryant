@@ -132,6 +132,7 @@ void EventDispatcher::init() {
         } catch (const std::exception& e) {
             KobeBryant::getInstance().getLogger().error("bot.error.prasePacket", {e.what()});
         }
+        CATCH_END
     });
 }
 
