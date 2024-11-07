@@ -13,32 +13,30 @@ CommandManager& CommandManager::getInstance() {
 }
 
 void CommandManager::init() {
-    std::jthread([&] {
-        std::string input;
-        while (std::getline(std::cin, input)) {
-            // 关闭程序命令
-            if (input == "stop") {
-                EXIST_FLAG = false;
-                PluginManager::getInstance().unloadAllPlugins();
-                PluginManager::getInstance().unloadPluginEngines();
-                KobeBryant::getInstance().getLogger().info("bot.main.stopping");
-                KobeBryant::getInstance().getWsClient().Close();
-                fmt::print("{}\n", tr("bot.main.exit"));
-                _getch();
-                return;
-            } else if (input == "reload") {
-                PluginManager::getInstance().unloadAllPlugins();
-                PluginManager::getInstance().loadAllPlugins();
-            } else if (input == "version") {
-                KobeBryant::getInstance().getLogger().info(
-                    "bot.command.version",
-                    {BOT_NAME, S(KOBE_VERSION_MAJOR), S(KOBE_VERSION_MINOR), S(KOBE_VERSION_PATCH)}
-                );
-            } else {
-                handleConsoleInput(input);
-            }
+    std::string input;
+    while (std::getline(std::cin, input)) {
+        // 关闭程序命令
+        if (input == "stop") {
+            EXIST_FLAG = false;
+            PluginManager::getInstance().unloadAllPlugins();
+            PluginManager::getInstance().unloadPluginEngines();
+            KobeBryant::getInstance().getLogger().info("bot.main.stopping");
+            KobeBryant::getInstance().getWsClient().Close();
+            fmt::print("{}\n", tr("bot.main.exit"));
+            _getch();
+            return;
+        } else if (input == "reload") {
+            PluginManager::getInstance().unloadAllPlugins();
+            PluginManager::getInstance().loadAllPlugins();
+        } else if (input == "version") {
+            KobeBryant::getInstance().getLogger().info(
+                "bot.command.version",
+                {BOT_NAME, S(KOBE_VERSION_MAJOR), S(KOBE_VERSION_MINOR), S(KOBE_VERSION_PATCH)}
+            );
+        } else {
+            handleConsoleInput(input);
         }
-    }).join();
+    }
 }
 
 void CommandManager::handleConsoleInput(std::string const& input) {

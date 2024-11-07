@@ -50,7 +50,7 @@ KobeBryant::KobeBryant() {
         mToken    = config["token"];
         mWsClient = std::make_unique<WebSocketClient>();
         // 初始化线程池
-        mThreadPool.emplace(3);
+        mThreadPool.emplace(2);
     }
     CATCH
 }
