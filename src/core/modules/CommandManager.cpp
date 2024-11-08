@@ -15,25 +15,8 @@ CommandManager& CommandManager::getInstance() {
 
 void CommandManager::init() {
     std::string input;
-    while (std::getline(std::cin, input)) {
-        // 关闭程序命令
-        if (input == "stop") {
-            EXIST_FLAG = false;
-            PluginManager::getInstance().unloadAllPlugins();
-            PluginManager::getInstance().unloadPluginEngines();
-            KobeBryant::getInstance().getLogger().info("bot.main.stopping");
-            KobeBryant::getInstance().getWsClient().Close();
-            fmt::print("{}\n", tr("bot.main.exit"));
-            _getch();
-            return;
-        } else if (input == "reload") {
-            PluginManager::getInstance().unloadAllPlugins();
-            PluginManager::getInstance().loadAllPlugins();
-        } else if (input == "version") {
-            KobeBryant::getInstance().getLogger().info("command.version.result", {KOBE_VERSION_COLOR_STRING});
-        } else {
-            handleConsoleInput(input);
-        }
+    while (EXIST_FLAG && std::getline(std::cin, input)) {
+        handleConsoleInput(input);
     }
 }
 
@@ -73,7 +56,21 @@ void CommandManager::handleCommand(
     std::string const&              raw
 ) {
     auto& logger = KobeBryant::getInstance().getLogger();
-    if (cmd == "plugins") {
+    if (cmd == "stop") {
+        EXIST_FLAG = false;
+        PluginManager::getInstance().unloadAllPlugins();
+        PluginManager::getInstance().unloadPluginEngines();
+        KobeBryant::getInstance().getLogger().info("bot.main.stopping");
+        KobeBryant::getInstance().getWsClient().Close();
+        fmt::print("{}\n", tr("bot.main.exit"));
+        _getch();
+        return;
+    } else if (cmd == "reload") {
+        PluginManager::getInstance().unloadAllPlugins();
+        PluginManager::getInstance().loadAllPlugins();
+    } else if (cmd == "version") {
+        KobeBryant::getInstance().getLogger().info("command.version.result", {KOBE_VERSION_COLOR_STRING});
+    } else if (cmd == "plugins") {
         try {
             auto& manager = PluginManager::getInstance();
             if (params.size() == 2) {
