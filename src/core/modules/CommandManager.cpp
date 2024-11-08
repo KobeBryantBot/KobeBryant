@@ -116,7 +116,7 @@ void CommandManager::handleCommand(
                     return logger.error("command.plugins.notFound", {plugin});
                 }
             }
-            return logger.error("command.wrongArguments", {">>" + raw + "<<"});
+            return logger.error("command.wrongArguments", {raw});
         }
         CATCH
     } else {
