@@ -41,7 +41,7 @@ Message& Message::reply(int64_t id) {
     return *this;
 }
 
-Message& Message::image(std::string const& raw, ImageType type, bool flash, std::optional<std::string> summary) {
+Message& Message::image(std::string const& raw, ImageType type, std::optional<std::string> summary) {
     try {
         nlohmann::json json = {
             {"type", "image"},
@@ -50,6 +50,8 @@ Message& Message::image(std::string const& raw, ImageType type, bool flash, std:
         if (type == ImageType::Binary) {
             auto info            = "base64://" + utils::encode(raw);
             json["data"]["file"] = info;
+        } else if (type == ImageType::Base64) {
+            json["data"]["file"] = "base64://" + raw;
         } else if (type == ImageType::Path) {
             auto info            = "file://" + std::filesystem::absolute(raw).string();
             json["data"]["file"] = info;
@@ -60,11 +62,8 @@ Message& Message::image(std::string const& raw, ImageType type, bool flash, std:
             }
             json["data"]["file"] = info;
         }
-        if (flash) {
-            json["type"] = "flash";
-        }
         if (summary) {
-            json["data"]["summary"] = *summary;
+            json["data"]["summary"] = summary.value();
         }
         mSerializedMessage.push_back(json);
     }
@@ -72,9 +71,23 @@ Message& Message::image(std::string const& raw, ImageType type, bool flash, std:
     return *this;
 }
 
-Message& Message::image(std::string const& raw, ImageType type, std::optional<std::string> summary) {
-    return image(raw, type, false, summary);
+Message& Message::avatar(int64_t target, uint16_t size, bool isGroup) {
+    auto sz = std::to_string(size);
+    auto id = std::to_string(target);
+    if (isGroup) {
+        std::string url = "https://p.qlogo.cn/gh/{GroupId}/{GroupId}/{Size}/";
+        utils::ReplaceStr(url, "{GroupId}", id);
+        utils::ReplaceStr(url, "{Size}", sz);
+        return image(url, Message::ImageType::Url);
+    } else {
+        std::string url = "https://q4.qlogo.cn/g?b=qq&nk={UserId}&s={Size}";
+        utils::ReplaceStr(url, "{UserId}", id);
+        utils::ReplaceStr(url, "{Size}", sz);
+        return image(url, Message::ImageType::Url);
+    }
 }
+
+Message& Message::avatar(int64_t target, bool isGroup) { return avatar(target, 640, isGroup); }
 
 Message& Message::record(std::filesystem::path const& path) {
     mSerializedMessage.push_back({

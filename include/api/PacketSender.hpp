@@ -14,7 +14,8 @@ public:
     enum class ImageType : int {
         Path   = 0, // 从文件路径读取
         Binary = 1, // 二进制数据
-        Url    = 2  // 网络URL
+        Url    = 2, // 网络URL
+        Base64 = 3  // Bsae64
     };
 
 public:
@@ -36,10 +37,11 @@ public:
     KobeBryant_API Message& face(int id);
 
     KobeBryant_API Message&
-    image(std::string const& raw, ImageType type, bool flash, std::optional<std::string> summary = {});
-
-    KobeBryant_API Message&
     image(std::string const& raw, ImageType type = ImageType::Path, std::optional<std::string> summary = {});
+
+    KobeBryant_API Message& avatar(int64_t target, uint16_t size = 640, bool isGroup = false);
+
+    KobeBryant_API Message& avatar(int64_t target, bool isGroup);
 
     KobeBryant_API Message& record(std::filesystem::path const& path);
 
