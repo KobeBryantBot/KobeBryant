@@ -48,6 +48,7 @@ void EventDispatcher::init() {
                         utils::ReplaceStr(rawMessage, "&#93;", "]");
                         utils::ReplaceStr(rawMessage, "&#44;", ",");
                         utils::ReplaceStr(rawMessage, "&amp;", "&");
+                        packet["raw_message"] = rawMessage;
                         std::optional<uint64_t> group;
                         if (packet.contains("group_id")) {
                             group = packet["group_id"];
