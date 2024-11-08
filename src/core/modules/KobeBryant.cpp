@@ -2,7 +2,7 @@
 #include "ScheduleManager.hpp"
 #include "api/utils/ModuleUtils.hpp"
 #include "api/utils/StringUtils.hpp"
-#include "fmt/color.h"
+#include "core/Version.hpp"
 #include "fmt/format.h"
 
 namespace fs = std::filesystem;
@@ -189,16 +189,7 @@ std::wstring KobeBryant::getProcessMutex() const {
 }
 
 void KobeBryant::printVersion() {
-    getLogger().info(
-        "{}: {}",
-        tr("bot.main.start"),
-        fmt::format(
-            fg(fmt::color::pink),
-            fmt::runtime(
-                fmt::format("{}-{}.{}.{}", BOT_NAME, KOBE_VERSION_MAJOR, KOBE_VERSION_MINOR, KOBE_VERSION_PATCH)
-            )
-        )
-    );
+    getLogger().info("{}: {}", tr("bot.main.start"), KOBE_VERSION_COLOR_STRING);
     getLogger().info("Copyright © 2024 KobeBryantBot. All rights reserved.");
 }
 

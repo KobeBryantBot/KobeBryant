@@ -2,6 +2,7 @@
 #include "KobeBryant.hpp"
 #include "PluginManager.hpp"
 #include "api/CommandRegistry.hpp"
+#include "core/Version.hpp"
 #include <conio.h>
 
 CommandManager& CommandManager::getInstance() {
@@ -29,10 +30,7 @@ void CommandManager::init() {
             PluginManager::getInstance().unloadAllPlugins();
             PluginManager::getInstance().loadAllPlugins();
         } else if (input == "version") {
-            KobeBryant::getInstance().getLogger().info(
-                "bot.command.version",
-                {BOT_NAME, S(KOBE_VERSION_MAJOR), S(KOBE_VERSION_MINOR), S(KOBE_VERSION_PATCH)}
-            );
+            KobeBryant::getInstance().getLogger().info("command.version.result", {KOBE_VERSION_COLOR_STRING});
         } else {
             handleConsoleInput(input);
         }
