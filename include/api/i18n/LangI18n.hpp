@@ -1,9 +1,12 @@
 #pragma once
 #include "api/i18n/base/LangLanguage.hpp"
+#include <functional>
 
 namespace i18n {
 
 class LangI18n {
+    friend LangLanguage;
+
 private:
     std::filesystem::path                                          mLanguageDirectory;
     std::unordered_map<std::string, std::shared_ptr<LangLanguage>> mAllLanguages;
@@ -24,6 +27,13 @@ public:
     KobeBryant_API bool updateOrCreateLanguage(std::string const& languageCode, std::string const& language);
 
     KobeBryant_API bool updateOrCreateLanguage(std::string const& languageCode, LangFile const& language);
+
+    KobeBryant_API void appendLanguage(std::string const& languageCode, std::string const& language);
+
+    KobeBryant_API void appendLanguage(std::string const& languageCode, LangFile const& language);
+
+    KobeBryant_API void
+    forEachLangFile(std::function<void(std::string const& languageCode, LangLanguage const& language)> const& func);
 
     KobeBryant_API bool loadAllLanguages();
 

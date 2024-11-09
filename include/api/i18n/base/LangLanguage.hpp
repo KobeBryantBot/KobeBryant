@@ -5,6 +5,8 @@
 namespace i18n {
 
 class LangLanguage : public LangFile {
+    friend LangFile;
+
 private:
     std::filesystem::path mFilePath;
 

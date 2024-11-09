@@ -1,5 +1,6 @@
 #pragma once
 #include "Macros.hpp"
+#include "api/i18n/base/LangFile.hpp"
 #include "fmt/format.h"
 #include <filesystem>
 #include <optional>
@@ -20,6 +21,10 @@ protected:
     std::optional<std::filesystem::path> mFilePath = {};
 
 public:
+    KobeBryant_API static void appendLanguage(std::string const& local, i18n::LangFile const& lang);
+
+    KobeBryant_API static void appendLanguage(std::string const& local, std::string const& lang);
+
     KobeBryant_NDAPI explicit Logger();
 
     KobeBryant_NDAPI explicit Logger(std::string const& title);

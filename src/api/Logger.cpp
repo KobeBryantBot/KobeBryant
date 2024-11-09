@@ -88,3 +88,11 @@ void Logger::printStr(LogLevel level, std::string const& data) const {
 std::string Logger::translate(std::string const& data, std::vector<std::string> const& params) const {
     return tr(data, params);
 }
+
+void Logger::appendLanguage(std::string const& local, i18n::LangFile const& lang) {
+    KobeBryant::getInstance().getI18n().appendLanguage(local, lang);
+}
+
+void Logger::appendLanguage(std::string const& local, std::string const& lang) {
+    KobeBryant::getInstance().getI18n().appendLanguage(local, lang);
+}

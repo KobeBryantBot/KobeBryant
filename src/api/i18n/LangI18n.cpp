@@ -123,5 +123,29 @@ std::string LangI18n::get(
     return translate(key, localLanguage, data, translateKey);
 }
 
+void LangI18n::appendLanguage(std::string const& languageCode, std::string const& language) {
+    auto data = LangFile::parse(language);
+    return appendLanguage(languageCode, data);
+}
+
+void LangI18n::appendLanguage(std::string const& languageCode, LangFile const& language) {
+    if (mAllLanguages.contains(languageCode)) {
+        mAllLanguages[languageCode]->merge_patch(language);
+    } else {
+        mAllLanguages[languageCode] =
+            std::make_shared<LangLanguage>(mLanguageDirectory / (languageCode + ".lang"), language);
+    }
+}
+
+void LangI18n::forEachLangFile(
+    std::function<void(std::string const& languageCode, LangLanguage const& language)> const& func
+) {
+    if (func) {
+        for (auto& [code, data] : mAllLanguages) {
+            func(code, *data);
+        }
+    }
+}
+
 
 } // namespace i18n
