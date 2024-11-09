@@ -132,7 +132,7 @@ void CommandManager::handleCommand(
 }
 
 bool CommandManager::unregisterCommand(HMODULE hModule, std::string const& cmd) {
-    if (mCallbacks.contains(cmd)) {
+    if (mPluginCommands[hModule].contains(cmd)) {
         mCallbacks.erase(cmd);
         mPluginCommands[hModule].erase(cmd);
         return true;
