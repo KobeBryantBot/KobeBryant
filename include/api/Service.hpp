@@ -40,7 +40,10 @@ public:
 
     KobeBryant_NDAPI static bool hasFunc(std::string const& pluginName, std::string const& funcName);
 
-    KobeBryant_NDAPI static bool removeFunc(std::string const& pluginName, std::string const& funcName);
+    static inline bool removeFunc(std::string const& funcName) {
+        auto pluginName = utils::getCurrentPluginName();
+        return removeFunc(pluginName, funcName);
+    }
 
 protected:
     template <typename... Args, std::size_t... Is>
@@ -61,4 +64,6 @@ protected:
     exportAnyFunc(std::string const& pluginName, std::string const& funcName, Service::AnyFunc const& func);
 
     KobeBryant_NDAPI static Service::AnyFunc importAnyFunc(std::string const& pluginName, std::string const& funcName);
+
+    KobeBryant_NDAPI static bool removeFunc(std::string const& pluginName, std::string const& funcName);
 };
