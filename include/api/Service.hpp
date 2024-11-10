@@ -8,6 +8,14 @@
 class Service {
 public:
     using AnyFunc = std::function<std::any(std::vector<std::any> const&)>;
+    template <typename Ret, typename... Args>
+    using FuncPtr = Ret (*)(Args...);
+
+    template <typename Ret, typename... Args>
+    static inline bool exportFunc(std::string const& funcName, FuncPtr<Ret, Args...> func) {
+        std::function<Ret(Args...)> function = func;
+        return exportFunc(funcName, function);
+    }
 
     template <typename Ret, typename... Args>
     static inline bool exportFunc(std::string const& funcName, std::function<Ret(Args...)> const& func) {
