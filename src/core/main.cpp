@@ -34,13 +34,6 @@ void fixConsoleOutput() {
     }
 }
 
-#include "api/Service.hpp"
-
-bool TestFunc(int a, double b) {
-    Logger().warn("success {} {}", a, b);
-    return true;
-}
-
 int main() {
     // 修复控制台输出兼容性问题
     fixConsoleOutput();
@@ -58,14 +51,6 @@ int main() {
         _getch();
         return 1;
     }
-
-    auto exp = Service::exportFunc<bool, int, double>("test", &TestFunc);
-    Logger().warn("Export {}", exp);
-
-    auto func = Service::importFunc<bool, int, double>("unknown", "test");
-    auto res  = func(1, 2.45);
-    Logger().warn("result {}", res);
-
     printLogo();
     bot.printVersion();
     bot.getLogger().info("bot.main.connecting");
