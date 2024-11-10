@@ -4,6 +4,9 @@
 #include <any>
 #include <functional>
 #include <stdexcept>
+#include <unordered_map>
+#include <variant>
+#include <vector>
 
 class Service {
     using AnyFunc = std::function<std::any(std::vector<std::any> const&)>;
@@ -11,6 +14,16 @@ class Service {
     using FuncPtr = Ret (*)(Args...);
 
 public:
+    using ScriptTypeBase = std::variant<std::monostate, int64_t, double, std::string, bool>;
+    using ScriptType     = std::variant<
+            std::monostate,
+            int64_t,
+            double,
+            std::string,
+            bool,
+            std::vector<ScriptTypeBase>,
+            std::unordered_map<std::string, ScriptTypeBase>>;
+
     template <typename Ret, typename... Args>
     static inline bool exportFunc(std::string const& funcName, FuncPtr<Ret, Args...> func) {
         std::function<Ret(Args...)> function = func;
