@@ -8,11 +8,12 @@
 class Logger {
 public:
     enum class LogLevel : int {
-        Fatal = 0,
-        Error = 1,
-        Warn  = 2,
-        Info  = 3, // Default
-        Debug = 4,
+        Trace = 0,
+        Fatal = 1,
+        Error = 2,
+        Warn  = 3,
+        Info  = 4, // Default
+        Debug = 5,
     };
 
 protected:

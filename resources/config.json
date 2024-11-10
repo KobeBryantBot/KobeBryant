@@ -4,7 +4,7 @@
     "language": "zh_CN",
     "logger": {
         "colorLog": true,
-        "logLevel": 3,
+        "level": 4,
         "logFile": true,
         "logFilePath": "./logs/latest.log"
     }

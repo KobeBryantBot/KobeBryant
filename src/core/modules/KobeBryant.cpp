@@ -28,7 +28,7 @@ KobeBryant::KobeBryant() {
     try {
         auto config = loadConfig();
         // 初始化日志系统
-        int logLevel = config["logger"]["logLevel"];
+        int logLevel = config["logger"]["level"];
         mLogger.setLevel(Logger::LogLevel(logLevel));
         if (bool logFile = config["logger"]["logFile"]) {
             mLogPath = (std::string)config["logger"]["logFilePath"];

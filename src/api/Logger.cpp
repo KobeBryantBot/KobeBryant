@@ -15,7 +15,7 @@
 #define COLOR(color, data) fmt::format(fg(color), fmt::runtime(data))
 
 std::string getLoggerPrefix(Logger::LogLevel level) {
-    static std::vector<std::string> map = {"[FATAL]", "[ERROR]", "[WARN]", "[INFO]", "[DEBUG]"};
+    static std::vector<std::string> map = {"[Trace]", "[FATAL]", "[ERROR]", "[WARN]", "[INFO]", "[DEBUG]"};
     return map[(int)level];
 }
 
@@ -64,6 +64,9 @@ void Logger::printStr(LogLevel level, std::string const& data) const {
             }
             auto time = COLOR(fmt::color::light_blue, timeStr);
             switch (level) {
+            case LogLevel::Trace: {
+                return fmt::print("{} {} {} {}\n", timeStr, prefix, mTitle, data);
+            }
             case LogLevel::Fatal: {
                 return fmt::print("{} \x1b[31m{} {} {}\x1b[0m\n", time, prefix, mTitle, data);
             }
