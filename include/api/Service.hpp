@@ -6,11 +6,11 @@
 #include <stdexcept>
 
 class Service {
-public:
     using AnyFunc = std::function<std::any(std::vector<std::any> const&)>;
     template <typename Ret, typename... Args>
     using FuncPtr = Ret (*)(Args...);
 
+public:
     template <typename Ret, typename... Args>
     static inline bool exportFunc(std::string const& funcName, FuncPtr<Ret, Args...> func) {
         std::function<Ret(Args...)> function = func;
