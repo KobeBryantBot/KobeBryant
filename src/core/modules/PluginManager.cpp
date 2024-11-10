@@ -207,6 +207,7 @@ void PluginManager::loadPluginEngines() {
                         if (path.filename().string() == name) {
                             auto entry = utils::stringtoWstring("./plugins/" + name + "/" + manifest->mEntry);
                             if (HMODULE hMoudle = LoadLibrary(entry.c_str())) {
+                                addModule(hMoudle, name);
                                 mEngineHandle[name] = hMoudle;
                                 logger.info("bot.pluginEngine.loaded", {name});
                             }
@@ -246,4 +247,15 @@ void PluginManager::unloadPluginEngines() {
         mEngineHandle.clear();
     }
     CATCH
+}
+
+void PluginManager::addModule(HMODULE handle, std::string const& name) { mModuleNames[handle] = name; }
+
+void PluginManager::removeModule(HMODULE handle) { mModuleNames.erase(handle); }
+
+std::optional<std::string> PluginManager::getModuleName(HMODULE handle) {
+    if (mModuleNames.contains(handle)) {
+        return mModuleNames[handle];
+    }
+    return {};
 }

@@ -2,6 +2,7 @@
 #include "CommandManager.hpp"
 #include "EventBusImpl.hpp"
 #include "KobeBryant.hpp"
+#include "PluginManager.hpp"
 #include "ScheduleManager.hpp"
 #include "ServiceManager.hpp"
 #include "api/utils/StringUtils.hpp"
@@ -25,9 +26,10 @@ bool NativePluginEngine::loadPlugin(std::string const& name, std::filesystem::pa
         auto& logger = KobeBryant::getInstance().getLogger();
         logger.info("bot.nativePlugin.loading", {name});
         auto wpath = utils::stringtoWstring(entry.string());
-        if (HMODULE hMoudle = LoadLibrary(wpath.c_str())) {
-            mPluginsMap1[name]    = hMoudle;
-            mPluginsMap2[hMoudle] = name;
+        if (HMODULE hModule = LoadLibrary(wpath.c_str())) {
+            PluginManager::getInstance().addModule(hModule, name);
+            mPluginsMap1[name]    = hModule;
+            mPluginsMap2[hModule] = name;
             logger.info("bot.nativePlugin.loaded", {name});
             return true;
         } else {
@@ -59,6 +61,7 @@ bool NativePluginEngine::unloadPlugin(HMODULE hModule) {
             EventBusImpl::getInstance().removePluginListeners(hModule);
             CommandManager::getInstance().unregisterPluginCommands(hModule);
             ScheduleManager::getInstance().removePluginTasks(hModule);
+            PluginManager::getInstance().removeModule(hModule);
             if (FreeLibrary(hModule)) {
                 mPluginsMap1.erase(name);
                 mPluginsMap2.erase(hModule);

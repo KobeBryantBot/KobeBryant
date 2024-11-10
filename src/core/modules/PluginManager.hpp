@@ -13,6 +13,7 @@ private:
     std::vector<std::shared_ptr<IPluginEngine>>                      mPluginEngines;
     std::unordered_map<std::string, std::unordered_set<std::string>> mPluginRely;
     std::unordered_map<std::string, HMODULE>                         mEngineHandle;
+    std::unordered_map<HMODULE, std::string>                         mModuleNames;
 
 public:
     static PluginManager& getInstance();
@@ -42,4 +43,10 @@ public:
     std::vector<std::string> getAllPlugins();
 
     NativePluginEngine& getNativePluginEngine();
+
+    void addModule(HMODULE handle, std::string const& name);
+
+    void removeModule(HMODULE handle);
+
+    std::optional<std::string> getModuleName(HMODULE handle);
 };

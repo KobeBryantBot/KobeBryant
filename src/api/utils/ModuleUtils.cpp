@@ -1,5 +1,6 @@
 #include "api/utils/ModuleUtils.hpp"
 #include "api/utils/StringUtils.hpp"
+#include "core/modules/PluginManager.hpp"
 
 namespace utils {
 
@@ -20,6 +21,10 @@ std::optional<std::vector<uint8_t>> readBinaryResource(HMODULE hModule, int id) 
         return utils::toBinaryArray(data.value());
     }
     return std::nullopt;
+}
+
+std::string getPluginModuleName(HMODULE hModule) {
+    return PluginManager::getInstance().getModuleName(hModule).value_or("unknown");
 }
 
 } // namespace utils

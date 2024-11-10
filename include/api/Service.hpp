@@ -10,9 +10,9 @@ public:
     using AnyFunc = std::function<std::any(std::vector<std::any> const&)>;
 
     template <typename Ret, typename... Args>
-    static inline bool
-    exportFunc(std::string const& pluginName, std::string const& funcName, std::function<Ret(Args...)> const& func) {
-        auto anyFunc = [func](std::vector<std::any> const& args) -> std::any {
+    static inline bool exportFunc(std::string const& funcName, std::function<Ret(Args...)> const& func) {
+        auto pluginName = utils::getCurrentPluginName();
+        auto anyFunc    = [func](std::vector<std::any> const& args) -> std::any {
             auto args_tuple = any_vector_to_tuple<Args...>(args);
             auto result     = func(std::get<Args>(args_tuple)...);
             return result;

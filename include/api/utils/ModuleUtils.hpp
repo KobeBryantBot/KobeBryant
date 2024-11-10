@@ -34,4 +34,11 @@ KobeBryant_NDAPI std::optional<std::vector<uint8_t>> readBinaryResource(HMODULE 
     return readBinaryResource(hModule, id);
 }
 
+KobeBryant_NDAPI std::string getPluginModuleName(HMODULE hModule);
+
+[[nodiscard]] inline std::string getCurrentPluginName() {
+    auto hModule = getCurrentModuleHandle();
+    return getPluginModuleName(hModule);
+}
+
 } // namespace utils
