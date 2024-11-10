@@ -1,18 +1,18 @@
 #include "api/Service.hpp"
 #include "core/modules/ServiceManager.hpp"
 
-bool Service::exportFuncPtr(std::string const& funcName, HMODULE hModule, FARPROC func) {
-    return ServiceManager::getInstance().exportFuncPtr(funcName, hModule, func);
+bool Service::exportAnyFunc(std::string const& pluginName, std::string const& funcName, Service::AnyFunc const& func) {
+    return ServiceManager::getInstance().exportAnyFunc(pluginName, funcName, func);
 }
 
-FARPROC Service::importFuncPtr(std::string const& pluginName, std::string const& funcName) {
-    return ServiceManager::getInstance().importFuncPtr(pluginName, funcName);
+Service::AnyFunc Service::importAnyFunc(std::string const& pluginName, std::string const& funcName) {
+    return ServiceManager::getInstance().importAnyFunc(pluginName, funcName);
 }
 
 bool Service::hasFunc(std::string const& pluginName, std::string const& funcName) {
-    return ServiceManager::getInstance().hasFunc(pluginName, funcName);
+    return ServiceManager::getInstance().hasAnyFunc(pluginName, funcName);
 }
 
-bool Service::removeFuncPtr(HMODULE hModule, std::string const& funcName) {
-    return ServiceManager::getInstance().removeFuncPtr(hModule, funcName);
+bool Service::removeFunc(std::string const& pluginName, std::string const& funcName) {
+    return ServiceManager::getInstance().removeAnyFunc(pluginName, funcName);
 }

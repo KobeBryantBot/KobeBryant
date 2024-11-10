@@ -59,7 +59,6 @@ bool NativePluginEngine::unloadPlugin(HMODULE hModule) {
             EventBusImpl::getInstance().removePluginListeners(hModule);
             CommandManager::getInstance().unregisterPluginCommands(hModule);
             ScheduleManager::getInstance().removePluginTasks(hModule);
-            ServiceManager::getInstance().removePluginFunc(hModule);
             if (FreeLibrary(hModule)) {
                 mPluginsMap1.erase(name);
                 mPluginsMap2.erase(hModule);
