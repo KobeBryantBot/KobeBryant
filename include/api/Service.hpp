@@ -35,7 +35,7 @@ public:
         auto pluginName = utils::getCurrentPluginName();
         auto anyFunc    = [func](std::vector<std::any> const& args) -> std::any {
             if (sizeof...(Args) != args.size()) {
-                throw std::runtime_error("Wrong number of arguments");
+                throw std::runtime_error("Wrong arguments count");
             }
             auto args_tuple = make_args<Args...>(args, std::index_sequence_for<Args...>{});
             if constexpr (std::is_void<Ret>::value) {
