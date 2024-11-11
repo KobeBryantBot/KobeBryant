@@ -24,7 +24,16 @@ std::optional<std::vector<uint8_t>> readBinaryResource(HMODULE hModule, int id) 
 }
 
 std::string getPluginModuleName(HMODULE hModule) {
-    return PluginManager::getInstance().getModuleName(hModule).value_or("unknown");
+    char lpFilename[MAX_PATH];
+    GetModuleFileNameA(hModule, lpFilename, sizeof(lpFilename));
+    std::string        pluginName = lpFilename;
+    static std::string parentPath = std::filesystem::absolute("./plugins/").string();
+    utils::ReplaceStr(pluginName, parentPath, "");
+    auto pos = pluginName.find("\\");
+    if (pos != std::string::npos) {
+        pluginName.erase(pos);
+    }
+    return pluginName;
 }
 
 } // namespace utils

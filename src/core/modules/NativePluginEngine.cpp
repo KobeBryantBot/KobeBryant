@@ -27,7 +27,6 @@ bool NativePluginEngine::loadPlugin(std::string const& name, std::filesystem::pa
         logger.info("bot.nativePlugin.loading", {name});
         auto wpath = utils::stringtoWstring(entry.string());
         if (HMODULE hModule = LoadLibrary(wpath.c_str())) {
-            PluginManager::getInstance().addModule(hModule, name);
             mPluginsMap1[name]    = hModule;
             mPluginsMap2[hModule] = name;
             logger.info("bot.nativePlugin.loaded", {name});
@@ -62,7 +61,6 @@ bool NativePluginEngine::unloadPlugin(HMODULE hModule) {
             EventBusImpl::getInstance().removePluginListeners(hModule);
             CommandManager::getInstance().unregisterPluginCommands(hModule);
             ScheduleManager::getInstance().removePluginTasks(hModule);
-            PluginManager::getInstance().removeModule(hModule);
             if (FreeLibrary(hModule)) {
                 mPluginsMap1.erase(name);
                 mPluginsMap2.erase(hModule);

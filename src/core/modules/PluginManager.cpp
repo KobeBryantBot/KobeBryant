@@ -110,6 +110,8 @@ bool PluginManager::loadPlugin(PluginManifest const& manifest, std::string const
                 }
                 if (isValidType(type)) {
                     if (mTypesMap[type]->loadPlugin(name, entryPath)) {
+                        auto relyName = mTypesName[type];
+                        mPluginRely[relyName].insert(name);
                         mPluginsMap[name] = type;
                         return true;
                     } else {
@@ -157,16 +159,18 @@ bool PluginManager::unloadPlugin(std::string const& name, bool force) {
             ServiceManager::getInstance().removePluginFunc(name);
             if (force && !mPluginRely[name].empty()) {
                 for (auto& rely : mPluginRely[name]) {
-                    unloadPlugin(rely, true);
+                    if (unloadPlugin(rely, true)) {
+                        mPluginRely[name].erase(rely);
+                    }
                 }
             }
             if (mPluginRely[name].empty()) {
                 auto type = mPluginsMap[name];
                 if (mTypesMap[type]->unloadPlugin(name)) {
-                    mPluginsMap.erase(name);
                     for (auto& [plugin, relys] : mPluginRely) {
                         relys.erase(name);
                     }
+                    mPluginsMap.erase(name);
                     return true;
                 } else {
                     logger.error("bot.plugin.unload.error", {name});
@@ -200,6 +204,8 @@ NativePluginEngine& PluginManager::getNativePluginEngine() {
 bool PluginManager::registerPluginEngine(HMODULE handle, std::shared_ptr<IPluginEngine> engine) {
     auto type = engine->getPluginType();
     if (!isValidType(type)) {
+        auto name            = utils::getPluginModuleName(handle);
+        mTypesName[type]     = name;
         mHandleTypes[handle] = type;
         mTypesMap[type]      = engine;
         mExtraEngines.push_back(engine);
@@ -213,6 +219,7 @@ void PluginManager::tryRemovePluginEngine(HMODULE handle) {
     if (mHandleTypes.contains(handle)) {
         auto type = mHandleTypes[handle];
         mTypesMap.erase(type);
+        mTypesName.erase(type);
         mExtraEngines.erase(
             std::remove_if(
                 mExtraEngines.begin(),
@@ -227,15 +234,4 @@ void PluginManager::tryRemovePluginEngine(HMODULE handle) {
 
 bool PluginEngineRegistry::registerPluginEngine(HMODULE handle, std::shared_ptr<IPluginEngine> engine) {
     return PluginManager::getInstance().registerPluginEngine(handle, std::move(engine));
-}
-
-void PluginManager::addModule(HMODULE handle, std::string const& name) { mModuleNames[handle] = name; }
-
-void PluginManager::removeModule(HMODULE handle) { mModuleNames.erase(handle); }
-
-std::optional<std::string> PluginManager::getModuleName(HMODULE handle) {
-    if (mModuleNames.contains(handle)) {
-        return mModuleNames[handle];
-    }
-    return {};
 }

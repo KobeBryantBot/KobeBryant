@@ -10,10 +10,10 @@ class PluginManager {
 private:
     std::unordered_map<std::string, std::string>                     mPluginsMap;
     std::unordered_map<std::string, std::shared_ptr<IPluginEngine>>  mTypesMap;
+    std::unordered_map<std::string, std::string>                     mTypesName;
     std::unordered_map<HMODULE, std::string>                         mHandleTypes;
     std::vector<std::shared_ptr<IPluginEngine>>                      mExtraEngines;
     std::unordered_map<std::string, std::unordered_set<std::string>> mPluginRely;
-    std::unordered_map<HMODULE, std::string>                         mModuleNames;
 
 public:
     static PluginManager& getInstance();
@@ -41,10 +41,4 @@ public:
     std::vector<std::string> getAllPlugins();
 
     NativePluginEngine& getNativePluginEngine();
-
-    void addModule(HMODULE handle, std::string const& name);
-
-    void removeModule(HMODULE handle);
-
-    std::optional<std::string> getModuleName(HMODULE handle);
 };
