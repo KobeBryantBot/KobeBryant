@@ -13,9 +13,8 @@ namespace fs = std::filesystem;
 PluginManager& PluginManager::getInstance() {
     static std::unique_ptr<PluginManager> instance;
     if (!instance) {
-        instance          = std::make_unique<PluginManager>();
-        auto nativeEngine = std::make_shared<NativePluginEngine>();
-        instance->mPluginEngines.push_back(nativeEngine);
+        instance                      = std::make_unique<PluginManager>();
+        auto nativeEngine             = std::make_shared<NativePluginEngine>();
         instance->mTypesMap["native"] = nativeEngine;
     }
     return *instance;
@@ -26,7 +25,8 @@ void PluginManager::loadAllPlugins() {
         auto& logger = KobeBryant::getInstance().getLogger();
         logger.info("bot.plugins.loadingAll");
         int count = 0;
-        for (auto& enginePtr : mPluginEngines) {
+        loadAllPlugins(mTypesMap["native"], count);
+        for (auto& enginePtr : mExtraEngines) {
             auto engine = std::weak_ptr<IPluginEngine>(enginePtr);
             loadAllPlugins(engine, count);
         }
@@ -192,61 +192,36 @@ NativePluginEngine& PluginManager::getNativePluginEngine() {
     return *static_cast<NativePluginEngine*>(mTypesMap["native"].get());
 }
 
-void PluginManager::loadPluginEngines() {
-    try {
-        if (!fs::exists("./plugins")) {
-            fs::create_directories("./plugins");
-        }
-        auto  paths  = utils::getAllFileDirectories("./plugins");
-        auto& logger = KobeBryant::getInstance().getLogger();
-        for (auto& path : paths) {
-            if (fs::exists(path / "manifest.json")) {
-                if (auto manifest = PluginManifest::readFrom(path / "manifest.json")) {
-                    if (manifest->mType == "engine") {
-                        auto name = manifest->mName;
-                        if (path.filename().string() == name) {
-                            auto entry = utils::stringtoWstring("./plugins/" + name + "/" + manifest->mEntry);
-                            if (HMODULE hMoudle = LoadLibrary(entry.c_str())) {
-                                addModule(hMoudle, name);
-                                mEngineHandle[name] = hMoudle;
-                                logger.info("bot.pluginEngine.loaded", {name});
-                            }
-                        } else {
-                            logger.error("bot.pluginEngine.nameMismatch", {name, path.filename().string(), name});
-                        }
-                    }
-                }
-            }
-        }
-    }
-    CATCH
-}
-
-bool PluginManager::registerPluginEngine(std::shared_ptr<IPluginEngine> engine) {
+bool PluginManager::registerPluginEngine(HMODULE handle, std::shared_ptr<IPluginEngine> engine) {
     auto type = engine->getPluginType();
     if (!isValidType(type)) {
-        mTypesMap[type] = engine;
-        mPluginEngines.push_back(engine);
+        mHandleTypes[handle] = type;
+        mTypesMap[type]      = engine;
+        mExtraEngines.push_back(engine);
         KobeBryant::getInstance().getLogger().info("bot.pluginEngine.registered", {engine->getPluginType()});
         return true;
     }
     return false;
 }
 
-bool PluginEngineRegistry::registerPluginEngine(std::shared_ptr<IPluginEngine> engine) {
-    return PluginManager::getInstance().registerPluginEngine(std::move(engine));
+void PluginManager::tryRemovePluginEngine(HMODULE handle) {
+    if (mHandleTypes.contains(handle)) {
+        auto type = mHandleTypes[handle];
+        mTypesMap.erase(type);
+        mExtraEngines.erase(
+            std::remove_if(
+                mExtraEngines.begin(),
+                mExtraEngines.end(),
+                [type](std::shared_ptr<IPluginEngine> engine) -> bool { return engine->getPluginType() == type; }
+            ),
+            mExtraEngines.end()
+        );
+        mHandleTypes.erase(handle);
+    }
 }
 
-void PluginManager::unloadPluginEngines() {
-    try {
-        mPluginEngines.clear();
-        mTypesMap.clear();
-        for (auto& [en, handle] : mEngineHandle) {
-            FreeLibrary(handle);
-        }
-        mEngineHandle.clear();
-    }
-    CATCH
+bool PluginEngineRegistry::registerPluginEngine(HMODULE handle, std::shared_ptr<IPluginEngine> engine) {
+    return PluginManager::getInstance().registerPluginEngine(handle, std::move(engine));
 }
 
 void PluginManager::addModule(HMODULE handle, std::string const& name) { mModuleNames[handle] = name; }

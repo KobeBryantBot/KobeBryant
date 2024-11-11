@@ -57,6 +57,7 @@ bool NativePluginEngine::unloadPlugin(HMODULE hModule) {
     try {
         if (mPluginsMap2.contains(hModule)) {
             auto name = mPluginsMap2[hModule];
+            PluginManager::getInstance().tryRemovePluginEngine(hModule);
             KobeBryant::getInstance().getLogger().info("bot.nativePlugin.unloading", {name});
             EventBusImpl::getInstance().removePluginListeners(hModule);
             CommandManager::getInstance().unregisterPluginCommands(hModule);

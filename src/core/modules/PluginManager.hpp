@@ -10,9 +10,9 @@ class PluginManager {
 private:
     std::unordered_map<std::string, std::string>                     mPluginsMap;
     std::unordered_map<std::string, std::shared_ptr<IPluginEngine>>  mTypesMap;
-    std::vector<std::shared_ptr<IPluginEngine>>                      mPluginEngines;
+    std::unordered_map<HMODULE, std::string>                         mHandleTypes;
+    std::vector<std::shared_ptr<IPluginEngine>>                      mExtraEngines;
     std::unordered_map<std::string, std::unordered_set<std::string>> mPluginRely;
-    std::unordered_map<std::string, HMODULE>                         mEngineHandle;
     std::unordered_map<HMODULE, std::string>                         mModuleNames;
 
 public:
@@ -22,11 +22,9 @@ public:
 
     bool isValidType(std::string const& type) const;
 
-    void loadPluginEngines();
+    bool registerPluginEngine(HMODULE handle, std::shared_ptr<IPluginEngine> engine);
 
-    void unloadPluginEngines();
-
-    bool registerPluginEngine(std::shared_ptr<IPluginEngine> engine);
+    void tryRemovePluginEngine(HMODULE handle);
 
     void loadAllPlugins();
 
