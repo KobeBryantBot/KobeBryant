@@ -10,6 +10,7 @@ struct PluginManifest {
     std::string              mEntry;
     std::string              mType               = "native";
     bool                     mPassive            = false;
+    std::vector<std::string> mPreload            = {};
     std::vector<std::string> mDependence         = {};
     std::vector<std::string> mOptionalDependence = {};
 

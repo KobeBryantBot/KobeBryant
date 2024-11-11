@@ -22,6 +22,9 @@ std::optional<PluginManifest> PluginManifest::readFrom(std::filesystem::path con
                 if (data.contains("passive")) {
                     result.mPassive = data["passive"];
                 }
+                if (data.contains("preload")) {
+                    result.mPreload = data["preload"];
+                }
                 if (data.contains("dependence")) {
                     result.mDependence = data["dependence"];
                 }

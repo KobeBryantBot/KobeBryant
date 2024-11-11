@@ -108,6 +108,14 @@ bool PluginManager::loadPlugin(PluginManifest const& manifest, std::string const
                         count++;
                     }
                 }
+                for (auto& preload : manifest.mPreload) {
+                    std::filesystem::path preloadPath("./plugins/" + name);
+                    preloadPath /= preload;
+                    if (!LoadLibrary(preloadPath.wstring().c_str())) {
+                        logger.error("plugin.preload.miss", {name, preload});
+                        return false;
+                    }
+                }
                 if (isValidType(type)) {
                     if (mTypesMap[type]->loadPlugin(name, entryPath)) {
                         auto relyName = mTypesName[type];
