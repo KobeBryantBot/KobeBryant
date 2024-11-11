@@ -157,7 +157,7 @@ bool PluginManager::unloadPlugin(std::string const& name, bool force) {
         auto& logger = KobeBryant::getInstance().getLogger();
         if (hasPlugin(name)) {
             ServiceManager::getInstance().removePluginFunc(name);
-            if (force && !mPluginRely[name].empty()) {
+            if (force) {
                 for (auto& rely : mPluginRely[name]) {
                     if (unloadPlugin(rely, true)) {
                         mPluginRely[name].erase(rely);
@@ -167,10 +167,11 @@ bool PluginManager::unloadPlugin(std::string const& name, bool force) {
             if (mPluginRely[name].empty()) {
                 auto type = mPluginsMap[name];
                 if (mTypesMap[type]->unloadPlugin(name)) {
+                    auto name_ = name;
                     for (auto& [plugin, relys] : mPluginRely) {
-                        relys.erase(name);
+                        mPluginRely[plugin].erase(name_);
                     }
-                    mPluginsMap.erase(name);
+                    mPluginsMap.erase(name_);
                     return true;
                 } else {
                     logger.error("bot.plugin.unload.error", {name});
