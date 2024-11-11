@@ -138,6 +138,11 @@ void PluginManager::unloadAllPlugins() {
         auto& logger = KobeBryant::getInstance().getLogger();
         logger.info("bot.plugins.unloadingAll");
         for (auto& [name, type] : mPluginsMap) {
+            if (type != "native") {
+                unloadPlugin(name, true);
+            }
+        }
+        for (auto& [name, type] : mPluginsMap) {
             unloadPlugin(name, true);
         }
         mPluginsMap.clear();
