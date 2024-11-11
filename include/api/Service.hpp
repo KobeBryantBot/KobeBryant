@@ -35,7 +35,7 @@ public:
         auto pluginName = utils::getCurrentPluginName();
         auto anyFunc    = [func](std::vector<std::any> const& args) -> std::any {
             if (sizeof...(Args) != args.size()) {
-                throw std::runtime_error("Wrong number of arguments.");
+                throw std::runtime_error("Wrong number of arguments");
             }
             auto args_tuple = make_args<Args...>(args, std::index_sequence_for<Args...>{});
             if constexpr (std::is_void<Ret>::value) {
@@ -60,7 +60,7 @@ public:
             return [func](Args... args) -> Ret {
                 std::vector<std::any> anyArgs = {std::any(args)...};
                 std::any              result  = func(anyArgs);
-                return std::any_cast<Ret>(result);
+                return cast_type<Ret>(result, "result");
             };
         }
     }
@@ -73,9 +73,18 @@ public:
     }
 
 protected:
+    template <typename T>
+    static inline T cast_type(std::any const& any, std::string const& info = "arguments") {
+        try {
+            return std::any_cast<T>(any);
+        } catch (std::bad_any_cast const&) {
+            throw std::runtime_error("Wrong type of " + info);
+        }
+    }
+
     template <typename... Args, std::size_t... Is>
     static inline std::tuple<Args...> make_args(std::vector<std::any> const& vec, std::index_sequence<Is...>) {
-        return std::make_tuple(std::any_cast<Args>(vec[Is])...);
+        return std::make_tuple(cast_type<Args>(vec[Is])...);
     }
 
     KobeBryant_NDAPI static bool exportAnyFunc(std::string const&, std::string const&, Service::AnyFunc const&);
