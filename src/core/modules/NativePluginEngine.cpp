@@ -25,8 +25,7 @@ bool NativePluginEngine::loadPlugin(std::string const& name, std::filesystem::pa
     try {
         auto& logger = KobeBryant::getInstance().getLogger();
         logger.info("bot.nativePlugin.loading", {name});
-        auto wpath = utils::stringtoWstring(entry.string());
-        if (HMODULE hModule = LoadLibrary(wpath.c_str())) {
+        if (HMODULE hModule = LoadLibrary(entry.wstring().c_str())) {
             mPluginsMap1[name]    = hModule;
             mPluginsMap2[hModule] = name;
             logger.info("bot.nativePlugin.loaded", {name});
