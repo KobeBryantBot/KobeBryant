@@ -81,8 +81,8 @@
 ```text
 ├── ...
 ├── KobeBryant.exe
-├── plugins
-    ├── PluginName（插件所在文件夹）
+└── plugins
+    └── PluginName（插件所在文件夹）
         ├── PluginEntry.dll（插件入口文件）
         ├── manifest.json
         └── ...（可选）
