@@ -28,7 +28,7 @@
 
 本框架开放插件引擎注册，除了可以加载 `C++` 的原生插件意外，你还可以编写任意语言的插件引擎，做到跨语言加载任意语言的插件。  
 
-我们已经编写并提供了 [Python插件引擎](https://github.com/KobeBryantBot/KobeBryantScriptEngine)，可加载Python插件。  
+我们已经编写并提供了 [Python插件引擎](https://github.com/KobeBryantBot/KobeBryantScriptEngine-Python)，可加载Python插件。  
 这只是插件引擎的一个示例，只要你愿意，你可以开发任意任意语言的插件引擎。
 
 框架内置了强大的 `事件系统(EventBus)` 和 `远程函数导出/导入(Service)` 系统，可提供跨语言的事件发布和函数调用。  
