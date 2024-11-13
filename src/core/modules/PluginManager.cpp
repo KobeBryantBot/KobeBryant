@@ -22,6 +22,9 @@ PluginManager& PluginManager::getInstance() {
 
 void PluginManager::loadAllPlugins() {
     try {
+        if (!fs::exists("./plugins")) {
+            fs::create_directories("./plugins");
+        }
         auto& logger = KobeBryant::getInstance().getLogger();
         logger.info("bot.plugins.loadingAll");
         int count = 0;

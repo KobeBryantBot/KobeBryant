@@ -7,8 +7,8 @@
 [![Contributors](https://img.shields.io/github/contributors/KobeBryantBot/KobeBryant.svg?style=for-the-badge)](https://github.com/KobeBryantBot/KobeBryant/graphs/contributors)
 [![Stars](https://img.shields.io/github/stars/KobeBryantBot/KobeBryant.svg?style=for-the-badge)](https://github.com/KobeBryantBot/KobeBryant/stargazers)
 [![Forks](https://img.shields.io/github/forks/KobeBryantBot/KobeBryant.svg?style=for-the-badge)](https://github.com/KobeBryantBot/KobeBryant/network/members)
-[![Issues](https://img.shields.io/github/issues/KobeBryantBot/KobeBryant.svg?style=for-the-badge)](https://github.com/KobeBryantBot/KobeBryant/pulls)
-[![Pull Requests](https://img.shields.io/github/issues-pr/KobeBryantBot/KobeBryant?style=for-the-badge)](https://github.com/KobeBryantBot/KobeBryant/issues)    
+[![Issues](https://img.shields.io/github/issues/KobeBryantBot/KobeBryant.svg?style=for-the-badge)](https://github.com/KobeBryantBot/KobeBryant/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/KobeBryantBot/KobeBryant?style=for-the-badge)](https://github.com/KobeBryantBot/KobeBryant/pulls)    
 [![License](https://img.shields.io/github/license/KobeBryantBot/KobeBryant.svg?style=for-the-badge)](LICENSE)
   
 [![982714789](https://img.shields.io/badge/QQ交流群%20982714789-pink?style=for-the-badge&logo=tencent%20qq)](https://qm.qq.com/q/78bKZ18A9O)
