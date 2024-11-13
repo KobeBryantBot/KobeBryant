@@ -35,7 +35,7 @@
 即使是不同语言编写的插件，依旧能够实现相互交互。例如C++插件可以和Python插件直接进行交互。
 
 # 使用方法
-- 下载最新版，放入一个文件夹中。
+- 从 [GitHub Release](https://github.com/KobeBryantBot/KobeBryant/releases) 下载最新版，放入一个文件夹中。
 - 双击 `KobeBryant.exe` 运行机器人。
 - 打开生成的 `config/config.json` 配置你的机器人（具体配置项后续介绍）。
 - 向 `plugins` 文件夹内放入需要运行的插件。
@@ -60,6 +60,12 @@
     }
 }
 ```
+
+# 构建项目
+如果你愿意自己构建项目，或者向 `KobeBryant` 贡献代码，您可以按照以下说明自行构建项目
+
+- 克隆仓库到本地，并使用你熟悉的 IDE （VS / VSCode / CLion等）打开项目目录，对 Cmake 项目进行编译生成。
+- 正常构建该项目即可。  
 
 # 原生插件（C++）介绍
 
@@ -155,10 +161,11 @@ void onDisable() {
 
 欢迎参与贡献！  
 
-你可以 [反馈问题](https://github.com/KobeBryantBot/KobeBryant/issues/new/choose) 或提交Pull Requests。
+- 你可以通过 [反馈问题](https://github.com/KobeBryantBot/KobeBryant/issues/new/choose) 帮助我们进行改进  
+- 如果你有能力帮助我们贡献代码，你也可以 Fork 本仓库，并 [提交 Pull Requests](https://github.com/KobeBryantBot/KobeBryant-Cxx/compare)
 
 ## 贡献者
 
-这个项目之所以存在，离不开所有的贡献者。
+这个项目之所以存在，离不开本项目所有的贡献者。
 
 ![贡献者](https://contrib.rocks/image?repo=KobeBryantBot/KobeBryant)
