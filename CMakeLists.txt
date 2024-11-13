@@ -38,8 +38,7 @@ add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
     COMMENT "Copying and packing all build files to ${PROJECT_SOURCE_DIR}/output directory"
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${PROJECT_SOURCE_DIR}/output
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${PROJECT_SOURCE_DIR}/output/KobeBryant.exe
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${PROJECT_SOURCE_DIR}/output/KobeBryant-windows-x64.exe
     COMMAND ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/scripts/after_build.py
-    COMMAND ${PROJECT_SOURCE_DIR}/scripts/UPX.exe ${PROJECT_SOURCE_DIR}/output/KobeBryant.exe
     VERBATIM
 )
