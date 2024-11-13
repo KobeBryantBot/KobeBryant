@@ -70,7 +70,7 @@
 # 原生插件（C++）介绍
 
 > KobeBryant本体只能加载原生插件  
-> 如果你需要加载其它类型的插件，请使用对应的插件引擎加载。  
+> KobeBryant在读取到非原生插件（`manifest.json`里面的`"type"`字段不是`"native"`时），会寻找已注册的插件引擎，并交由对应的插件引擎加载    
 > 插件引擎本质上也是一个原生插件，你可以编写插件引擎来加载其它插件。
 
 ## 插件结构
@@ -162,7 +162,7 @@ void onDisable() {
 欢迎参与贡献！  
 
 - 你可以通过 [反馈问题](https://github.com/KobeBryantBot/KobeBryant/issues/new/choose) 帮助我们进行改进  
-- 如果你有能力帮助我们贡献代码，你也可以 Fork 本仓库，并 [提交 Pull Requests](https://github.com/KobeBryantBot/KobeBryant-Cxx/compare)
+- 如果你有能力帮助我们贡献代码，你也可以 Fork 本仓库，并 [提交 Pull Requests](https://github.com/KobeBryantBot/KobeBryant/compare)
 
 ## 贡献者
 
