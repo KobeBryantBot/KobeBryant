@@ -1,8 +1,7 @@
 # KobeBryant
 
 [![Latest Tag](https://img.shields.io/github/v/tag/KobeBryantBot/KobeBryant?label=Latest%20Tag&style=for-the-badge)](https://github.com/KobeBryantBot/KobeBryant/releases) 
-[![Downloads](https://img.shields.io/github/downloads-pre/KobeBryantBot/KobeBryant/latest/total?style=for-the-badge&logoColor=41a3ed&label=DOWNLOADS&color=2fffdc)
-](https://github.com/KobeBryantBot/KobeBryant/releases)  
+[![Downloads](https://img.shields.io/github/downloads/KobeBryantBot/KobeBryant/total?style=for-the-badge&color=%2300ff00)](https://github.com/KobeBryantBot/KobeBryant/releases)  
 ![C++](https://img.shields.io/badge/C++-23-blue?logo=C%2B%2B&logoColor=41a3ed&style=for-the-badge)   
 [![Contributors](https://img.shields.io/github/contributors/KobeBryantBot/KobeBryant.svg?style=for-the-badge)](https://github.com/KobeBryantBot/KobeBryant/graphs/contributors)
 [![Stars](https://img.shields.io/github/stars/KobeBryantBot/KobeBryant.svg?style=for-the-badge)](https://github.com/KobeBryantBot/KobeBryant/stargazers)
