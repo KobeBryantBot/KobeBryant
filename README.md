@@ -35,6 +35,8 @@
 即使是不同语言编写的插件，依旧能够实现相互交互。例如C++插件可以和Python插件直接进行交互。
 
 # 使用方法
+
+## 启动KobeBryant
 - 从 [GitHub Release](https://github.com/KobeBryantBot/KobeBryant/releases) 下载最新版，放入一个文件夹中。
 - 双击 `KobeBryant.exe` 运行机器人。
 - 打开生成的 `config/config.json` 配置你的机器人（具体配置项后续介绍）。
@@ -42,6 +44,14 @@
 - 重启机器人。
 
 > 如果你无法运行 `KobeBryant.exe` 或者运行后闪退，请更新 [VC运行库](https://aka.ms/vs/17/release/vc_redist.x64.exe)
+
+## 插件热修改
+- 你可以在控制台上面使用命令 `plugins list` 列出当前加载的插件
+- 你可以在控制台上面使用命令 `plugins load/unload/reload <PluginName>` 来进行热加载、热卸载和热重载插件。
+> 注意：热加载不会有任何问题，但是热卸载和热重载能否成功，取决于插件开发者是否支持
+
+## 关闭KobeBryant
+- 你可以在控制台上面使用命令 `stop` 安全关闭 `KobeBryant` 
 
 # 配置文件（config.json）
 默认配置文件如下，请自行修改
