@@ -1,5 +1,5 @@
-name: Feature request
-description: 新功能请求
+name: 新功能请求
+description: 功能不够？提交新功能请求。
 title: "[新功能请求]: "
 labels: ["type: enhancement"]
 body:
