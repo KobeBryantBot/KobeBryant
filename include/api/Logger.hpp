@@ -1,6 +1,7 @@
 #pragma once
 #include "Macros.hpp"
 #include "api/i18n/base/LangFile.hpp"
+#include "api/utils/ModuleUtils.hpp"
 #include "fmt/format.h"
 #include <filesystem>
 #include <optional>
@@ -26,9 +27,7 @@ public:
 
     KobeBryant_API static void appendLanguage(std::string const& local, std::string const& lang);
 
-    KobeBryant_NDAPI explicit Logger();
-
-    KobeBryant_NDAPI explicit Logger(std::string const& title);
+    KobeBryant_NDAPI explicit Logger(std::string const& title = utils::getCurrentPluginName());
 
     KobeBryant_API void setTitle(std::string const& title);
 

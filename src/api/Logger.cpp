@@ -19,8 +19,6 @@ std::string getLoggerPrefix(Logger::LogLevel level) {
     return map[(int)level];
 }
 
-Logger::Logger() = default;
-
 Logger::Logger(std::string const& title) { mTitle = "[" + title + "]"; }
 
 void Logger::setTitle(std::string const& title) { mTitle = "[" + title + "]"; }
