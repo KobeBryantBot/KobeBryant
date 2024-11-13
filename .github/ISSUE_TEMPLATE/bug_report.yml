@@ -1,0 +1,40 @@
+name: 漏洞反馈
+description: 提交报告来帮助我们进行改进
+title: "[漏洞反馈]: "
+labels: ["type: bug"]
+body:
+  - type: textarea
+    attributes:
+      label: 请描述你遇到的漏洞
+      description: 简述这个漏洞
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 复现方案
+      description: 请描述复现此漏洞的步骤
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 预期行为
+      description: 请简述预期的行为。
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 截图
+      description: 如果可能，请提供截图。
+
+  - type: input
+    attributes:
+      label: 版本
+      description: 你所使用的 KobeBryant 的版本
+
+  - type: textarea
+    attributes:
+      label: 更多信息
+      description: 如果有更多信息，请提供。

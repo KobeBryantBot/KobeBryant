@@ -1,0 +1,28 @@
+name: Feature request
+description: 新功能请求
+title: "[新功能请求]: "
+labels: ["type: enhancement"]
+body:
+  - type: textarea
+    attributes:
+      label: 您的功能请求是否与问题相关？请简单描述。
+      description: 对你所遇到的问题进行简述。
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 请描述你希望的解决方案
+      description: 对你所期望的解决方案进行简述。
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 请描述你考虑过的替代方案
+      description: 对你曾考虑过的替代方案进行简述（如果有的话）
+
+  - type: textarea
+    attributes:
+      label: 更多信息
+      description: 如果有可能，请提供更多信息
