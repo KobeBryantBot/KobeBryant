@@ -199,7 +199,7 @@ void onDisable() {
 
 # 开源许可
 
-版权所有 © 2024 KobeBryantBot, 保留所有权利.
+### 版权所有 © 2024 KobeBryantBot, 保留所有权利.
 
 本项目采用 LGPL-3.0 许可证发行 - 阅读 [LICENSE](LICENSE) 文件获取更多信息。   
 
