@@ -1,0 +1,62 @@
+on:
+  release:
+    types:
+    - published
+  
+jobs:
+  build:
+    name: Build
+    runs-on: windows-2022
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3.2.0
+        with:
+          fetch-depth: 1
+          submodules: 'true'
+      - name: Configure CMake (MSVC)
+        run: |
+          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=MinSizeRel
+        shell: cmd
+      - name: Build all
+        run: |
+          cmake --build ${{github.workspace}}/build --config MinSizeRel
+        shell: cmd
+      - name: Upload EXE
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: KobeBryant-windows-x64
+          path: |
+            ${{ github.workspace }}\output\KobeBryant.exe
+  
+  upload-to-release:
+    needs:
+      - build
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+  
+      - name: Download Windows-x64 artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: KobeBryant-windows-x64
+          path: release/
+  
+      - name: Copy additional files
+        run: |
+          cp LICENSE README.md release/
+  
+      - name: Archive Windows-x64 directory
+        run: |
+          cd release/
+          zip -r ../KobeBryant-windows-x64.zip *
+          cd ..
+  
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            release/KobeBryant-windows-x64.zip
