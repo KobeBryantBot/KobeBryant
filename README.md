@@ -48,14 +48,14 @@
 
 ## 目前支持的系统和架构
 
-| 系统和架构     | 支持情况           | 支持的版本          | 是否计划支持        |
+| 系统和架构     | 支持情况           | 是否计划支持        | 支持的版本          |
 | ------------- | ------------------ | ------------------ | ------------------ |
-| Whndows-x64   | :white_check_mark: | >= v0.1.0          | :white_check_mark: |
-| Whndows-arm64 | :x:                | -                  | :white_check_mark: |
-| Linux-x64     | :x:                | -                  |:white_check_mark: |
-| Linux-arm64   | :x:                | -                  | :white_check_mark: |
-| macOS-x64     | :x:                | -                  | :x:                |
-| macOS-arm64   | :x:                | -                  |:x:                |
+| Whndows-x64   | :white_check_mark: | :white_check_mark: | >= v0.1.0          |
+| Whndows-arm64 | :x:                | :white_check_mark: | -                  |
+| Linux-x64     | :x:                | :white_check_mark: | -                  |
+| Linux-arm64   | :x:                | :white_check_mark: | -                  |
+| macOS-x64     | :x:                | :x:                | -                  |
+| macOS-arm64   | :x:                | :x:                | -                  |
 
 > 注意：  
 > 我们没有计划支持32位系统，也不要开支持32位系统的Issue。  
