@@ -178,11 +178,11 @@ void onEnable() {
     // 运行插件
     EventBus::getInstance().subscribe<MessageEvent>([&](const MessageEvent& ev) {
         if (ev.mType == MessageType::Group && ev.mSubType == MessageSubType::Normal) {
-            if (ev.mRawMessage.find("原神") != std::string::npos) {
+            if (ev.mRawMessage.find("man") != std::string::npos) {
                 auto& sender = PacketSender::getInstance();
                 sender.sendGroupMessage(
                     *ev.mGroup,
-                    Message().at(ev.mSender).text(" 原神，启动！")
+                    Message().at(ev.mSender).text(" Man! \nWhat can I say? \nMamba out!")
                 );
             }
         }
