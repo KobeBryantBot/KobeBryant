@@ -25,6 +25,6 @@ jobs:
       - name: Upload EXE
         uses: actions/upload-artifact@v3.1.0
         with:
-          name: KobeBryant-windows-x64.exe
+          name: KobeBryant-windows-x64
           path: |
-            ${{ github.workspace }}\output\KobeBryant-windows-x64.exe
+            ${{ github.workspace }}\output\KobeBryant.exe
