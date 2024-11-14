@@ -50,8 +50,8 @@
 
 | 系统和架构     | 支持情况           | 是否计划支持        | 支持的版本          |
 | ------------- | ------------------ | ------------------ | ------------------ |
-| Whndows-x64   | :white_check_mark: | :white_check_mark: | >= v0.1.0          |
-| Whndows-arm64 | :x:                | :white_check_mark: | -                  |
+| Windows-x64   | :white_check_mark: | :white_check_mark: | >= v0.1.0          |
+| Windows-arm64 | :x:                | :white_check_mark: | -                  |
 | Linux-x64     | :x:                | :white_check_mark: | -                  |
 | Linux-arm64   | :x:                | :white_check_mark: | -                  |
 | macOS-x64     | :x:                | :x:                | -                  |
