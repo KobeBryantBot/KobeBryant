@@ -60,4 +60,4 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            release/KobeBryant-windows-x64.zip
+            KobeBryant-windows-x64.zip
