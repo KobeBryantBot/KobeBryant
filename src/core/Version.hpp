@@ -4,8 +4,8 @@
 #include "fmt/format.h"
 
 #define KOBE_VERSION_MAJOR 0
-#define KOBE_VERSION_MINOR 6
-#define KOBE_VERSION_PATCH 6
+#define KOBE_VERSION_MINOR 7
+#define KOBE_VERSION_PATCH 0
 
 #define KOBE_VERSION_STRING                                                                                            \
     fmt::format("{}-{}.{}.{}", BOT_NAME, KOBE_VERSION_MAJOR, KOBE_VERSION_MINOR, KOBE_VERSION_PATCH)
