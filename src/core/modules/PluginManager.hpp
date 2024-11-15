@@ -11,7 +11,7 @@ private:
     std::unordered_map<std::string, std::string>                     mPluginsMap;
     std::unordered_map<std::string, std::shared_ptr<IPluginEngine>>  mTypesMap;
     std::unordered_map<std::string, std::string>                     mTypesName;
-    std::unordered_map<HMODULE, std::string>                         mHandleTypes;
+    std::unordered_map<std::string, std::string>                     mHandleTypes;
     std::vector<std::shared_ptr<IPluginEngine>>                      mExtraEngines;
     std::unordered_map<std::string, std::unordered_set<std::string>> mPluginRely;
 
@@ -22,9 +22,9 @@ public:
 
     bool isValidType(std::string const& type) const;
 
-    bool registerPluginEngine(HMODULE handle, std::shared_ptr<IPluginEngine> engine);
+    bool registerPluginEngine(std::string const& handle, std::shared_ptr<IPluginEngine> engine);
 
-    void tryRemovePluginEngine(HMODULE handle);
+    void tryRemovePluginEngine(std::string const& handle);
 
     void loadAllPlugins();
 

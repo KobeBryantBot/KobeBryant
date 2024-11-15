@@ -250,11 +250,10 @@ NativePluginEngine& PluginManager::getNativePluginEngine() {
     return *static_cast<NativePluginEngine*>(mTypesMap["native"].get());
 }
 
-bool PluginManager::registerPluginEngine(HMODULE handle, std::shared_ptr<IPluginEngine> engine) {
+bool PluginManager::registerPluginEngine(std::string const& handle, std::shared_ptr<IPluginEngine> engine) {
     auto type = engine->getPluginType();
     if (!isValidType(type)) {
-        auto name            = utils::getPluginModuleName(handle);
-        mTypesName[type]     = name;
+        mTypesName[type]     = handle;
         mHandleTypes[handle] = type;
         mTypesMap[type]      = engine;
         mExtraEngines.push_back(engine);
@@ -264,7 +263,7 @@ bool PluginManager::registerPluginEngine(HMODULE handle, std::shared_ptr<IPlugin
     return false;
 }
 
-void PluginManager::tryRemovePluginEngine(HMODULE handle) {
+void PluginManager::tryRemovePluginEngine(std::string const& handle) {
     if (mHandleTypes.contains(handle)) {
         auto type = mHandleTypes[handle];
         mTypesMap.erase(type);
@@ -281,6 +280,6 @@ void PluginManager::tryRemovePluginEngine(HMODULE handle) {
     }
 }
 
-bool PluginEngineRegistry::registerPluginEngine(HMODULE handle, std::shared_ptr<IPluginEngine> engine) {
+bool PluginEngineRegistry::registerPluginEngine(std::string const& handle, std::shared_ptr<IPluginEngine> engine) {
     return PluginManager::getInstance().registerPluginEngine(handle, std::move(engine));
 }
