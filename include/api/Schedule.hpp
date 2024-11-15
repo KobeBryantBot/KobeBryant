@@ -10,10 +10,10 @@ public:
     using Task   = std::function<void()>;
 
 protected:
-    KobeBryant_NDAPI static TaskID addDelay(std::string const& plugin, std::chrono::milliseconds, Task const& task);
-    KobeBryant_NDAPI static TaskID addRepeat(std::string const& plugin, std::chrono::milliseconds, Task const& task);
-    KobeBryant_NDAPI static TaskID
-    addRepeat(std::string const& plugin, std::chrono::milliseconds, Task const& task, uint64_t times);
+    KobeBryant_NDAPI static TaskID addDelay(std::string const&, std::chrono::milliseconds, Task const&);
+    KobeBryant_NDAPI static TaskID addRepeat(std::string const&, std::chrono::milliseconds, Task const&);
+    KobeBryant_NDAPI static TaskID addRepeat(std::string const&, std::chrono::milliseconds, Task const&, uint64_t);
+    KobeBryant_NDAPI static bool   cancel(std::string const&, TaskID);
 
 public:
     template <class T, class D>
@@ -49,5 +49,8 @@ public:
         return -1;
     }
 
-    KobeBryant_API static bool cancelTask(TaskID id);
+    static inline bool cancelTask(TaskID id) {
+        auto plugin = utils::getCurrentPluginName();
+        return cancel(plugin, id);
+    }
 };

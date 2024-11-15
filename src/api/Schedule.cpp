@@ -14,4 +14,6 @@ Schedule::addRepeat(std::string const& plugin, std::chrono::milliseconds delay, 
     return ScheduleManager::getInstance().addRepeatTask(plugin, delay, task, times);
 }
 
-bool Schedule::cancelTask(TaskID id) { return ScheduleManager::getInstance().cancelTask(id); }
+bool Schedule::cancel(std::string const& plugin, TaskID id) {
+    return ScheduleManager::getInstance().cancelTask(plugin, id);
+}

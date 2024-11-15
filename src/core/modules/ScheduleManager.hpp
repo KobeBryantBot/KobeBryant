@@ -67,7 +67,7 @@ public:
         uint64_t                     times
     );
 
-    bool cancelTask(size_t id);
+    bool cancelTask(std::string const& plugin, size_t id);
 
     void removePluginTasks(std::string const& plugin);
 

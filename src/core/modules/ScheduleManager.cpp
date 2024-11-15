@@ -133,7 +133,7 @@ size_t ScheduleManager::addRepeatTask(
         }
         mTaskTimes[id]--;
         if (mTaskTimes[id] <= 0) {
-            ScheduleManager::getInstance().cancelTask(id);
+            ScheduleManager::getInstance().cancelTask(plugin, id);
         }
     });
     mTaskTimes[id] = times;
@@ -142,24 +142,27 @@ size_t ScheduleManager::addRepeatTask(
     return id;
 }
 
-bool ScheduleManager::cancelTask(size_t id) {
+bool ScheduleManager::cancelTask(std::string const& owner, size_t id) {
     auto plugin = getTaskOwner(id);
-    mPluginTasks[plugin].erase(id);
-    mTaskIdMap.erase(id);
-    mTaskTimes.erase(id);
-    return Scheduler::getInstance().cancelTask(id);
+    if (owner == plugin) {
+        mPluginTasks[plugin].erase(id);
+        mTaskIdMap.erase(id);
+        mTaskTimes.erase(id);
+        return Scheduler::getInstance().cancelTask(id);
+    }
+    return false;
 }
 
 void ScheduleManager::removePluginTasks(std::string const& plugin) {
     for (auto& id : mPluginTasks[plugin]) {
-        cancelTask(id);
+        cancelTask(plugin, id);
     }
     mPluginTasks.erase(plugin);
 }
 
 void ScheduleManager::removeAllTasks() {
-    for (auto& [id, hMoudle] : mTaskIdMap) {
-        cancelTask(id);
+    for (auto& [id, plugin] : mTaskIdMap) {
+        cancelTask(plugin, id);
     }
     mTaskIdMap.clear();
     mPluginTasks.clear();
