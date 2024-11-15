@@ -40,7 +40,7 @@ void EventBus::addListener(Listener const& listener, std::function<void(Event co
 
 void EventBus::forEachListener(
     std::type_index                                               type,
-    std::function<void(std::function<void(Event const&)> const&)> func
+    std::function<bool(std::function<void(Event const&)> const&)> func
 ) {
     if (func) {
         auto& impl = EventBusImpl::getInstance();
@@ -48,7 +48,9 @@ void EventBus::forEachListener(
             for (auto& listener : listeners) {
                 if (listener.mType == type) {
                     if (auto& callback = impl.mCallbacks[listener]) {
-                        func(callback);
+                        if (!func(callback)) {
+                            return;
+                        }
                     }
                 }
             }

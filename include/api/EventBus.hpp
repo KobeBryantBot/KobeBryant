@@ -21,7 +21,7 @@ struct Listener {
 class EventBus {
 protected:
     KobeBryant_API void addListener(Listener const&, std::function<void(Event const&)>, uint32_t);
-    KobeBryant_API void forEachListener(std::type_index, std::function<void(std::function<void(Event const&)> const&)>);
+    KobeBryant_API void forEachListener(std::type_index, std::function<bool(std::function<void(Event const&)> const&)>);
     KobeBryant_API void printException(std::string const& ex);
 
 public:
@@ -59,6 +59,9 @@ public:
     template <std::derived_from<Event> T>
     inline void publish(T const& ev) {
         auto type = std::type_index(typeid(T));
-        forEachListener(type, [&](std::function<void(Event const&)> const& callback) { callback(ev); });
+        forEachListener(type, [&](std::function<void(Event const&)> const& callback) -> bool {
+            callback(ev);
+            return !ev.isPassingBlocked();
+        });
     }
 };
