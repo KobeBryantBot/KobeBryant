@@ -28,6 +28,12 @@ jobs:
           name: KobeBryant-windows-x64
           path: |
             ${{ github.workspace }}\output\KobeBryant.exe
+      - name: Upload SDK
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: sdk-windows-x64
+          path: |
+            ${{ github.workspace }}\output\sdk
   
   upload-to-release:
     needs:
@@ -43,16 +49,28 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: KobeBryant-windows-x64
-          path: release/
+          path: release-windows-x64/
+
+      - name: Download sdk-windows-x64 artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: sdk-windows-x64
+          path: sdk-windows-x64/
   
       - name: Copy additional files
         run: |
-          cp LICENSE README.md release/
+          cp LICENSE README.md release-windows-x64/
   
       - name: Archive Windows-x64 directory
         run: |
-          cd release/
+          cd release-windows-x64/
           zip -r ../KobeBryant-windows-x64.zip *
+          cd ..
+
+      - name: Archive sdk-windows-x64 directory
+        run: |
+          cd sdk-windows-x64/
+          zip -r ../sdk-windows-x64.zip *
           cd ..
   
       - name: Create GitHub Release
@@ -61,3 +79,4 @@ jobs:
         with:
           files: |
             KobeBryant-windows-x64.zip
+            sdk-windows-x64.zip

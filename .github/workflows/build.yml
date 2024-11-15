@@ -27,3 +27,9 @@ jobs:
           name: KobeBryant-windows-x64
           path: |
             ${{ github.workspace }}\output\KobeBryant.exe
+      - name: Upload SDK
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: sdk-windows-x64
+          path: |
+            ${{ github.workspace }}\output\sdk
