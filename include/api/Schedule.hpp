@@ -10,17 +10,17 @@ public:
     using Task   = std::function<void()>;
 
 protected:
-    KobeBryant_NDAPI static TaskID addDelay(HMODULE hModule, std::chrono::milliseconds, Task const& task);
-    KobeBryant_NDAPI static TaskID addRepeat(HMODULE hModule, std::chrono::milliseconds, Task const& task);
+    KobeBryant_NDAPI static TaskID addDelay(std::string const& plugin, std::chrono::milliseconds, Task const& task);
+    KobeBryant_NDAPI static TaskID addRepeat(std::string const& plugin, std::chrono::milliseconds, Task const& task);
     KobeBryant_NDAPI static TaskID
-    addRepeat(HMODULE hModule, std::chrono::milliseconds, Task const& task, uint64_t times);
+    addRepeat(std::string const& plugin, std::chrono::milliseconds, Task const& task, uint64_t times);
 
 public:
     template <class T, class D>
     static inline TaskID addDelayTask(std::chrono::duration<T, D> duration, Task const& task) {
-        auto time    = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
-        auto hModule = utils::getCurrentModuleHandle();
-        return addDelay(hModule, time, task);
+        auto time   = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
+        auto plugin = utils::getCurrentPluginName();
+        return addDelay(plugin, time, task);
     }
 
     template <class T, class D>
@@ -29,9 +29,9 @@ public:
         if (immediately && task) {
             task();
         }
-        auto time    = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
-        auto hModule = utils::getCurrentModuleHandle();
-        return addRepeat(hModule, time, task);
+        auto time   = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
+        auto plugin = utils::getCurrentPluginName();
+        return addRepeat(plugin, time, task);
     }
 
     template <class T, class D>
@@ -42,9 +42,9 @@ public:
             times--;
         }
         if (times >= 1) {
-            auto time    = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
-            auto hModule = utils::getCurrentModuleHandle();
-            return addRepeat(hModule, time, task, times);
+            auto time   = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
+            auto plugin = utils::getCurrentPluginName();
+            return addRepeat(plugin, time, task, times);
         }
         return -1;
     }

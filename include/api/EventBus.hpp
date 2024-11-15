@@ -12,8 +12,8 @@
 struct Listener {
     uint64_t              mId;
     std::type_index       mType;
-    HMODULE               mModule;
-    KobeBryant_NDAPI      Listener(std::type_index type, HMODULE hModule);
+    std::string           mPlugin;
+    KobeBryant_NDAPI      Listener(std::type_index type, std::string const& plugin);
     KobeBryant_NDAPI bool operator<(const Listener& rhs) const;
     KobeBryant_NDAPI bool operator==(const Listener& rhs) const;
 };
@@ -22,7 +22,7 @@ class EventBus {
 protected:
     KobeBryant_API void addListener(Listener const&, std::function<void(Event&)>, uint32_t);
     KobeBryant_API void forEachListener(std::type_index, std::function<bool(std::function<void(Event&)> const&)>);
-    KobeBryant_API void printException(std::string const& ex);
+    KobeBryant_API void printException(std::string const&);
 
 public:
     EventBus();
@@ -35,8 +35,8 @@ public:
     template <std::derived_from<Event> T>
     inline Listener subscribe(std::function<void(T&)> callback, uint32_t priority = 500) {
         auto type     = std::type_index(typeid(T));
-        auto hModule  = utils::getCurrentModuleHandle();
-        auto listener = Listener(type, hModule);
+        auto plugin   = utils::getCurrentPluginName();
+        auto listener = Listener(type, plugin);
         addListener(
             listener,
             [=](Event& event) {

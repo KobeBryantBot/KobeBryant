@@ -38,13 +38,13 @@ void CommandManager::handleConsoleInput(std::string const& input) {
 }
 
 bool CommandManager::registerSimpleCommand(
-    HMODULE                                              hModule,
+    std::string const&                                   plugin,
     std::string const&                                   cmd,
     std::function<void(std::vector<std::string> const&)> callback
 ) {
     if (!cmd.empty() && !mCallbacks.contains(cmd) && !mProtectedCommands.contains(cmd)) {
         mCallbacks[cmd] = std::move(callback);
-        mPluginCommands[hModule].insert(cmd);
+        mPluginCommands[plugin].insert(cmd);
         return true;
     }
     return false;
@@ -132,20 +132,20 @@ void CommandManager::handleCommand(
     }
 }
 
-bool CommandManager::unregisterCommand(HMODULE hModule, std::string const& cmd) {
-    if (mPluginCommands[hModule].contains(cmd)) {
+bool CommandManager::unregisterCommand(std::string const& plugin, std::string const& cmd) {
+    if (mPluginCommands[plugin].contains(cmd)) {
         mCallbacks.erase(cmd);
-        mPluginCommands[hModule].erase(cmd);
+        mPluginCommands[plugin].erase(cmd);
         return true;
     }
     return false;
 }
 
-void CommandManager::unregisterPluginCommands(HMODULE hModule) {
-    for (auto& cmd : mPluginCommands[hModule]) {
-        unregisterCommand(hModule, cmd);
+void CommandManager::unregisterPluginCommands(std::string const& plugin) {
+    for (auto& cmd : mPluginCommands[plugin]) {
+        unregisterCommand(plugin, cmd);
     }
-    mPluginCommands.erase(hModule);
+    mPluginCommands.erase(plugin);
 }
 
 void CommandManager::unregisterAllCommands() {
@@ -163,15 +163,15 @@ CommandRegistry& CommandRegistry::getInstance() {
 }
 
 bool CommandRegistry::registerSimpleCommand(
-    HMODULE                                              hModule,
+    std::string const&                                   plugin,
     std::string const&                                   cmd,
     std::function<void(std::vector<std::string> const&)> callback
 ) {
-    return CommandManager::getInstance().registerSimpleCommand(hModule, cmd, std::move(callback));
+    return CommandManager::getInstance().registerSimpleCommand(plugin, cmd, std::move(callback));
 }
 
-bool CommandRegistry::unregisterCommand(HMODULE hModule, std::string const& cmd) {
-    return CommandManager::getInstance().unregisterCommand(hModule, cmd);
+bool CommandRegistry::unregisterCommand(std::string const& plugin, std::string const& cmd) {
+    return CommandManager::getInstance().unregisterCommand(plugin, cmd);
 }
 
 void CommandRegistry::executeCommand(std::string const& command) {

@@ -6,7 +6,7 @@ bool Listener::operator<(const Listener& rhs) const { return mId < rhs.mId; }
 
 bool Listener::operator==(const Listener& rhs) const { return mId == rhs.mId; }
 
-Listener::Listener(std::type_index type, HMODULE hModule) : mType(type), mModule(hModule) {
+Listener::Listener(std::type_index type, std::string const& plugin) : mType(type), mPlugin(plugin) {
     auto& impl = EventBusImpl::getInstance();
     impl.mNextEventId++;
     auto eventId = impl.mNextEventId;
@@ -67,9 +67,9 @@ bool EventBus::unsubscribe(Listener const& listener) {
     return false;
 }
 
-void EventBusImpl::removePluginListeners(HMODULE hModule) {
+void EventBusImpl::removePluginListeners(std::string const& plugin) {
     for (auto& [listener, callback] : mCallbacks) {
-        if (listener.mModule == hModule) {
+        if (listener.mPlugin == plugin) {
             mCallbacks.erase(listener);
         }
     }

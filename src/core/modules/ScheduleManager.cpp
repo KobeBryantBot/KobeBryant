@@ -91,31 +91,37 @@ ScheduleManager& ScheduleManager::getInstance() {
     return *instance;
 }
 
-HMODULE ScheduleManager::getTaskOwner(size_t id) {
+std::string ScheduleManager::getTaskOwner(size_t id) {
     if (mTaskIdMap.contains(id)) {
         return mTaskIdMap[id];
     }
-    return NULL;
+    return {};
 }
 
-size_t
-ScheduleManager::addDelayTask(HMODULE hModule, std::chrono::milliseconds delay, std::function<void()> const& task) {
+size_t ScheduleManager::addDelayTask(
+    std::string const&           plugin,
+    std::chrono::milliseconds    delay,
+    std::function<void()> const& task
+) {
     auto id = Scheduler::getInstance().addDelayTask(delay, task);
-    mPluginTasks[hModule].insert(id);
-    mTaskIdMap[id] = hModule;
-    return id;
-}
-
-size_t
-ScheduleManager::addRepeatTask(HMODULE hModule, std::chrono::milliseconds interval, std::function<void()> const& task) {
-    auto id = Scheduler::getInstance().addRepeatTask(interval, task);
-    mPluginTasks[hModule].insert(id);
-    mTaskIdMap[id] = hModule;
+    mPluginTasks[plugin].insert(id);
+    mTaskIdMap[id] = plugin;
     return id;
 }
 
 size_t ScheduleManager::addRepeatTask(
-    HMODULE                      hModule,
+    std::string const&           plugin,
+    std::chrono::milliseconds    interval,
+    std::function<void()> const& task
+) {
+    auto id = Scheduler::getInstance().addRepeatTask(interval, task);
+    mPluginTasks[plugin].insert(id);
+    mTaskIdMap[id] = plugin;
+    return id;
+}
+
+size_t ScheduleManager::addRepeatTask(
+    std::string const&           plugin,
     std::chrono::milliseconds    interval,
     std::function<void()> const& task,
     uint64_t                     times
@@ -131,25 +137,24 @@ size_t ScheduleManager::addRepeatTask(
         }
     });
     mTaskTimes[id] = times;
-    mPluginTasks[hModule].insert(id);
-    mTaskIdMap[id] = hModule;
+    mPluginTasks[plugin].insert(id);
+    mTaskIdMap[id] = plugin;
     return id;
 }
 
 bool ScheduleManager::cancelTask(size_t id) {
-    if (auto hModule = getTaskOwner(id)) {
-        mPluginTasks[hModule].erase(id);
-        mTaskIdMap.erase(id);
-        mTaskTimes.erase(id);
-    }
+    auto plugin = getTaskOwner(id);
+    mPluginTasks[plugin].erase(id);
+    mTaskIdMap.erase(id);
+    mTaskTimes.erase(id);
     return Scheduler::getInstance().cancelTask(id);
 }
 
-void ScheduleManager::removePluginTasks(HMODULE hModule) {
-    for (auto& id : mPluginTasks[hModule]) {
+void ScheduleManager::removePluginTasks(std::string const& plugin) {
+    for (auto& id : mPluginTasks[plugin]) {
         cancelTask(id);
     }
-    mPluginTasks.erase(hModule);
+    mPluginTasks.erase(plugin);
 }
 
 void ScheduleManager::removeAllTasks() {

@@ -202,6 +202,9 @@ bool PluginManager::unloadPlugin(std::string const& name, bool force) {
         auto& logger = KobeBryant::getInstance().getLogger();
         if (hasPlugin(name)) {
             ServiceManager::getInstance().removePluginFunc(name);
+            EventBusImpl::getInstance().removePluginListeners(name);
+            CommandManager::getInstance().unregisterPluginCommands(name);
+            ScheduleManager::getInstance().removePluginTasks(name);
             if (force) {
                 for (auto& rely : mPluginRely[name]) {
                     if (unloadPlugin(rely, true)) {

@@ -46,21 +46,22 @@ public:
 
 class ScheduleManager {
 private:
-    std::unordered_map<HMODULE, std::unordered_set<size_t>> mPluginTasks;
-    std::unordered_map<size_t, HMODULE>                     mTaskIdMap;
-    std::unordered_map<size_t, uint64_t>                    mTaskTimes;
+    std::unordered_map<std::string, std::unordered_set<size_t>> mPluginTasks;
+    std::unordered_map<size_t, std::string>                     mTaskIdMap;
+    std::unordered_map<size_t, uint64_t>                        mTaskTimes;
 
 public:
     static ScheduleManager& getInstance();
 
-    HMODULE getTaskOwner(size_t id);
+    std::string getTaskOwner(size_t id);
 
-    size_t addDelayTask(HMODULE hModule, std::chrono::milliseconds delay, std::function<void()> const& task);
+    size_t addDelayTask(std::string const& plugin, std::chrono::milliseconds delay, std::function<void()> const& task);
 
-    size_t addRepeatTask(HMODULE hModule, std::chrono::milliseconds interval, std::function<void()> const& task);
+    size_t
+    addRepeatTask(std::string const& plugin, std::chrono::milliseconds interval, std::function<void()> const& task);
 
     size_t addRepeatTask(
-        HMODULE                      hModule,
+        std::string const&           plugin,
         std::chrono::milliseconds    interval,
         std::function<void()> const& task,
         uint64_t                     times
@@ -68,7 +69,7 @@ public:
 
     bool cancelTask(size_t id);
 
-    void removePluginTasks(HMODULE hModule);
+    void removePluginTasks(std::string const& plugin);
 
     void removeAllTasks();
 };
