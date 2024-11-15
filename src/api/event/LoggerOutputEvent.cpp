@@ -1,10 +1,10 @@
 #include "api/event/LoggerOutputEvent.hpp"
 
 LoggerOutputEvent::LoggerOutputEvent(
-    std::string const& outputMessage,
-    Logger::LogLevel   logLevel,
-    std::string const& title,
-    std::string const& time
+    std::string&      outputMessage,
+    Logger::LogLevel& logLevel,
+    std::string&      title,
+    std::string&      time
 )
 : mOutputMessage(outputMessage),
   mLogLevel(logLevel),

@@ -12,7 +12,7 @@ public:
 
     KobeBryant_API void block_pass();
 
-    KobeBryant_NDAPI bool isPassingBlocked() const;
+    KobeBryant_NDAPI bool isPassingBlocked();
 };
 
 class CancellableEvent : public Event {
@@ -24,5 +24,5 @@ public:
 
     KobeBryant_API void cancel();
 
-    KobeBryant_NDAPI bool isCancelled() const;
+    KobeBryant_NDAPI bool isCancelled();
 };

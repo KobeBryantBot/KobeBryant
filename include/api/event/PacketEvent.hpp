@@ -10,5 +10,5 @@ public:
 
     KobeBryant_NDAPI PacketEvent(nlohmann::json packet);
 
-    KobeBryant_NDAPI std::string toString(int format = 4) const;
+    KobeBryant_NDAPI std::string toString(int format = 4);
 };

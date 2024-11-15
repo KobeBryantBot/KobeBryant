@@ -20,8 +20,8 @@ struct Listener {
 
 class EventBus {
 protected:
-    KobeBryant_API void addListener(Listener const&, std::function<void(Event const&)>, uint32_t);
-    KobeBryant_API void forEachListener(std::type_index, std::function<bool(std::function<void(Event const&)> const&)>);
+    KobeBryant_API void addListener(Listener const&, std::function<void(Event&)>, uint32_t);
+    KobeBryant_API void forEachListener(std::type_index, std::function<bool(std::function<void(Event&)> const&)>);
     KobeBryant_API void printException(std::string const& ex);
 
 public:
@@ -33,16 +33,16 @@ public:
     KobeBryant_NDAPI static EventBus& getInstance();
 
     template <std::derived_from<Event> T>
-    inline Listener subscribe(std::function<void(T const&)> callback, uint32_t priority = 500) {
+    inline Listener subscribe(std::function<void(T&)> callback, uint32_t priority = 500) {
         auto type     = std::type_index(typeid(T));
         auto hModule  = utils::getCurrentModuleHandle();
         auto listener = Listener(type, hModule);
         addListener(
             listener,
-            [=](const Event& event) {
+            [=](Event& event) {
                 try {
                     if (callback) {
-                        T const& ev = dynamic_cast<T const&>(event);
+                        T& ev = dynamic_cast<T&>(event);
                         callback(ev);
                     }
                 } catch (const std::exception& e) {
@@ -57,9 +57,9 @@ public:
     KobeBryant_API bool unsubscribe(Listener const& listener);
 
     template <std::derived_from<Event> T>
-    inline void publish(T const& ev) {
+    inline void publish(T& ev) {
         auto type = std::type_index(typeid(T));
-        forEachListener(type, [&](std::function<void(Event const&)> const& callback) -> bool {
+        forEachListener(type, [&](std::function<void(Event&)> const& callback) -> bool {
             callback(ev);
             return !ev.isPassingBlocked();
         });

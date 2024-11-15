@@ -4,10 +4,10 @@
 
 class EventBusImpl {
 public:
-    std::map<Listener, std::function<void(Event const&)>> mCallbacks;
-    std::map<uint32_t, std::set<Listener>>                mListeners;
-    std::map<Listener, uint32_t>                          mListenerPriority;
-    uint64_t                                              mNextEventId = 0;
+    std::map<Listener, std::function<void(Event&)>> mCallbacks;
+    std::map<uint32_t, std::set<Listener>>          mListeners;
+    std::map<Listener, uint32_t>                    mListenerPriority;
+    uint64_t                                        mNextEventId = 0;
 
     static EventBusImpl& getInstance();
 

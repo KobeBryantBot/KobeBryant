@@ -31,17 +31,14 @@ EventBus& EventBus::getInstance() {
     return *instance;
 }
 
-void EventBus::addListener(Listener const& listener, std::function<void(Event const&)> callback, uint32_t priority) {
+void EventBus::addListener(Listener const& listener, std::function<void(Event&)> callback, uint32_t priority) {
     auto& impl                       = EventBusImpl::getInstance();
     impl.mCallbacks[listener]        = std::move(callback);
     impl.mListenerPriority[listener] = priority;
     impl.mListeners[priority].insert(listener);
 }
 
-void EventBus::forEachListener(
-    std::type_index                                               type,
-    std::function<bool(std::function<void(Event const&)> const&)> func
-) {
+void EventBus::forEachListener(std::type_index type, std::function<bool(std::function<void(Event&)> const&)> func) {
     if (func) {
         auto& impl = EventBusImpl::getInstance();
         for (auto& [priority, listeners] : impl.mListeners) {

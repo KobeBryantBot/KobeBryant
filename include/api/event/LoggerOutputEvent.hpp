@@ -4,15 +4,10 @@
 
 class LoggerOutputEvent : public CancellableEvent {
 public:
-    std::string      mOutputMessage;
-    Logger::LogLevel mLogLevel;
-    std::string      mTitle;
-    std::string      mTime;
+    std::string&      mOutputMessage;
+    Logger::LogLevel& mLogLevel;
+    std::string&      mTitle;
+    std::string&      mTime;
 
-    LoggerOutputEvent(
-        std::string const& outputMessage,
-        Logger::LogLevel   logLevel,
-        std::string const& title,
-        std::string const& time
-    );
+    LoggerOutputEvent(std::string& outputMessage, Logger::LogLevel& logLevel, std::string& title, std::string& time);
 };

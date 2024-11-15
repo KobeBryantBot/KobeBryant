@@ -43,14 +43,16 @@ void logToFile(std::filesystem::path const& path, std::string const& logStr) {
     fileStream.close();
 }
 
-void Logger::printStr(LogLevel level, std::string const& data) const {
+void Logger::printStr(LogLevel level, std::string const& input) const {
     try {
         if (mLogLevel >= level) {
+            auto              data    = input;
             auto              timeStr = utils::getTimeStringFormatted("[%Y-%m-%d %H:%M:%S]");
             auto              prefix  = getLoggerPrefix(level);
-            auto              logStr  = fmt::format("{} {} {} {}", timeStr, prefix, mTitle, data);
-            LoggerOutputEvent ev(data, level, mTitle, timeStr);
+            auto              title   = mTitle;
+            LoggerOutputEvent ev(data, level, title, timeStr);
             EventBus::getInstance().publish(ev);
+            auto logStr = fmt::format("{} {} {} {}", timeStr, prefix, title, data);
             if (!ev.isCancelled()) {
                 if (auto globalPath = KobeBryant::getInstance().getLogPath()) {
                     logToFile(*globalPath, logStr);
