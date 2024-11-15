@@ -20,7 +20,7 @@ struct PluginManifest {
     std::string                   mEntry;
     std::string                   mType{"native"};
     std::string                   mDescription{};
-    std::optional<Version>        mVersion{};
+    Version                       mVersion{0, 0, 0};
     bool                          mPassive{false};
     std::vector<std::string>      mPreload{};
     std::vector<PluginDependence> mDependence{};

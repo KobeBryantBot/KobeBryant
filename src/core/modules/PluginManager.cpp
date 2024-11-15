@@ -65,16 +65,50 @@ void PluginManager::loadAllPlugins(std::weak_ptr<IPluginEngine> engine, int& cou
     CATCH
 }
 
-bool PluginManager::loadPlugin(std::string const& name, bool isDependence) {
+bool PluginManager::loadPlugin(std::string const& name) {
     try {
         if (!hasPlugin(name)) {
             if (fs::exists("./plugins/" + name + "/manifest.json")) {
                 if (auto manifest = PluginManifest::readFrom("./plugins/" + name + "/manifest.json")) {
                     if (name == manifest->mName) {
                         int temp = 0;
-                        if (!manifest->mPassive || isDependence) {
+                        if (manifest->mPassive) {
                             return loadPlugin(*manifest, manifest->mType, temp);
                         }
+                    } else {
+                        KobeBryant::getInstance().getLogger().error(
+                            "bot.plugin.nameMismatch",
+                            {manifest->mName, name, manifest->mName}
+                        );
+                    }
+                }
+            }
+        }
+    }
+    CATCH
+    return false;
+}
+
+bool PluginManager::loadDependence(
+    std::string const&     name,
+    std::optional<Version> minVersion,
+    std::optional<Version> maxVersion,
+    std::string const&     plugin
+) {
+    try {
+        if (!hasPlugin(name)) {
+            if (fs::exists("./plugins/" + name + "/manifest.json")) {
+                if (auto manifest = PluginManifest::readFrom("./plugins/" + name + "/manifest.json")) {
+                    if (name == manifest->mName) {
+                        int temp = 0;
+                        if (!((minVersion && manifest->mVersion < *minVersion)
+                              || (maxVersion && manifest->mVersion > *maxVersion))) {
+                            return loadPlugin(*manifest, manifest->mType, temp);
+                        }
+                        KobeBryant::getInstance().getLogger().error(
+                            "plugin.dependence.versionMismatch",
+                            {name, plugin}
+                        );
                     } else {
                         KobeBryant::getInstance().getLogger().error(
                             "bot.plugin.nameMismatch",
@@ -98,7 +132,7 @@ bool PluginManager::loadPlugin(PluginManifest const& manifest, std::string const
         if (fs::exists(entryPath)) {
             for (auto& depe : manifest.mDependence) {
                 if (!hasPlugin(depe.mName)) {
-                    if (loadPlugin(depe.mName, true)) {
+                    if (loadDependence(depe.mName, depe.mMinVersion, depe.mMaxVersion, name)) {
                         count++;
                         mPluginRely[depe.mName].insert(name);
                     } else {
@@ -108,7 +142,7 @@ bool PluginManager::loadPlugin(PluginManifest const& manifest, std::string const
                 }
             }
             for (auto& opde : manifest.mOptionalDependence) {
-                if (loadPlugin(opde.mName, true)) {
+                if (loadDependence(opde.mName, opde.mMinVersion, opde.mMaxVersion, name)) {
                     count++;
                 }
             }

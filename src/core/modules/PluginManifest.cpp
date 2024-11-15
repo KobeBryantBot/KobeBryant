@@ -52,7 +52,9 @@ std::optional<PluginManifest> PluginManifest::readFrom(std::filesystem::path con
                 }
                 if (data.contains("version") && data["version"].is_string()) {
                     std::string verStr = data["version"];
-                    result.mVersion    = Version::fromString(verStr);
+                    if (auto ver = Version::fromString(verStr)) {
+                        result.mVersion = *ver;
+                    }
                 }
                 if (data.contains("description") && data["description"].is_string()) {
                     result.mDescription = data["description"];

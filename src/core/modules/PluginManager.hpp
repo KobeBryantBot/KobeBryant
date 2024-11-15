@@ -30,7 +30,14 @@ public:
 
     void loadAllPlugins(std::weak_ptr<IPluginEngine> engine, int& count);
 
-    bool loadPlugin(std::string const& name, bool isDependence = false);
+    bool loadPlugin(std::string const& name);
+
+    bool loadDependence(
+        std::string const&     name,
+        std::optional<Version> minVersion,
+        std::optional<Version> maxVersion,
+        std::string const&     plugin
+    );
 
     bool loadPlugin(PluginManifest const& manifest, std::string const& type, int& count);
 
