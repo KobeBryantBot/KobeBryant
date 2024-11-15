@@ -2,7 +2,7 @@
 #include "Event.hpp"
 #include "api/Logger.hpp"
 
-class LoggerOutputEvent : public Event {
+class LoggerOutputEvent : public CancellableEvent {
 public:
     std::string      mOutputMessage;
     Logger::LogLevel mLogLevel;
