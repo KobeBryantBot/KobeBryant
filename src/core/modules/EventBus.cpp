@@ -55,14 +55,16 @@ void EventBus::forEachListener(std::type_index type, std::function<bool(std::fun
     }
 }
 
-bool EventBus::unsubscribe(Listener const& listener) {
-    auto& impl = EventBusImpl::getInstance();
-    if (impl.mCallbacks.contains(listener)) {
-        impl.mCallbacks.erase(listener);
-        auto priority = impl.mListenerPriority[listener];
-        impl.mListeners[priority].erase(listener);
-        impl.mListenerPriority.erase(listener);
-        return true;
+bool EventBus::removeListener(std::string const& plugin, Listener const& listener) {
+    if (listener.mPlugin == plugin) {
+        auto& impl = EventBusImpl::getInstance();
+        if (impl.mCallbacks.contains(listener)) {
+            impl.mCallbacks.erase(listener);
+            auto priority = impl.mListenerPriority[listener];
+            impl.mListeners[priority].erase(listener);
+            impl.mListenerPriority.erase(listener);
+            return true;
+        }
     }
     return false;
 }

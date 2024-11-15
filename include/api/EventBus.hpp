@@ -22,6 +22,7 @@ class EventBus {
 protected:
     KobeBryant_API void addListener(Listener const&, std::function<void(Event&)>, uint32_t);
     KobeBryant_API void forEachListener(std::type_index, std::function<bool(std::function<void(Event&)> const&)>);
+    KobeBryant_API bool removeListener(std::string const&, Listener const&);
     KobeBryant_API void printException(std::string const&);
 
 public:
@@ -54,7 +55,10 @@ public:
         return listener;
     }
 
-    KobeBryant_API bool unsubscribe(Listener const& listener);
+    inline bool unsubscribe(Listener const& listener) {
+        auto plugin = utils::getCurrentPluginName();
+        return removeListener(plugin, listener);
+    }
 
     template <std::derived_from<Event> T>
     inline void publish(T& ev) {
