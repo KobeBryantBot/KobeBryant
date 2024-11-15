@@ -50,3 +50,4 @@ bot.catch.unknownEception=捕获到未知的 SEH 异常
 bot.nativePlugin.unloading=正在卸载原生插件 %s
 bot.nativePlugin.loading=正在加载原生插件 %s
 plugin.preload.miss=无法加载插件 %1$s，找不到预加载项 %2$s
+command.plugins.list.empty=当前没有加载任何插件。

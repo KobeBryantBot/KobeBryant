@@ -74,16 +74,18 @@ void CommandManager::handleCommand(
             auto& manager = PluginManager::getInstance();
             if (params.size() == 2) {
                 if (params[1] == "list") {
-                    auto        plugins = manager.getAllPlugins();
-                    auto        count   = plugins.size();
-                    std::string info;
-                    for (auto& plugin : plugins) {
-                        info += plugin;
-                        info += ", ";
+                    auto plugins = manager.getAllPlugins();
+                    if (!plugins.empty()) {
+                        auto        count = plugins.size();
+                        std::string info;
+                        for (auto& plugin : plugins) {
+                            info += plugin;
+                            info += ", ";
+                        }
+                        info.erase(info.size() - 2);
+                        return logger.info("command.plugins.list", {S(count), info});
                     }
-                    info.pop_back();
-                    info.pop_back();
-                    return logger.info("command.plugins.list", {S(count), info});
+                    return logger.info("command.plugins.list.empty");
                 }
             } else if (params.size() == 3) {
                 auto plugin = params[2];
