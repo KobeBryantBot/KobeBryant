@@ -1,9 +1,9 @@
 #include "api/PacketSender.hpp"
-#include "EventDispatcher.hpp"
-#include "KobeBryant.hpp"
 #include "api/utils/Base64Utils.hpp"
 #include "api/utils/StringUtils.hpp"
 #include "core/Global.hpp"
+#include "core/modules/EventDispatcher.hpp"
+#include "core/modules/KobeBryant.hpp"
 #include "magic_enum/magic_enum.hpp"
 #include <random>
 
