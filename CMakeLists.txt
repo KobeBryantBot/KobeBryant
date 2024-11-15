@@ -37,7 +37,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
     COMMENT "Copying and packing all build files to ${PROJECT_SOURCE_DIR}/output directory"
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${PROJECT_SOURCE_DIR}/output/sdk
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${PROJECT_SOURCE_DIR}/output
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${PROJECT_SOURCE_DIR}/output/${PROJECT_NAME}.exe
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/output/sdk/include
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/lib ${PROJECT_SOURCE_DIR}/output/sdk/lib

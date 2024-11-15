@@ -65,14 +65,16 @@ void PluginManager::loadAllPlugins(std::weak_ptr<IPluginEngine> engine, int& cou
     CATCH
 }
 
-bool PluginManager::loadPlugin(std::string const& name, bool force) {
+bool PluginManager::loadPlugin(std::string const& name, bool isDependence) {
     try {
         if (!hasPlugin(name)) {
             if (fs::exists("./plugins/" + name + "/manifest.json")) {
                 if (auto manifest = PluginManifest::readFrom("./plugins/" + name + "/manifest.json")) {
                     if (name == manifest->mName) {
                         int temp = 0;
-                        return loadPlugin(*manifest, manifest->mType, temp, force);
+                        if (!manifest->mPassive || isDependence) {
+                            return loadPlugin(*manifest, manifest->mType, temp);
+                        }
                     } else {
                         KobeBryant::getInstance().getLogger().error(
                             "bot.plugin.nameMismatch",
@@ -87,51 +89,49 @@ bool PluginManager::loadPlugin(std::string const& name, bool force) {
     return false;
 }
 
-bool PluginManager::loadPlugin(PluginManifest const& manifest, std::string const& type, int& count, bool force) {
+bool PluginManager::loadPlugin(PluginManifest const& manifest, std::string const& type, int& count) {
     try {
-        if ((!manifest.mPassive || force)) {
-            auto                  type      = manifest.mType;
-            auto                  name      = manifest.mName;
-            auto&                 logger    = KobeBryant::getInstance().getLogger();
-            std::filesystem::path entryPath = "./plugins/" + name + "/" + manifest.mEntry;
-            if (fs::exists(entryPath)) {
-                for (auto& depe : manifest.mDependence) {
-                    if (!hasPlugin(depe)) {
-                        if (loadPlugin(depe, true)) {
-                            count++;
-                            mPluginRely[depe].insert(name);
-                        } else {
-                            logger.error("bot.plugin.dependenceMiss", {depe, name});
-                            return false;
-                        }
-                    }
-                }
-                for (auto& opde : manifest.mOptionalDependence) {
-                    if (loadPlugin(opde, true)) {
+        auto                  type      = manifest.mType;
+        auto                  name      = manifest.mName;
+        auto&                 logger    = KobeBryant::getInstance().getLogger();
+        std::filesystem::path entryPath = "./plugins/" + name + "/" + manifest.mEntry;
+        if (fs::exists(entryPath)) {
+            for (auto& depe : manifest.mDependence) {
+                if (!hasPlugin(depe.mName)) {
+                    if (loadPlugin(depe.mName, true)) {
                         count++;
-                    }
-                }
-                for (auto& preload : manifest.mPreload) {
-                    std::filesystem::path preloadPath("./plugins/" + name);
-                    preloadPath /= preload;
-                    if (!LoadLibrary(preloadPath.wstring().c_str())) {
-                        logger.error("plugin.preload.miss", {name, preload});
+                        mPluginRely[depe.mName].insert(name);
+                    } else {
+                        logger.error("bot.plugin.dependenceMiss", {depe.mName, name});
                         return false;
                     }
                 }
-                if (isValidType(type)) {
-                    if (mTypesMap[type]->loadPlugin(name, entryPath)) {
-                        auto relyName = mTypesName[type];
-                        mPluginRely[relyName].insert(name);
-                        mPluginsMap[name] = type;
-                        return true;
-                    } else {
-                        logger.error("bot.plugin.load.fail", {name});
-                    }
-                }
-            } else {
-                logger.error("bot.plugin.noEntry", {name, manifest.mEntry});
             }
+            for (auto& opde : manifest.mOptionalDependence) {
+                if (loadPlugin(opde.mName, true)) {
+                    count++;
+                }
+            }
+            for (auto& preload : manifest.mPreload) {
+                std::filesystem::path preloadPath("./plugins/" + name);
+                preloadPath /= preload;
+                if (!LoadLibrary(preloadPath.wstring().c_str())) {
+                    logger.error("plugin.preload.miss", {name, preload});
+                    return false;
+                }
+            }
+            if (isValidType(type)) {
+                if (mTypesMap[type]->loadPlugin(name, entryPath)) {
+                    auto relyName = mTypesName[type];
+                    mPluginRely[relyName].insert(name);
+                    mPluginsMap[name] = type;
+                    return true;
+                } else {
+                    logger.error("bot.plugin.load.fail", {name});
+                }
+            }
+        } else {
+            logger.error("bot.plugin.noEntry", {name, manifest.mEntry});
         }
     }
     CATCH
