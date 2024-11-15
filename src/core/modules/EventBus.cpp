@@ -31,16 +31,27 @@ EventBus& EventBus::getInstance() {
     return *instance;
 }
 
-void EventBus::addListener(Listener const& listener, std::function<void(Event const&)> callback) {
-    auto& impl                = EventBusImpl::getInstance();
-    impl.mCallbacks[listener] = std::move(callback);
+void EventBus::addListener(Listener const& listener, std::function<void(Event const&)> callback, uint32_t priority) {
+    auto& impl                       = EventBusImpl::getInstance();
+    impl.mCallbacks[listener]        = std::move(callback);
+    impl.mListenerPriority[listener] = priority;
+    impl.mListeners[priority].insert(listener);
 }
 
-void EventBus::forEachListener(std::function<void(Listener const&, std::function<void(Event const&)> const&)> func) {
+void EventBus::forEachListener(
+    std::type_index                                               type,
+    std::function<void(std::function<void(Event const&)> const&)> func
+) {
     if (func) {
         auto& impl = EventBusImpl::getInstance();
-        for (auto& [listener, callback] : impl.mCallbacks) {
-            func(listener, callback);
+        for (auto& [priority, listeners] : impl.mListeners) {
+            for (auto& listener : listeners) {
+                if (listener.mType == type) {
+                    if (auto& callback = impl.mCallbacks[listener]) {
+                        func(callback);
+                    }
+                }
+            }
         }
     }
 }
@@ -49,6 +60,9 @@ bool EventBus::unsubscribe(Listener const& listener) {
     auto& impl = EventBusImpl::getInstance();
     if (impl.mCallbacks.contains(listener)) {
         impl.mCallbacks.erase(listener);
+        auto priority = impl.mListenerPriority[listener];
+        impl.mListeners[priority].erase(listener);
+        impl.mListenerPriority.erase(listener);
         return true;
     }
     return false;
