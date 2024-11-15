@@ -12,17 +12,20 @@ public:
     CommandRegistry(const CommandRegistry&)            = delete;
     CommandRegistry& operator=(const CommandRegistry&) = delete;
 
-    KobeBryant_NDAPI static CommandRegistry& getInstance();
-
-    inline bool registerCommand(std::string const& cmd, std::function<void(std::vector<std::string> const&)> callback) {
-        return registerCommand(utils::getCurrentModuleHandle(), cmd, callback);
-    }
-
-    KobeBryant_NDAPI bool registerCommand(
+protected:
+    KobeBryant_NDAPI bool registerSimpleCommand(
         HMODULE                                              hModule,
         std::string const&                                   cmd,
         std::function<void(std::vector<std::string> const&)> callback
     );
+
+public:
+    KobeBryant_NDAPI static CommandRegistry& getInstance();
+
+    inline bool
+    registerSimpleCommand(std::string const& cmd, std::function<void(std::vector<std::string> const&)> callback) {
+        return registerSimpleCommand(utils::getCurrentModuleHandle(), cmd, callback);
+    }
 
     inline bool unregisterCommand(std::string const& cmd) {
         return unregisterCommand(utils::getCurrentModuleHandle(), cmd);

@@ -37,7 +37,7 @@ void CommandManager::handleConsoleInput(std::string const& input) {
     KobeBryant::getInstance().getLogger().error("command.unknown", {""});
 }
 
-bool CommandManager::registerCommand(
+bool CommandManager::registerSimpleCommand(
     HMODULE                                              hModule,
     std::string const&                                   cmd,
     std::function<void(std::vector<std::string> const&)> callback
@@ -162,12 +162,12 @@ CommandRegistry& CommandRegistry::getInstance() {
     return *instance;
 }
 
-bool CommandRegistry::registerCommand(
+bool CommandRegistry::registerSimpleCommand(
     HMODULE                                              hModule,
     std::string const&                                   cmd,
     std::function<void(std::vector<std::string> const&)> callback
 ) {
-    return CommandManager::getInstance().registerCommand(hModule, cmd, std::move(callback));
+    return CommandManager::getInstance().registerSimpleCommand(hModule, cmd, std::move(callback));
 }
 
 bool CommandRegistry::unregisterCommand(HMODULE hModule, std::string const& cmd) {

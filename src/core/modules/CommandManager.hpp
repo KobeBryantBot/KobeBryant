@@ -14,7 +14,7 @@ public:
 
     void handleConsoleInput(std::string const& input);
 
-    bool registerCommand(
+    bool registerSimpleCommand(
         HMODULE                                              hModule,
         std::string const&                                   cmd,
         std::function<void(std::vector<std::string> const&)> callback
