@@ -39,7 +39,7 @@ void initCrashLogger() {
     std::wstring cmd =
         utils::stringtoWstring(fmt::format("{} {} \"{}\"", "./CrashLogger.exe", GetCurrentProcessId(), BOT_NAME));
     if (!CreateProcess(nullptr, cmd.data(), &sa, &sa, true, 0, nullptr, nullptr, &si, &pi)) {
-        return;
+        return Logger().error("CrashLogger.exe does not exist!");
     }
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);

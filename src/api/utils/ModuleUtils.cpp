@@ -24,6 +24,9 @@ std::optional<std::vector<uint8_t>> readBinaryResource(HMODULE hModule, int id) 
 }
 
 std::string getPluginModuleName(HMODULE hModule) {
+    if (hModule == GetModuleHandle(NULL)) {
+        return "KobeBryant";
+    }
     char lpFilename[MAX_PATH];
     GetModuleFileNameA(hModule, lpFilename, sizeof(lpFilename));
     std::string        pluginName = lpFilename;
