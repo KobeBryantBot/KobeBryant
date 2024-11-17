@@ -51,7 +51,7 @@ void Logger::printStr(LogLevel level, std::string&& data) const noexcept {
         auto              prefix  = getLoggerPrefix(level);
         auto              title   = mTitle;
         LoggerOutputEvent ev(data, level, title, timeStr);
-        // EventBus::getInstance().publish(ev);
+        EventBus::getInstance().publish(ev);
         auto logStr = fmt::format("{} {} {} {}", timeStr, prefix, title, data);
         if (!ev.isCancelled()) {
             if (auto globalPath = KobeBryant::getInstance().getLogPath()) {

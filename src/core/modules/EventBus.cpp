@@ -73,6 +73,9 @@ void EventBusImpl::removePluginListeners(std::string const& plugin) {
     for (auto& [listener, callback] : mCallbacks) {
         if (listener.mPlugin == plugin) {
             mCallbacks.erase(listener);
+            auto priority = mListenerPriority[listener];
+            mListeners[priority].erase(listener);
+            mListenerPriority.erase(listener);
         }
     }
 }

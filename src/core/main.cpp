@@ -57,7 +57,6 @@ void fixConsoleOutput() {
     }
 }
 
-
 int main() {
     // 修复控制台输出兼容性问题
     fixConsoleOutput();
