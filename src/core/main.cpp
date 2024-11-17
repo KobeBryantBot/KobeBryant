@@ -63,6 +63,7 @@ int main() {
 #ifdef DEBUG_MODE
     initCrashLogger();
 #endif
+    backupLog();
     // 初始化机器人核心
     auto& bot = KobeBryant::getInstance();
     bot.getLogger().info("bot.main.loadConfig");

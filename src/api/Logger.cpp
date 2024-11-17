@@ -45,7 +45,40 @@ void logToFile(std::filesystem::path const& path, std::string const& logStr) {
     });
 }
 
+std::string getLastDate() {
+    static std::optional<std::string> mLastDate;
+    if (!mLastDate) {
+        mLastDate = utils::getTimeStringFormatted("%Y-%m-%d");
+    }
+    return *mLastDate;
+}
+
+void backupLog() {
+    if (std::filesystem::exists("./logs/latest.log")) {
+        if (!std::filesystem::exists("./logs/backup")) {
+            std::filesystem::create_directories("./logs/backup");
+        }
+        auto logs     = utils::getAllFileFullNameInDirectory("./logs/backup");
+        int  count    = 1;
+        auto lastDate = getLastDate();
+        for (auto& log : logs) {
+            if (log.starts_with(lastDate)) {
+                count++;
+            }
+        }
+        std::string newPath = fmt::format("./logs/backup/{}-{}.log", lastDate, count);
+        if (std::filesystem::exists(newPath)) {
+            std::filesystem::remove(newPath);
+        }
+        std::filesystem::copy("./logs/latest.log", newPath);
+        std::filesystem::remove("./logs/latest.log");
+    }
+}
+
 void Logger::printStr(LogLevel level, std::string&& data) const noexcept {
+    if (getLastDate() != utils::getTimeStringFormatted("%Y-%m-%d")) {
+        backupLog();
+    }
     if (mLogLevel >= level) {
         auto              timeStr = utils::getTimeStringFormatted("[%Y-%m-%d %H:%M:%S]");
         auto              prefix  = getLoggerPrefix(level);
