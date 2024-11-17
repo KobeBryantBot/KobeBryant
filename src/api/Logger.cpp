@@ -50,10 +50,10 @@ void Logger::printStr(LogLevel level, std::string&& data) const noexcept {
         auto              timeStr = utils::getTimeStringFormatted("[%Y-%m-%d %H:%M:%S]");
         auto              prefix  = getLoggerPrefix(level);
         auto              title   = mTitle;
-        // LoggerOutputEvent ev(data, level, title, timeStr);
+        LoggerOutputEvent ev(data, level, title, timeStr);
         // EventBus::getInstance().publish(ev);
         auto logStr = fmt::format("{} {} {} {}", timeStr, prefix, title, data);
-        // if (!ev.isCancelled()) {
+        if (!ev.isCancelled()) {
             if (auto globalPath = KobeBryant::getInstance().getLogPath()) {
                 logToFile(*globalPath, logStr);
             }
@@ -85,7 +85,7 @@ void Logger::printStr(LogLevel level, std::string&& data) const noexcept {
             }
             }
         }
-    //}
+    }
 }
 
 void Logger::printView(LogLevel level, std::string_view data) const noexcept { printStr(level, std::string(data)); }
