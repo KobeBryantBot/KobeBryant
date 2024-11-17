@@ -23,6 +23,29 @@ void printLogo() {
     PRINT(R"(                                                                     )");
 }
 
+#ifdef DEBUG_MODE
+#include <api/utils/StringUtils.hpp>
+#include <fmt/format.h>
+
+void initCrashLogger() {
+    STARTUPINFO si;
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    PROCESS_INFORMATION pi;
+    SECURITY_ATTRIBUTES sa;
+    sa.bInheritHandle       = true;
+    sa.lpSecurityDescriptor = nullptr;
+    sa.nLength              = sizeof(SECURITY_ATTRIBUTES);
+    std::wstring cmd =
+        utils::stringtoWstring(fmt::format("{} {} \"{}\"", "./CrashLogger.exe", GetCurrentProcessId(), BOT_NAME));
+    if (!CreateProcess(nullptr, cmd.data(), &sa, &sa, true, 0, nullptr, nullptr, &si, &pi)) {
+        return;
+    }
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+}
+#endif
+
 void fixConsoleOutput() {
     SetConsoleOutputCP(CP_UTF8);
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -34,9 +57,13 @@ void fixConsoleOutput() {
     }
 }
 
+
 int main() {
     // 修复控制台输出兼容性问题
     fixConsoleOutput();
+#ifdef DEBUG_MODE
+    initCrashLogger();
+#endif
     // 初始化机器人核心
     auto& bot = KobeBryant::getInstance();
     bot.getLogger().info("bot.main.loadConfig");

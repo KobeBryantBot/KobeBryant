@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED 23)
 add_compile_options(
     /EHa
     /utf-8
-    -DNDEBUG
     /O2
 )
 
@@ -15,7 +14,10 @@ add_compile_definitions(
     NOMINMAX
     UNICODE
     KobeBryant_EXPORTS
+    DEBUG_MODE
 )
+
+add_link_options(/DEBUG)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
