@@ -9,32 +9,28 @@ public:
 
 private:
     struct TaskInfo {
-        TaskID                                id;
-        Task                                  task;
-        std::chrono::steady_clock::time_point runTime;
-        std::chrono::milliseconds             interval;
-        std::atomic<bool>                     cancelled{false};
+        Task                                  mTask;
+        std::chrono::steady_clock::time_point mRunTime;
+        std::chrono::milliseconds             mInterval;
+        std::atomic<bool>                     mCancelled{false};
 
-        TaskInfo(
-            TaskID                                id,
-            Task                                  task,
-            std::chrono::steady_clock::time_point runTime,
-            std::chrono::milliseconds             interval
-        )
-        : id(id),
-          task(std::move(task)),
-          runTime(runTime),
-          interval(interval) {}
+        TaskInfo(Task task, std::chrono::steady_clock::time_point runTime, std::chrono::milliseconds interval)
+        : mTask(std::move(task)),
+          mRunTime(runTime),
+          mInterval(interval) {}
     };
 
 protected:
-    std::mutex                             mMtx;
-    std::condition_variable                mCv;
-    std::vector<std::shared_ptr<TaskInfo>> mTasks;
-    std::unordered_map<TaskID, size_t>     mTaskIndexMap;
-    TaskID                                 mNextTaskID = 0;
+    std::mutex                                  mMtx;
+    std::condition_variable                     mCv;
+    std::map<TaskID, std::unique_ptr<TaskInfo>> mTasks;
+    TaskID                                      mNextTaskID = 0;
 
 public:
+    Scheduler() = default;
+
+    ~Scheduler();
+
     static Scheduler& getInstance();
 
     TaskID addDelayTask(std::chrono::milliseconds delay, Task const& task);
