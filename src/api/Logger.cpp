@@ -15,7 +15,7 @@
 #define COLOR(color, data) fmt::format(fg(color), fmt::runtime(data))
 
 std::string getLoggerPrefix(Logger::LogLevel level) {
-    static std::vector<std::string> map = {"[Trace]", "[FATAL]", "[ERROR]", "[WARN]", "[INFO]", "[DEBUG]"};
+    static std::vector<std::string> map = {"[TRACE]", "[FATAL]", "[ERROR]", "[WARN]", "[INFO]", "[DEBUG]"};
     return map[(int)level];
 }
 
@@ -45,16 +45,15 @@ void logToFile(std::filesystem::path const& path, std::string const& logStr) {
     });
 }
 
-void Logger::printStr(LogLevel level, std::string const& input) const {
+void Logger::printStr(LogLevel level, std::string&& data) const noexcept {
     if (mLogLevel >= level) {
-        auto              data    = input;
         auto              timeStr = utils::getTimeStringFormatted("[%Y-%m-%d %H:%M:%S]");
         auto              prefix  = getLoggerPrefix(level);
         auto              title   = mTitle;
-        LoggerOutputEvent ev(data, level, title, timeStr);
-        EventBus::getInstance().publish(ev);
+        // LoggerOutputEvent ev(data, level, title, timeStr);
+        // EventBus::getInstance().publish(ev);
         auto logStr = fmt::format("{} {} {} {}", timeStr, prefix, title, data);
-        if (!ev.isCancelled()) {
+        // if (!ev.isCancelled()) {
             if (auto globalPath = KobeBryant::getInstance().getLogPath()) {
                 logToFile(*globalPath, logStr);
             }
@@ -82,15 +81,17 @@ void Logger::printStr(LogLevel level, std::string const& input) const {
                 return fmt::print("{} \x1b[90m{} {} {}\x1b[0m\n", time, prefix, mTitle, data);
             }
             default: {
-                return fmt::print("{} {} {} {}\n", time, COLOR(fmt::color::light_sea_green, prefix), mTitle, data);
+                return fmt::print("{} \x1b[36m{} \x1b[0m{} {}\n", time, prefix, mTitle, data);
             }
             }
         }
-    }
+    //}
 }
 
-std::string Logger::translate(std::string const& data, std::vector<std::string> const& params) const {
-    return tr(data, params);
+void Logger::printView(LogLevel level, std::string_view data) const noexcept { printStr(level, std::string(data)); }
+
+std::string Logger::translate(std::string_view data, std::vector<std::string> const& params) const {
+    return tr(std::string(data), params);
 }
 
 void Logger::appendLanguage(std::string const& local, i18n::LangFile const& lang) {

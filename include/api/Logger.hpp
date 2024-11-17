@@ -35,53 +35,58 @@ public:
 
     KobeBryant_API bool setFile(std::filesystem::path const& path);
 
-    KobeBryant_API void printStr(LogLevel level, std::string const& data) const;
+    KobeBryant_API void printStr(LogLevel level, std::string&& data) const noexcept;
 
-    KobeBryant_NDAPI std::string translate(std::string const& data, std::vector<std::string> const& params) const;
+    KobeBryant_API void printView(LogLevel level, std::string_view data) const noexcept;
+
+    KobeBryant_NDAPI std::string translate(std::string_view data, std::vector<std::string> const& params) const;
 
 public:
+    template <typename... Args>
+    void log(LogLevel level, fmt::format_string<Args...> fmt, Args&&... args) const {
+        printStr(level, fmt::vformat(fmt.get(), fmt::make_format_args(args...)));
+    }
+    void log(LogLevel level, std::string_view msg, std::vector<std::string> const& params = {}) const {
+        printView(level, translate(msg, params));
+    }
+
     template <typename... Args>
     void fatal(fmt::format_string<Args...> fmt, Args&&... args) const {
         printStr(LogLevel::Fatal, fmt::vformat(fmt.get(), fmt::make_format_args(args...)));
     }
-
-    void fatal(std::string const& msg, std::vector<std::string> const& params = {}) const {
-        printStr(LogLevel::Fatal, translate(msg, params));
+    void fatal(std::string_view msg, std::vector<std::string> const& params = {}) const {
+        printView(LogLevel::Fatal, translate(msg, params));
     }
 
     template <typename... Args>
     void error(fmt::format_string<Args...> fmt, Args&&... args) const {
         printStr(LogLevel::Error, fmt::vformat(fmt.get(), fmt::make_format_args(args...)));
     }
-
-    void error(std::string const& msg, std::vector<std::string> const& params = {}) const {
-        printStr(LogLevel::Error, translate(msg, params));
+    void error(std::string_view msg, std::vector<std::string> const& params = {}) const {
+        printView(LogLevel::Error, translate(msg, params));
     }
 
     template <typename... Args>
     void warn(fmt::format_string<Args...> fmt, Args&&... args) const {
         printStr(LogLevel::Warn, fmt::vformat(fmt.get(), fmt::make_format_args(args...)));
     }
-
-    void warn(std::string const& msg, std::vector<std::string> const& params = {}) const {
-        printStr(LogLevel::Warn, translate(msg, params));
+    void warn(std::string_view msg, std::vector<std::string> const& params = {}) const {
+        printView(LogLevel::Warn, translate(msg, params));
     }
 
     template <typename... Args>
     void info(fmt::format_string<Args...> fmt, Args&&... args) const {
         printStr(LogLevel::Info, fmt::vformat(fmt.get(), fmt::make_format_args(args...)));
     }
-
-    void info(std::string const& msg, std::vector<std::string> const& params = {}) const {
-        printStr(LogLevel::Info, translate(msg, params));
+    void info(std::string_view msg, std::vector<std::string> const& params = {}) const {
+        printView(LogLevel::Info, translate(msg, params));
     }
 
     template <typename... Args>
     void debug(fmt::format_string<Args...> fmt, Args&&... args) const {
         printStr(LogLevel::Debug, fmt::vformat(fmt.get(), fmt::make_format_args(args...)));
     }
-
-    void debug(std::string const& msg, std::vector<std::string> const& params = {}) const {
-        printStr(LogLevel::Debug, translate(msg, params));
+    void debug(std::string_view msg, std::vector<std::string> const& params = {}) const {
+        printView(LogLevel::Debug, translate(msg, params));
     }
 };
