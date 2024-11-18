@@ -22,8 +22,8 @@
 
 本框架开放插件引擎注册，除了可以加载 `C++` 的原生插件以外，你还可以编写任意语言的插件引擎，做到跨语言加载任意语言的插件。  
 
-我们已经编写并提供了 [Python插件引擎](https://github.com/KobeBryantBot/KobeBryantScriptEngine-Python)，可加载Python插件。  
-未来我们还计划提供 `Node.js` 引擎，支持Node.js插件。  
+**我们已经编写并提供了 [Python插件引擎](https://github.com/KobeBryantBot/KobeBryantScriptEngine-Python)，可加载Python插件。**  
+**未来我们还计划提供 `Node.js` 引擎，支持Node.js插件。**  
 
 以上这只是插件引擎的示例，插件引擎只是一个模块，本质上就是一个原生插件，因此插件引擎并不需要官方编写实现。  
 只要你愿意，你可以编写支持任意你喜欢的语言对应的插件引擎，来加载对应语言的插件。
