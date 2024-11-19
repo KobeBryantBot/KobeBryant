@@ -157,9 +157,9 @@ KobeBryant在加载插件时，是先读取插件文件夹里面的 `manifest.js
     "passive": false,            // 可选：如果插件不被其它插件依赖，是否跳过加载（一般纯前置插件才填写true）
     "dependence": [              // 可选：插件依赖项（硬依赖），格式如下
         {
-            "name": "MyDependence_1",  // 依赖插件的名字（每项依赖必填此字段）
-            "min_version": "v1.0.0", // 依赖插件的最低版本（没有最低版本要求可不填）
-            "max_version": "v1.8.0"  // 依赖插件的最高版本（没有最高版本要求可不填）
+            "name": "MyDependence_1", // 依赖插件的名字（每项依赖必填此字段）
+            "min_version": "v1.0.0",  // 依赖插件的最低版本（没有最低版本要求可不填）
+            "max_version": "v1.8.0"   // 依赖插件的最高版本（没有最高版本要求可不填）
         },
         {
             "name": "MyDependence_2"
