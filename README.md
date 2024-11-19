@@ -53,14 +53,14 @@
 
 ## 目前支持的系统和架构
 
-| 系统和架构     | 支持情况           | 是否计划支持        | 支持的版本          |
-| ------------- | ------------------ | ------------------ | ------------------ |
-| Windows-x64   | :white_check_mark: | :white_check_mark: | >= v0.1.0          |
-| Windows-arm64 | :x:                | :white_check_mark: | -                  |
-| Linux-x64     | :x:                | :white_check_mark: | -                  |
-| Linux-arm64   | :x:                | :white_check_mark: | -                  |
-| macOS-x64     | :x:                | :x:                | -                  |
-| macOS-arm64   | :x:                | :x:                | -                  |
+| 系统和架构    | 支持情况           | 是否计划支持       | 支持的版本 |
+| ------------- | ------------------ | ------------------ | ---------- |
+| Windows-x64   | :white_check_mark: | :white_check_mark: | >= v0.1.0  |
+| Windows-arm64 | :x:                | :white_check_mark: | -          |
+| Linux-x64     | :x:                | :white_check_mark: | -          |
+| Linux-arm64   | :x:                | :white_check_mark: | -          |
+| macOS-x64     | :x:                | :x:                | -          |
+| macOS-arm64   | :x:                | :x:                | -          |
 
 > 注意：  
 > 我们没有计划支持32位系统，也不要开支持32位系统的Issue。  
@@ -145,13 +145,27 @@ KobeBryant在加载插件时，是先读取插件文件夹里面的 `manifest.js
 ```json
 // manifest.json
 {
-    "name": "PluginName",       // 必需：插件名，必须和文件夹名称一致
-    "entry": "PluginEntry.dll", // 必需：插件入口文件
-    "type": "native",           // 可选：（默认是"native"）原生插件请填写"native"，其它类型由插件引擎注册
-    "preload": [],              // 可选：需要预加载的DLL
-    "passive": false,           // 可选：如果插件不被其它插件依赖，是否跳过加载（一般纯前置插件才填写true）
-    "dependence": [],           // 可选：插件依赖项（硬依赖）
-    "optional_dependence": [],  // 可选：插件依赖项（可选依赖）
+    "name": "PluginName",        // 必需：插件名，必须和文件夹名称一致
+    "entry": "PluginEntry.dll",  // 必需：插件入口文件
+    "version": "v1.0.0",         // 可选：（默认是"v0.0.0"）插件的版本
+    "description": "Manba out!", // 可选：插件描述
+    "type": "native",            // 可选：（默认是"native"）原生插件请填写"native"，其它类型由插件引擎注册
+    "preload": [                 // 可选：需要预加载的DLL，格式如下
+        "MyPreload_1.dll",
+        "MyPreload_2.dll"
+    ],
+    "passive": false,            // 可选：如果插件不被其它插件依赖，是否跳过加载（一般纯前置插件才填写true）
+    "dependence": [              // 可选：插件依赖项（硬依赖），格式如下
+        {
+            "name": "MyDependence_1",  // 依赖插件的名字（每项依赖必填此字段）
+            "min_version": "v1.0.0", // 依赖插件的最低版本（没有最低版本要求可不填）
+            "max_version": "v1.8.0"  // 依赖插件的最高版本（没有最高版本要求可不填）
+        },
+        {
+            "name": "MyDependence_2"
+        }
+    ],
+    "optional_dependence": []   // 可选：插件依赖项（可选依赖），格式同 `"dependence"`，此处不再展开
 }
 ```
 
