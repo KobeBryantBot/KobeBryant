@@ -8,18 +8,20 @@ protected:
     class LevelDBImpl;
     std::unique_ptr<LevelDBImpl> mImpl;
 
-private:
+public:
     enum CompressionType { kNoCompression = 0x0, kSnappyCompression = 0x1, kZstdCompression = 0x2 };
 
-public:
-    [[nodiscard]] explicit LevelDB(const std::filesystem::path& path);
+    [[nodiscard]] explicit LevelDB(
+        std::filesystem::path const& path,
+        CompressionType              compressionType = CompressionType::kSnappyCompression
+    );
 
     [[nodiscard]] explicit LevelDB(
-        const std::filesystem::path& path,
+        std::filesystem::path const& path,
         bool                         createIfMiss,
         bool                         fixIfError,
         int                          bloomFilterBit  = 0,
-        CompressionType              compressionType = CompressionType::kNoCompression
+        CompressionType              compressionType = CompressionType::kSnappyCompression
     );
 
     LevelDB(LevelDB const&) noexcept = delete;
