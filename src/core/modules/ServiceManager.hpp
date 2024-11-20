@@ -5,13 +5,13 @@
 
 class ServiceManager {
 private:
-    using AnyFunc = std::function<std::any(std::vector<std::any> const&)>;
+    using AnyFunc = std::function<std::any(const std::vector<std::any>&)>;
     std::unordered_map<std::string, std::unordered_map<std::string, AnyFunc>> mPluginFunctions;
 
 public:
     static ServiceManager& getInstance();
 
-    bool exportAnyFunc(const std::string& pluginName, const std::string& funcName, AnyFunc const& func);
+    bool exportAnyFunc(const std::string& pluginName, const std::string& funcName, const AnyFunc& func);
 
     AnyFunc importAnyFunc(const std::string& pluginName, const std::string& funcName);
 

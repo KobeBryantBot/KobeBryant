@@ -1,6 +1,6 @@
 #include "api/i18n/base/LangLanguage.hpp"
-#include "core/Global.hpp"
 #include "api/utils/FileUtils.hpp"
+#include "core/Global.hpp"
 
 namespace i18n {
 
@@ -10,14 +10,14 @@ LangLanguage::LangLanguage(const std::filesystem::path& filePath, const std::str
     merge_patch(data);
 }
 
-LangLanguage::LangLanguage(const std::filesystem::path& filePath, LangFile const& defaultLanguage)
+LangLanguage::LangLanguage(const std::filesystem::path& filePath, const LangFile& defaultLanguage)
 : mFilePath(filePath) {
     merge_patch(defaultLanguage);
 }
 
 LangLanguage::LangLanguage(
     const std::filesystem::path&                        filePath,
-    std::unordered_map<std::string, std::string> const& defaultLanguage
+    const std::unordered_map<std::string, std::string>& defaultLanguage
 )
 : mFilePath(filePath) {
     merge_patch(LangFile(defaultLanguage));

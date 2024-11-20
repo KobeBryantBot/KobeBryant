@@ -45,11 +45,11 @@ public:
 
     void connect();
 
-    void subscribeLogin(std::function<void(bool, nlohmann::json)> const& callback);
+    void subscribeLogin(const std::function<void(bool, nlohmann::json)>& callback);
 
     void sendRawPacket(const std::string& input);
 
-    uint64_t subscribeReceiveRawPacket(std::function<void(const std::string&)> const& callback);
+    uint64_t subscribeReceiveRawPacket(const std::function<void(const std::string&)>& callback);
 
     bool unsubscribeReceiveRawPacket(uint64_t id);
 

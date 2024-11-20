@@ -101,7 +101,7 @@ std::string trimString(const std::string& str) {
     return str.substr(first, (last - first + 1));
 }
 
-std::string toBinaryString(std::vector<uint8_t> const& binary) { return std::string(binary.begin(), binary.end()); }
+std::string toBinaryString(const std::vector<uint8_t>& binary) { return std::string(binary.begin(), binary.end()); }
 
 std::vector<uint8_t> toBinaryArray(const std::string& binary) {
     return std::vector<uint8_t>(binary.begin(), binary.end());

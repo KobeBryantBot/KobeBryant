@@ -5,7 +5,7 @@
 namespace utils {
 namespace fs = std::filesystem;
 
-std::optional<std::string> readFile(fs::path const& filePath, bool isBinary) {
+std::optional<std::string> readFile(const fs::path& filePath, bool isBinary) {
     if (!fs::exists(filePath)) {
         return std::nullopt;
     }
@@ -21,7 +21,7 @@ std::optional<std::string> readFile(fs::path const& filePath, bool isBinary) {
     return data;
 }
 
-bool writeFile(fs::path const& filePath, std::string_view content, bool isBinary) {
+bool writeFile(const fs::path& filePath, std::string_view content, bool isBinary) {
     std::ofstream           fWrite;
     std::ios_base::openmode mode = std::ios_base::out;
     if (isBinary) mode |= std::ios_base::binary;
@@ -44,7 +44,7 @@ std::optional<std::vector<uint8_t>> readBinaryFile(const std::filesystem::path& 
     return std::nullopt;
 }
 
-bool writeBinaryFile(const std::filesystem::path& filePath, std::vector<uint8_t> const& content) {
+bool writeBinaryFile(const std::filesystem::path& filePath, const std::vector<uint8_t>& content) {
     auto binary = utils::toBinaryString(content);
     return writeFile(filePath, binary, true);
 }

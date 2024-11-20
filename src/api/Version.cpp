@@ -27,7 +27,7 @@ std::optional<Version> Version::fromString(const std::string& version) {
     return {};
 }
 
-std::optional<Version> Version::fromVector(std::vector<uint32_t> const& version) {
+std::optional<Version> Version::fromVector(const std::vector<uint32_t>& version) {
     if (version.size() == 3) {
         return Version(version[0], version[1], version[2]);
     }
@@ -38,7 +38,7 @@ Version Version::getKobeBryantVersion() { return Version(KOBE_VERSION_MAJOR, KOB
 
 Version::Version(uint32_t major, uint32_t minor, uint32_t patch) : mMajor(major), mMinor(minor), mPatch(patch) {}
 
-bool Version::isInRange(Version const& minVersion, Version const& maxVersion) const {
+bool Version::isInRange(const Version& minVersion, const Version& maxVersion) const {
     return (*this >= minVersion) && (*this <= maxVersion);
 }
 

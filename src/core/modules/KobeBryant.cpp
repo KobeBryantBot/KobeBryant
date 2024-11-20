@@ -100,7 +100,7 @@ void KobeBryant::init() {
     CATCH
 }
 
-void KobeBryant::subscribeLogin(std::function<void(bool, nlohmann::json)> const& callback) {
+void KobeBryant::subscribeLogin(const std::function<void(bool, nlohmann::json)>& callback) {
     subscribeReceiveRawPacket([=](const std::string& text) {
         try {
             if (callback) {
@@ -158,7 +158,7 @@ void KobeBryant::sendRawPacket(const std::string& input) {
 
 bool KobeBryant::hasConnected() const { return mConnected; }
 
-uint64_t KobeBryant::subscribeReceiveRawPacket(std::function<void(const std::string&)> const& callback) {
+uint64_t KobeBryant::subscribeReceiveRawPacket(const std::function<void(const std::string&)>& callback) {
     mNextCallbackId++;
     mPacketCallback[mNextCallbackId] = std::move(callback);
     return mNextCallbackId;

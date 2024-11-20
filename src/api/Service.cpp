@@ -1,7 +1,7 @@
 #include "api/Service.hpp"
 #include "core/modules/ServiceManager.hpp"
 
-bool Service::exportAnyFunc(const std::string& pluginName, const std::string& funcName, Service::AnyFunc const& func) {
+bool Service::exportAnyFunc(const std::string& pluginName, const std::string& funcName, const Service::AnyFunc& func) {
     return ServiceManager::getInstance().exportAnyFunc(pluginName, funcName, func);
 }
 

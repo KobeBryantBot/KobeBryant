@@ -38,7 +38,7 @@ void EventBus::addListener(const Listener& listener, std::function<void(Event&)>
     impl.mListeners[priority].insert(listener);
 }
 
-void EventBus::forEachListener(std::type_index type, std::function<bool(std::function<void(Event&)> const&)> func) {
+void EventBus::forEachListener(std::type_index type, std::function<bool(const std::function<void(Event&)>&)> func) {
     if (func) {
         auto& impl = EventBusImpl::getInstance();
         for (auto& [priority, listeners] : impl.mListeners) {

@@ -123,7 +123,7 @@ bool PluginManager::loadDependence(
     return false;
 }
 
-bool PluginManager::loadPlugin(PluginManifest const& manifest, const std::string& type, int& count, bool force) {
+bool PluginManager::loadPlugin(const PluginManifest& manifest, const std::string& type, int& count, bool force) {
     try {
         if (!manifest.mPassive || force) {
             auto                  type      = manifest.mType;

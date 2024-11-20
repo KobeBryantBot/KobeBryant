@@ -28,7 +28,7 @@ bool LangI18n::updateOrCreateLanguage(const std::string& languageCode, const std
     return loadOrCreateLanguage(languageCode, lang);
 }
 
-bool LangI18n::updateOrCreateLanguage(const std::string& languageCode, LangFile const& language) {
+bool LangI18n::updateOrCreateLanguage(const std::string& languageCode, const LangFile& language) {
     auto path = mLanguageDirectory / (languageCode + ".lang");
     auto lang = std::make_shared<LangLanguage>(path, language);
     return loadOrCreateLanguage(languageCode, lang);
@@ -128,7 +128,7 @@ void LangI18n::appendLanguage(const std::string& languageCode, const std::string
     return appendLanguage(languageCode, data);
 }
 
-void LangI18n::appendLanguage(const std::string& languageCode, LangFile const& language) {
+void LangI18n::appendLanguage(const std::string& languageCode, const LangFile& language) {
     if (mAllLanguages.contains(languageCode)) {
         mAllLanguages[languageCode]->merge_patch(language);
     } else {
@@ -138,7 +138,7 @@ void LangI18n::appendLanguage(const std::string& languageCode, LangFile const& l
 }
 
 void LangI18n::forEachLangFile(
-    std::function<void(const std::string& languageCode, LangLanguage const& language)> const& func
+    const std::function<void(const std::string& languageCode, const LangLanguage& language)>& func
 ) {
     if (func) {
         for (auto& [code, data] : mAllLanguages) {

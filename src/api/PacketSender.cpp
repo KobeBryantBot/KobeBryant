@@ -453,7 +453,7 @@ void PacketSender::getFriendsListInfo(
 }
 
 void PacketSender::getFriendsList(
-    std::function<void(std::vector<uint64_t> const&)> callback,
+    std::function<void(const std::vector<uint64_t>&)> callback,
     std::function<void()>                             timeoutCallback,
     uint64_t                                          seconds
 ) {
@@ -543,7 +543,7 @@ void PacketSender::getGroupMembersListInfo(
 
 void PacketSender::getGroupMembersList(
     uint64_t                                          groupId,
-    std::function<void(std::vector<uint64_t> const&)> callback,
+    std::function<void(const std::vector<uint64_t>&)> callback,
     std::function<void()>                             timeoutCallback,
     uint64_t                                          seconds
 ) {
@@ -576,7 +576,7 @@ void PacketSender::chooseRandomGroupMember(
 ) {
     return getGroupMembersList(
         groupId,
-        [=](std::vector<uint64_t> const& list) {
+        [=](const std::vector<uint64_t>& list) {
             if (callback) {
                 std::random_device              rd;
                 std::mt19937                    gen(rd());
@@ -592,7 +592,7 @@ void PacketSender::chooseRandomGroupMember(
 }
 
 void PacketSender::getGroupsList(
-    std::function<void(std::vector<uint64_t> const&)> callback,
+    std::function<void(const std::vector<uint64_t>&)> callback,
     std::function<void()>                             timeoutCallback,
     uint64_t                                          seconds
 ) {

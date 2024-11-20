@@ -139,7 +139,7 @@ void EventDispatcher::init() {
 
 void EventDispatcher::addCallback(
     const utils::UUID&                                uuid,
-    std::function<void(const nlohmann::json&)> const& callback,
+    const std::function<void(const nlohmann::json&)>& callback,
     std::function<void()>                             timeoutCallback,
     uint64_t                                          seconds
 ) {

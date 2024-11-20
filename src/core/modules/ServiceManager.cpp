@@ -9,7 +9,7 @@ ServiceManager& ServiceManager::getInstance() {
     return *instance;
 }
 
-bool ServiceManager::exportAnyFunc(const std::string& pluginName, const std::string& funcName, AnyFunc const& func) {
+bool ServiceManager::exportAnyFunc(const std::string& pluginName, const std::string& funcName, const AnyFunc& func) {
     if (!hasAnyFunc(pluginName, funcName)) {
         mPluginFunctions[pluginName][funcName] = std::move(func);
         return true;
@@ -17,7 +17,7 @@ bool ServiceManager::exportAnyFunc(const std::string& pluginName, const std::str
     return false;
 }
 
-std::function<std::any(std::vector<std::any> const&)>
+std::function<std::any(const std::vector<std::any>&)>
 ServiceManager::importAnyFunc(const std::string& pluginName, const std::string& funcName) {
     return mPluginFunctions[pluginName][funcName];
 }

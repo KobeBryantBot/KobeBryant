@@ -6,7 +6,7 @@
 
 namespace i18n {
 
-LangFile::LangFile(std::unordered_map<std::string, std::string> const& data) : mData(data) {}
+LangFile::LangFile(const std::unordered_map<std::string, std::string>& data) : mData(data) {}
 
 LangFile LangFile::parse_file(const std::filesystem::path& filePath) {
     std::vector<std::string> lines;
@@ -130,7 +130,7 @@ bool LangFile::has_value(const std::string& key) { return (bool)mData.count(key)
 
 void LangFile::set(const std::string& key, const std::string& value) { mData[key] = value; }
 
-void LangFile::merge_patch(LangFile const& newData) {
+void LangFile::merge_patch(const LangFile& newData) {
     for (auto& key : newData.mData) {
         mData[key.first] = key.second;
     }
