@@ -17,7 +17,7 @@ private:
     std::string                                                 mToken;
     bool                                                        mConnected      = false;
     uint64_t                                                    mNextCallbackId = 0;
-    std::map<uint64_t, std::function<void(std::string const&)>> mPacketCallback;
+    std::map<uint64_t, std::function<void(const std::string&)>> mPacketCallback;
     bool                                                        mColorLog = true;
     std::optional<std::filesystem::path>                        mLogPath;
     std::optional<ThreadPool<>>                                 mThreadPool;
@@ -47,9 +47,9 @@ public:
 
     void subscribeLogin(std::function<void(bool, nlohmann::json)> const& callback);
 
-    void sendRawPacket(std::string const& input);
+    void sendRawPacket(const std::string& input);
 
-    uint64_t subscribeReceiveRawPacket(std::function<void(std::string const&)> const& callback);
+    uint64_t subscribeReceiveRawPacket(std::function<void(const std::string&)> const& callback);
 
     bool unsubscribeReceiveRawPacket(uint64_t id);
 

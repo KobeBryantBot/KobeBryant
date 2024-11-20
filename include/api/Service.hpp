@@ -9,7 +9,7 @@
 #include <vector>
 
 class Service {
-    using AnyFunc = std::function<std::any(std::vector<std::any> const&)>;
+    using AnyFunc = std::function<std::any(const std::vector<std::any>&)>;
     template <typename Ret, typename... Args>
     using FuncPtr = Ret (*)(Args...);
 
@@ -25,15 +25,15 @@ public:
             std::unordered_map<std::string, ScriptTypeBase>>;
 
     template <typename Ret, typename... Args>
-    static inline bool exportFunc(std::string const& funcName, FuncPtr<Ret, Args...> func) {
+    static inline bool exportFunc(const std::string& funcName, FuncPtr<Ret, Args...> func) {
         std::function<Ret(Args...)> function = func;
         return exportFunc(funcName, function);
     }
 
     template <typename Ret, typename... Args>
-    static inline bool exportFunc(std::string const& funcName, std::function<Ret(Args...)> const& func) {
+    static inline bool exportFunc(const std::string& funcName, const std::function<Ret(Args...)>& func) {
         auto pluginName = utils::getCurrentPluginName();
-        auto anyFunc    = [func](std::vector<std::any> const& args) -> std::any {
+        auto anyFunc    = [func](const std::vector<std::any>& args) -> std::any {
             if (sizeof...(Args) != args.size()) {
                 throw std::runtime_error("Wrong arguments count");
             }
@@ -49,7 +49,7 @@ public:
     }
 
     template <typename Ret, typename... Args>
-    static inline std::function<Ret(Args...)> importFunc(std::string const& pluginName, std::string const& funcName) {
+    static inline std::function<Ret(Args...)> importFunc(const std::string& pluginName, const std::string& funcName) {
         auto func = importAnyFunc(pluginName, funcName);
         if constexpr (std::is_void<Ret>::value) {
             return [func](Args... args) {
@@ -65,31 +65,27 @@ public:
         }
     }
 
-    KobeBryant_NDAPI static bool hasFunc(std::string const& pluginName, std::string const& funcName);
+    KobeBryant_NDAPI static bool hasFunc(const std::string& pluginName, const std::string& funcName);
 
-    static inline bool removeFunc(std::string const& funcName) {
+    static inline bool removeFunc(const std::string& funcName) {
         auto pluginName = utils::getCurrentPluginName();
         return removeFunc(pluginName, funcName);
     }
 
 protected:
     template <typename T>
-    static inline T cast_type(std::any const& any, std::string const& info = "arguments") {
+    static inline T cast_type(const std::any& any, const std::string& info = "arguments") {
         try {
             return std::any_cast<T>(any);
-        } catch (std::bad_any_cast const&) {
+        } catch (const std::bad_any_cast&) {
             throw std::runtime_error("Wrong type of " + info);
         }
     }
-
     template <typename... Args, std::size_t... Is>
-    static inline std::tuple<Args...> make_args(std::vector<std::any> const& vec, std::index_sequence<Is...>) {
+    static inline std::tuple<Args...> make_args(const std::vector<std::any>& vec, std::index_sequence<Is...>) {
         return std::make_tuple(cast_type<Args>(vec[Is])...);
     }
-
-    KobeBryant_NDAPI static bool exportAnyFunc(std::string const&, std::string const&, Service::AnyFunc const&);
-
-    KobeBryant_NDAPI static Service::AnyFunc importAnyFunc(std::string const&, std::string const&);
-
-    KobeBryant_NDAPI static bool removeFunc(std::string const&, std::string const&);
+    KobeBryant_NDAPI static bool removeFunc(const std::string&, const std::string&);
+    KobeBryant_NDAPI static bool exportAnyFunc(const std::string&, const std::string&, const Service::AnyFunc&);
+    KobeBryant_NDAPI static Service::AnyFunc importAnyFunc(const std::string&, const std::string&);
 };

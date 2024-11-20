@@ -8,7 +8,7 @@ namespace i18n {
 
 LangFile::LangFile(std::unordered_map<std::string, std::string> const& data) : mData(data) {}
 
-LangFile LangFile::parse_file(std::filesystem::path const& filePath) {
+LangFile LangFile::parse_file(const std::filesystem::path& filePath) {
     std::vector<std::string> lines;
     std::ifstream            file(filePath);
     auto                     result = LangFile();
@@ -54,7 +54,7 @@ std::vector<std::string> splitStringByNewline(const std::string& input) {
     return std::move(lines);
 }
 
-LangFile LangFile::parse(std::string const& data) {
+LangFile LangFile::parse(const std::string& data) {
     auto lines  = splitStringByNewline(data);
     auto result = LangFile();
     for (auto& line : lines) {
@@ -78,12 +78,12 @@ LangFile LangFile::parse(std::string const& data) {
     return std::move(result);
 }
 
-LangFile LangFile::from_json(std::string const& jsonString) {
+LangFile LangFile::from_json(const std::string& jsonString) {
     auto json = nlohmann::json::parse(jsonString, nullptr, true, true);
     return from_json(json);
 }
 
-LangFile LangFile::from_json(nlohmann::json const& json) {
+LangFile LangFile::from_json(const nlohmann::json& json) {
     std::unordered_map<std::string, std::string> languageMap;
     for (nlohmann::json::const_iterator it = json.begin(); it != json.end(); ++it) {
         if (it.value().is_string()) {
@@ -116,7 +116,7 @@ nlohmann::json LangFile::to_json() {
     return std::move(json);
 }
 
-bool LangFile::write_to_file(std::filesystem::path const& filePath) {
+bool LangFile::write_to_file(const std::filesystem::path& filePath) {
     std::ofstream newFile(filePath);
     if (newFile.is_open()) {
         newFile << dump();
@@ -126,9 +126,9 @@ bool LangFile::write_to_file(std::filesystem::path const& filePath) {
     return false;
 }
 
-bool LangFile::has_value(std::string const& key) { return (bool)mData.count(key); }
+bool LangFile::has_value(const std::string& key) { return (bool)mData.count(key); }
 
-void LangFile::set(std::string const& key, std::string const& value) { mData[key] = value; }
+void LangFile::set(const std::string& key, const std::string& value) { mData[key] = value; }
 
 void LangFile::merge_patch(LangFile const& newData) {
     for (auto& key : newData.mData) {
@@ -136,14 +136,14 @@ void LangFile::merge_patch(LangFile const& newData) {
     }
 }
 
-std::optional<std::string> LangFile::try_get(std::string const& key) {
+std::optional<std::string> LangFile::try_get(const std::string& key) {
     if (mData.contains(key)) {
         return mData[key];
     }
     return {};
 }
 
-bool LangFile::erase(std::string const& key) {
+bool LangFile::erase(const std::string& key) {
     if (has_value(key)) {
         mData.erase(key);
         return true;
@@ -151,14 +151,14 @@ bool LangFile::erase(std::string const& key) {
     return false;
 }
 
-void LangFile::erase(std::vector<std::string> const& keys) {
+void LangFile::erase(const std::vector<std::string>& keys) {
     for (auto& key : keys) {
         mData.erase(key);
     }
 }
 
 std::string
-LangFile::get(std::string const& key, std::vector<std::string> const& param, std::string const& translateKeys) {
+LangFile::get(const std::string& key, const std::vector<std::string>& param, const std::string& translateKeys) {
     auto value = try_get(key);
     if (value.has_value()) {
         auto result = value.value();
@@ -185,7 +185,7 @@ LangFile::get(std::string const& key, std::vector<std::string> const& param, std
 }
 
 std::string
-LangFile::translate(std::string const& key, std::vector<std::string> const& data, std::string const& translateKeys) {
+LangFile::translate(const std::string& key, const std::vector<std::string>& data, const std::string& translateKeys) {
     return get(key, data, translateKeys);
 }
 

@@ -4,19 +4,19 @@
 
 namespace i18n {
 
-LangLanguage::LangLanguage(std::filesystem::path const& filePath, std::string const& defaultLanguage)
+LangLanguage::LangLanguage(const std::filesystem::path& filePath, const std::string& defaultLanguage)
 : mFilePath(filePath) {
     auto data = LangFile::parse(defaultLanguage);
     merge_patch(data);
 }
 
-LangLanguage::LangLanguage(std::filesystem::path const& filePath, LangFile const& defaultLanguage)
+LangLanguage::LangLanguage(const std::filesystem::path& filePath, LangFile const& defaultLanguage)
 : mFilePath(filePath) {
     merge_patch(defaultLanguage);
 }
 
 LangLanguage::LangLanguage(
-    std::filesystem::path const&                        filePath,
+    const std::filesystem::path&                        filePath,
     std::unordered_map<std::string, std::string> const& defaultLanguage
 )
 : mFilePath(filePath) {

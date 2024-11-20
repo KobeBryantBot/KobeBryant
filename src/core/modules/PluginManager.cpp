@@ -65,7 +65,7 @@ void PluginManager::loadAllPlugins(std::weak_ptr<IPluginEngine> engine, int& cou
     CATCH
 }
 
-bool PluginManager::loadPlugin(std::string const& name, bool force) {
+bool PluginManager::loadPlugin(const std::string& name, bool force) {
     try {
         if (!hasPlugin(name)) {
             if (fs::exists("./plugins/" + name + "/manifest.json")) {
@@ -90,10 +90,10 @@ bool PluginManager::loadPlugin(std::string const& name, bool force) {
 }
 
 bool PluginManager::loadDependence(
-    std::string const&     name,
+    const std::string&     name,
     std::optional<Version> minVersion,
     std::optional<Version> maxVersion,
-    std::string const&     plugin
+    const std::string&     plugin
 ) {
     try {
         if (!hasPlugin(name)) {
@@ -123,7 +123,7 @@ bool PluginManager::loadDependence(
     return false;
 }
 
-bool PluginManager::loadPlugin(PluginManifest const& manifest, std::string const& type, int& count, bool force) {
+bool PluginManager::loadPlugin(PluginManifest const& manifest, const std::string& type, int& count, bool force) {
     try {
         if (!manifest.mPassive || force) {
             auto                  type      = manifest.mType;
@@ -174,9 +174,9 @@ bool PluginManager::loadPlugin(PluginManifest const& manifest, std::string const
     return false;
 }
 
-bool PluginManager::hasPlugin(std::string const& name) const { return mPluginsMap.contains(name); }
+bool PluginManager::hasPlugin(const std::string& name) const { return mPluginsMap.contains(name); }
 
-bool PluginManager::isValidType(std::string const& name) const { return mTypesMap.contains(name); }
+bool PluginManager::isValidType(const std::string& name) const { return mTypesMap.contains(name); }
 
 void PluginManager::unloadAllPlugins() {
     try {
@@ -199,7 +199,7 @@ void PluginManager::unloadAllPlugins() {
     } catch (...) {}
 }
 
-bool PluginManager::unloadPlugin(std::string const& name, bool force) {
+bool PluginManager::unloadPlugin(const std::string& name, bool force) {
     try {
         auto& logger = KobeBryant::getInstance().getLogger();
         if (hasPlugin(name)) {
@@ -252,7 +252,7 @@ NativePluginEngine& PluginManager::getNativePluginEngine() {
     return *static_cast<NativePluginEngine*>(mTypesMap["native"].get());
 }
 
-bool PluginManager::registerPluginEngine(std::string const& handle, std::shared_ptr<IPluginEngine> engine) {
+bool PluginManager::registerPluginEngine(const std::string& handle, std::shared_ptr<IPluginEngine> engine) {
     auto type = engine->getPluginType();
     if (!isValidType(type)) {
         mTypesName[type]     = handle;
@@ -265,7 +265,7 @@ bool PluginManager::registerPluginEngine(std::string const& handle, std::shared_
     return false;
 }
 
-void PluginManager::tryRemovePluginEngine(std::string const& handle) {
+void PluginManager::tryRemovePluginEngine(const std::string& handle) {
     if (mHandleTypes.contains(handle)) {
         auto type = mHandleTypes[handle];
         mTypesMap.erase(type);
@@ -282,6 +282,6 @@ void PluginManager::tryRemovePluginEngine(std::string const& handle) {
     }
 }
 
-bool PluginEngineRegistry::registerPluginEngine(std::string const& handle, std::shared_ptr<IPluginEngine> engine) {
+bool PluginEngineRegistry::registerPluginEngine(const std::string& handle, std::shared_ptr<IPluginEngine> engine) {
     return PluginManager::getInstance().registerPluginEngine(handle, std::move(engine));
 }

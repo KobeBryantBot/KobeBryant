@@ -46,7 +46,7 @@ Scheduler& Scheduler::getInstance() {
     return *instance;
 }
 
-Scheduler::TaskID Scheduler::addDelayTask(std::chrono::milliseconds delay, Task const& task) {
+Scheduler::TaskID Scheduler::addDelayTask(std::chrono::milliseconds delay, const Task& task) {
     std::lock_guard<std::mutex> lock(mMtx);
     TaskID                      id       = mNextTaskID++;
     auto                        taskInfo = std::make_unique<TaskInfo>(
@@ -59,7 +59,7 @@ Scheduler::TaskID Scheduler::addDelayTask(std::chrono::milliseconds delay, Task 
     return id;
 }
 
-Scheduler::TaskID Scheduler::addRepeatTask(std::chrono::milliseconds interval, Task const& task) {
+Scheduler::TaskID Scheduler::addRepeatTask(std::chrono::milliseconds interval, const Task& task) {
     std::lock_guard<std::mutex> lock(mMtx);
     TaskID                      id = mNextTaskID++;
     auto taskInfo = std::make_unique<TaskInfo>(std::move(task), std::chrono::steady_clock::now() + interval, interval);
@@ -94,9 +94,9 @@ std::string ScheduleManager::getTaskOwner(size_t id) {
 }
 
 size_t ScheduleManager::addDelayTask(
-    std::string const&           plugin,
+    const std::string&           plugin,
     std::chrono::milliseconds    delay,
-    std::function<void()> const& task
+    const std::function<void()>& task
 ) {
     auto id = Scheduler::getInstance().addDelayTask(delay, task);
     mPluginTasks[plugin].insert(id);
@@ -105,9 +105,9 @@ size_t ScheduleManager::addDelayTask(
 }
 
 size_t ScheduleManager::addRepeatTask(
-    std::string const&           plugin,
+    const std::string&           plugin,
     std::chrono::milliseconds    interval,
-    std::function<void()> const& task
+    const std::function<void()>& task
 ) {
     auto id = Scheduler::getInstance().addRepeatTask(interval, task);
     mPluginTasks[plugin].insert(id);
@@ -116,9 +116,9 @@ size_t ScheduleManager::addRepeatTask(
 }
 
 size_t ScheduleManager::addRepeatTask(
-    std::string const&           plugin,
+    const std::string&           plugin,
     std::chrono::milliseconds    interval,
-    std::function<void()> const& task,
+    const std::function<void()>& task,
     uint64_t                     times
 ) {
 
@@ -137,7 +137,7 @@ size_t ScheduleManager::addRepeatTask(
     return id;
 }
 
-bool ScheduleManager::cancelTask(std::string const& owner, size_t id) {
+bool ScheduleManager::cancelTask(const std::string& owner, size_t id) {
     auto plugin = getTaskOwner(id);
     if (owner == plugin) {
         mPluginTasks[plugin].erase(id);
@@ -148,7 +148,7 @@ bool ScheduleManager::cancelTask(std::string const& owner, size_t id) {
     return false;
 }
 
-void ScheduleManager::removePluginTasks(std::string const& plugin) {
+void ScheduleManager::removePluginTasks(const std::string& plugin) {
     for (auto& id : mPluginTasks[plugin]) {
         cancelTask(plugin, id);
     }

@@ -11,7 +11,7 @@ public:
 
     static EventBusImpl& getInstance();
 
-    void removePluginListeners(std::string const& plugin);
+    void removePluginListeners(const std::string& plugin);
 
     void removeAllListeners();
 };

@@ -20,7 +20,7 @@ void CommandManager::init() {
     }
 }
 
-void CommandManager::handleConsoleInput(std::string const& input) {
+void CommandManager::handleConsoleInput(const std::string& input) {
     std::vector<std::string> params;
     std::istringstream       iss(input);
     std::string              temp;
@@ -38,9 +38,9 @@ void CommandManager::handleConsoleInput(std::string const& input) {
 }
 
 bool CommandManager::registerSimpleCommand(
-    std::string const&                                   plugin,
-    std::string const&                                   cmd,
-    std::function<void(std::vector<std::string> const&)> callback
+    const std::string&                                   plugin,
+    const std::string&                                   cmd,
+    std::function<void(const std::vector<std::string>&)> callback
 ) {
     if (!cmd.empty() && !mCallbacks.contains(cmd) && !mProtectedCommands.contains(cmd)) {
         mCallbacks[cmd] = std::move(callback);
@@ -51,9 +51,9 @@ bool CommandManager::registerSimpleCommand(
 }
 
 void CommandManager::handleCommand(
-    std::string const&              cmd,
-    std::vector<std::string> const& params,
-    std::string const&              raw
+    const std::string&              cmd,
+    const std::vector<std::string>& params,
+    const std::string&              raw
 ) {
     auto& logger = KobeBryant::getInstance().getLogger();
     if (cmd == "stop") {
@@ -132,7 +132,7 @@ void CommandManager::handleCommand(
     }
 }
 
-bool CommandManager::unregisterCommand(std::string const& plugin, std::string const& cmd) {
+bool CommandManager::unregisterCommand(const std::string& plugin, const std::string& cmd) {
     if (mPluginCommands[plugin].contains(cmd)) {
         mCallbacks.erase(cmd);
         mPluginCommands[plugin].erase(cmd);
@@ -141,7 +141,7 @@ bool CommandManager::unregisterCommand(std::string const& plugin, std::string co
     return false;
 }
 
-void CommandManager::unregisterPluginCommands(std::string const& plugin) {
+void CommandManager::unregisterPluginCommands(const std::string& plugin) {
     for (auto& cmd : mPluginCommands[plugin]) {
         unregisterCommand(plugin, cmd);
     }
@@ -163,18 +163,18 @@ CommandRegistry& CommandRegistry::getInstance() {
 }
 
 bool CommandRegistry::registerSimpleCommand(
-    std::string const&                                   plugin,
-    std::string const&                                   cmd,
-    std::function<void(std::vector<std::string> const&)> callback
+    const std::string&                                   plugin,
+    const std::string&                                   cmd,
+    std::function<void(const std::vector<std::string>&)> callback
 ) {
     return CommandManager::getInstance().registerSimpleCommand(plugin, cmd, std::move(callback));
 }
 
-bool CommandRegistry::unregisterCommand(std::string const& plugin, std::string const& cmd) {
+bool CommandRegistry::unregisterCommand(const std::string& plugin, const std::string& cmd) {
     return CommandManager::getInstance().unregisterCommand(plugin, cmd);
 }
 
-void CommandRegistry::executeCommand(std::string const& command) {
+void CommandRegistry::executeCommand(const std::string& command) {
     CommandManager::getInstance().handleConsoleInput(command);
 }
 

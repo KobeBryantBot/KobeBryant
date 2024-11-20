@@ -21,7 +21,7 @@ std::string getErrorReason(unsigned long errorCode) {
     return {};
 }
 
-bool NativePluginEngine::loadPlugin(std::string const& name, std::filesystem::path const& entry) {
+bool NativePluginEngine::loadPlugin(const std::string& name, const std::filesystem::path& entry) {
     try {
         auto& logger = KobeBryant::getInstance().getLogger();
         logger.info("bot.nativePlugin.loading", {name});
@@ -40,7 +40,7 @@ bool NativePluginEngine::loadPlugin(std::string const& name, std::filesystem::pa
     return false;
 }
 
-bool NativePluginEngine::unloadPlugin(std::string const& name) {
+bool NativePluginEngine::unloadPlugin(const std::string& name) {
     try {
         if (mPluginsMap1.contains(name)) {
             auto hModule = mPluginsMap1[name];
@@ -69,4 +69,4 @@ bool NativePluginEngine::unloadPlugin(HMODULE hModule) {
     return false;
 }
 
-HMODULE NativePluginEngine::getPluginHandle(std::string const& name) { return mPluginsMap1[name]; }
+HMODULE NativePluginEngine::getPluginHandle(const std::string& name) { return mPluginsMap1[name]; }

@@ -33,9 +33,9 @@ public:
 
     static Scheduler& getInstance();
 
-    TaskID addDelayTask(std::chrono::milliseconds delay, Task const& task);
+    TaskID addDelayTask(std::chrono::milliseconds delay, const Task& task);
 
-    TaskID addRepeatTask(std::chrono::milliseconds delay, Task const& task);
+    TaskID addRepeatTask(std::chrono::milliseconds delay, const Task& task);
 
     bool cancelTask(TaskID id);
 };
@@ -51,21 +51,21 @@ public:
 
     std::string getTaskOwner(size_t id);
 
-    size_t addDelayTask(std::string const& plugin, std::chrono::milliseconds delay, std::function<void()> const& task);
+    size_t addDelayTask(const std::string& plugin, std::chrono::milliseconds delay, const std::function<void()>& task);
 
     size_t
-    addRepeatTask(std::string const& plugin, std::chrono::milliseconds interval, std::function<void()> const& task);
+    addRepeatTask(const std::string& plugin, std::chrono::milliseconds interval, const std::function<void()>& task);
 
     size_t addRepeatTask(
-        std::string const&           plugin,
+        const std::string&           plugin,
         std::chrono::milliseconds    interval,
-        std::function<void()> const& task,
+        const std::function<void()>& task,
         uint64_t                     times
     );
 
-    bool cancelTask(std::string const& plugin, size_t id);
+    bool cancelTask(const std::string& plugin, size_t id);
 
-    void removePluginTasks(std::string const& plugin);
+    void removePluginTasks(const std::string& plugin);
 
     void removeAllTasks();
 };

@@ -17,7 +17,7 @@ Message& Message::at(uint64_t qid) {
     return *this;
 }
 
-Message& Message::text(std::string const& text) {
+Message& Message::text(const std::string& text) {
     mSerializedMessage.push_back({
         {"type", "text"          },
         {"data", {{"text", text}}}
@@ -41,7 +41,7 @@ Message& Message::reply(int64_t id) {
     return *this;
 }
 
-Message& Message::image(std::string const& raw, ImageType type, std::optional<std::string> summary) {
+Message& Message::image(const std::string& raw, ImageType type, std::optional<std::string> summary) {
     try {
         nlohmann::json json = {
             {"type", "image"},
@@ -89,7 +89,7 @@ Message& Message::avatar(int64_t target, uint16_t size, bool isGroup) {
 
 Message& Message::avatar(int64_t target, bool isGroup) { return avatar(target, 640, isGroup); }
 
-Message& Message::record(std::filesystem::path const& path) {
+Message& Message::record(const std::filesystem::path& path) {
     mSerializedMessage.push_back({
         {"type", "record"                                                        },
         {"data", {{"file", "file://" + std::filesystem::absolute(path).string()}}}
@@ -97,7 +97,7 @@ Message& Message::record(std::filesystem::path const& path) {
     return *this;
 }
 
-Message& Message::video(std::filesystem::path const& path) {
+Message& Message::video(const std::filesystem::path& path) {
     mSerializedMessage.push_back({
         {"type", "video"                                                         },
         {"data", {{"file", "file://" + std::filesystem::absolute(path).string()}}}
@@ -140,7 +140,7 @@ Message& Message::poke(int64_t type, int64_t id) {
     return *this;
 }
 
-Message& Message::share(std::string const& url, std::optional<std::string> title) {
+Message& Message::share(const std::string& url, std::optional<std::string> title) {
     nlohmann::json json = {
         {"type", "share"       },
         {"data", {{"url", url}}}
@@ -161,7 +161,7 @@ Message& Message::contact(uint64_t qq, bool isGroup) {
     return *this;
 }
 
-Message& Message::json(std::string const& json) {
+Message& Message::json(const std::string& json) {
     mSerializedMessage.push_back({
         {"type", "contact"       },
         {"data", {{"data", json}}}
@@ -171,7 +171,7 @@ Message& Message::json(std::string const& json) {
 
 nlohmann::json Message::serialize() const { return mSerializedMessage; }
 
-MessagePacket::MessagePacket(uint64_t target, std::string type, Message const& msg, utils::UUID const& echo) {
+MessagePacket::MessagePacket(uint64_t target, std::string type, const Message& msg, const utils::UUID& echo) {
     mSerializedPacket = {
         {"action", "send_msg"                                                                 },
         {"echo",   echo.toString()                                                            },
@@ -194,17 +194,17 @@ PacketSender& PacketSender::getInstance() {
     return *instance;
 }
 
-void PacketSender::sendRawPacket(std::string const& rawPacket) {
+void PacketSender::sendRawPacket(const std::string& rawPacket) {
     if (KobeBryant::getInstance().hasConnected()) {
         KobeBryant::getInstance().sendRawPacket(rawPacket);
     }
 }
 
-void PacketSender::sendRawPacket(nlohmann::json const& rawPacket) { sendRawPacket(rawPacket.dump()); }
+void PacketSender::sendRawPacket(const nlohmann::json& rawPacket) { sendRawPacket(rawPacket.dump()); }
 
 void PacketSender::sendRawPacket(
-    std::string const&                         rawPacket,
-    std::function<void(nlohmann::json const&)> callback,
+    const std::string&                         rawPacket,
+    std::function<void(const nlohmann::json&)> callback,
     std::function<void()>                      timeoutCallback,
     uint64_t                                   seconds
 ) {
@@ -213,8 +213,8 @@ void PacketSender::sendRawPacket(
 }
 
 void PacketSender::sendRawPacket(
-    nlohmann::json const&                      rawPacket,
-    std::function<void(nlohmann::json const&)> callback,
+    const nlohmann::json&                      rawPacket,
+    std::function<void(const nlohmann::json&)> callback,
     std::function<void()>                      timeoutCallback,
     uint64_t                                   seconds
 ) {
@@ -228,22 +228,22 @@ void PacketSender::sendRawPacket(
     return sendRawPacket(rawPacket);
 }
 
-void PacketSender::sendGroupMessage(uint64_t groupId, std::string const& msg) {
+void PacketSender::sendGroupMessage(uint64_t groupId, const std::string& msg) {
     auto message = Message().text(msg);
     sendGroupMessage(groupId, message);
 }
 
-void PacketSender::sendGroupMessage(uint64_t groupId, Message const& msg) {
+void PacketSender::sendGroupMessage(uint64_t groupId, const Message& msg) {
     auto pkt = MessagePacket(groupId, "group", msg);
     sendRawPacket(pkt.serialize());
 }
 
-void PacketSender::sendPrivateMessage(uint64_t friendId, std::string const& msg) {
+void PacketSender::sendPrivateMessage(uint64_t friendId, const std::string& msg) {
     auto message = Message().text(msg);
     sendPrivateMessage(friendId, message);
 }
 
-void PacketSender::sendPrivateMessage(uint64_t friendId, Message const& msg) {
+void PacketSender::sendPrivateMessage(uint64_t friendId, const Message& msg) {
     auto pkt = MessagePacket(friendId, "private", msg);
     sendRawPacket(pkt.serialize());
 }
@@ -312,7 +312,7 @@ void PacketSender::setGroupAdmin(uint64_t groupId, uint64_t target, bool enable)
     sendRawPacket(packet);
 }
 
-void PacketSender::setGroupCard(uint64_t groupId, uint64_t target, std::string const& card) {
+void PacketSender::setGroupCard(uint64_t groupId, uint64_t target, const std::string& card) {
     nlohmann::json packet = {
         {"action", "set_group_card"                                            },
         {"params", {{"group_id", groupId}, {"user_id", target}, {"card", card}}}
@@ -320,7 +320,7 @@ void PacketSender::setGroupCard(uint64_t groupId, uint64_t target, std::string c
     sendRawPacket(packet);
 }
 
-void PacketSender::setGroupName(uint64_t groupId, std::string const& name) {
+void PacketSender::setGroupName(uint64_t groupId, const std::string& name) {
     nlohmann::json packet = {
         {"action", "set_group_card"                             },
         {"params", {{"group_id", groupId}, {"group_name", name}}}
@@ -336,7 +336,7 @@ void PacketSender::leaveGroup(uint64_t groupId, bool dismiss) {
     sendRawPacket(packet);
 }
 
-void PacketSender::handleFriendAddRequest(bool approve, std::string const& flag, std::string const& remark) {
+void PacketSender::handleFriendAddRequest(bool approve, const std::string& flag, const std::string& remark) {
     nlohmann::json packet = {
         {"action", "set_friend_add_request"                                  },
         {"params", {{"flag", flag}, {"approve", approve}, {"remark", remark}}}
@@ -347,8 +347,8 @@ void PacketSender::handleFriendAddRequest(bool approve, std::string const& flag,
 void PacketSender::handleGroupAddRequest(
     bool               approve,
     RequestSubType     type,
-    std::string const& flag,
-    std::string const& reason
+    const std::string& flag,
+    const std::string& reason
 ) {
     nlohmann::json packet = {
         {"action", "set_group_add_request"},
@@ -363,7 +363,7 @@ void PacketSender::handleGroupAddRequest(
 
 void PacketSender::getMessage(
     int64_t                                    messageId,
-    std::function<void(nlohmann::json const&)> callback,
+    std::function<void(const nlohmann::json&)> callback,
     std::function<void()>                      timeoutCallback,
     uint64_t                                   seconds
 ) {
@@ -376,7 +376,7 @@ void PacketSender::getMessage(
 }
 
 void PacketSender::getGroupsListInfo(
-    std::function<void(nlohmann::json const&)> callback,
+    std::function<void(const nlohmann::json&)> callback,
     std::function<void()>                      timeoutCallback,
     uint64_t                                   seconds
 ) {
@@ -390,7 +390,7 @@ void PacketSender::getGroupsListInfo(
 
 void PacketSender::getForwardMessage(
     std::string                                messageId,
-    std::function<void(nlohmann::json const&)> callback,
+    std::function<void(const nlohmann::json&)> callback,
     std::function<void()>                      timeoutCallback,
     uint64_t                                   seconds
 ) {
@@ -403,7 +403,7 @@ void PacketSender::getForwardMessage(
 }
 
 void PacketSender::getLoginInfo(
-    std::function<void(nlohmann::json const&)> callback,
+    std::function<void(const nlohmann::json&)> callback,
     std::function<void()>                      timeoutCallback,
     uint64_t                                   seconds
 ) {
@@ -418,7 +418,7 @@ void PacketSender::getLoginInfo(
 void PacketSender::getStrangerInfo(
     uint64_t                                   target,
     bool                                       noCache,
-    std::function<void(nlohmann::json const&)> callback,
+    std::function<void(const nlohmann::json&)> callback,
     std::function<void()>                      timeoutCallback,
     uint64_t                                   seconds
 ) {
@@ -432,7 +432,7 @@ void PacketSender::getStrangerInfo(
 
 void PacketSender::getStrangerInfo(
     uint64_t                                   target,
-    std::function<void(nlohmann::json const&)> callback,
+    std::function<void(const nlohmann::json&)> callback,
     std::function<void()>                      timeoutCallback,
     uint64_t                                   seconds
 ) {
@@ -440,7 +440,7 @@ void PacketSender::getStrangerInfo(
 }
 
 void PacketSender::getFriendsListInfo(
-    std::function<void(nlohmann::json const&)> callback,
+    std::function<void(const nlohmann::json&)> callback,
     std::function<void()>                      timeoutCallback,
     uint64_t                                   seconds
 ) {
@@ -458,7 +458,7 @@ void PacketSender::getFriendsList(
     uint64_t                                          seconds
 ) {
     return getFriendsListInfo(
-        [=](nlohmann::json const& packet) {
+        [=](const nlohmann::json& packet) {
             try {
                 if (callback) {
                     auto                  data = packet["data"];
@@ -480,7 +480,7 @@ void PacketSender::getFriendsList(
 void PacketSender::getGroupInfo(
     uint64_t                                   groupId,
     bool                                       noCache,
-    std::function<void(nlohmann::json const&)> callback,
+    std::function<void(const nlohmann::json&)> callback,
     std::function<void()>                      timeoutCallback,
     uint64_t                                   seconds
 ) {
@@ -494,7 +494,7 @@ void PacketSender::getGroupInfo(
 
 void PacketSender::getGroupInfo(
     uint64_t                                   groupId,
-    std::function<void(nlohmann::json const&)> callback,
+    std::function<void(const nlohmann::json&)> callback,
     std::function<void()>                      timeoutCallback,
     uint64_t                                   seconds
 ) {
@@ -505,7 +505,7 @@ void PacketSender::getGroupMemberInfo(
     uint64_t                                   groupId,
     uint64_t                                   target,
     bool                                       noCache,
-    std::function<void(nlohmann::json const&)> callback,
+    std::function<void(const nlohmann::json&)> callback,
     std::function<void()>                      timeoutCallback,
     uint64_t                                   seconds
 ) {
@@ -520,7 +520,7 @@ void PacketSender::getGroupMemberInfo(
 void PacketSender::getGroupMemberInfo(
     uint64_t                                   groupId,
     uint64_t                                   target,
-    std::function<void(nlohmann::json const&)> callback,
+    std::function<void(const nlohmann::json&)> callback,
     std::function<void()>                      timeoutCallback,
     uint64_t                                   seconds
 ) {
@@ -529,7 +529,7 @@ void PacketSender::getGroupMemberInfo(
 
 void PacketSender::getGroupMembersListInfo(
     uint64_t                                   groupId,
-    std::function<void(nlohmann::json const&)> callback,
+    std::function<void(const nlohmann::json&)> callback,
     std::function<void()>                      timeoutCallback,
     uint64_t                                   seconds
 ) {
@@ -549,7 +549,7 @@ void PacketSender::getGroupMembersList(
 ) {
     return getGroupMembersListInfo(
         groupId,
-        [=](nlohmann::json const& packet) {
+        [=](const nlohmann::json& packet) {
             try {
                 if (callback) {
                     auto                  data = packet["data"];
@@ -597,7 +597,7 @@ void PacketSender::getGroupsList(
     uint64_t                                          seconds
 ) {
     return getGroupsListInfo(
-        [=](nlohmann::json const& packet) {
+        [=](const nlohmann::json& packet) {
             try {
                 if (callback) {
                     auto                  data = packet["data"];

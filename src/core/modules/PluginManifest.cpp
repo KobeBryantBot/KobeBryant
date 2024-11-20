@@ -5,7 +5,7 @@
 
 namespace fs = std::filesystem;
 
-std::vector<PluginDependence> PluginDependence::fromJson(nlohmann::json const& json) {
+std::vector<PluginDependence> PluginDependence::fromJson(const nlohmann::json& json) {
     try {
         if (json.is_array()) {
             std::vector<PluginDependence> result;
@@ -35,7 +35,7 @@ std::vector<PluginDependence> PluginDependence::fromJson(nlohmann::json const& j
     return {};
 }
 
-std::optional<PluginManifest> PluginManifest::readFrom(std::filesystem::path const& path) {
+std::optional<PluginManifest> PluginManifest::readFrom(const std::filesystem::path& path) {
     try {
         if (auto file = utils::readFile(path)) {
             auto data = nlohmann::json::parse(*file, nullptr, true, true);

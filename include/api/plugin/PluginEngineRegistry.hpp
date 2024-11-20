@@ -7,7 +7,7 @@
 
 class PluginEngineRegistry {
 protected:
-    KobeBryant_NDAPI static bool registerPluginEngine(std::string const&, std::shared_ptr<IPluginEngine>);
+    KobeBryant_NDAPI static bool registerPluginEngine(const std::string&, std::shared_ptr<IPluginEngine>);
 
 public:
     template <std::derived_from<IPluginEngine> T, typename... Args>

@@ -13,17 +13,17 @@ struct Listener {
     uint64_t              mId;
     std::type_index       mType;
     std::string           mPlugin;
-    KobeBryant_NDAPI      Listener(std::type_index type, std::string const& plugin);
+    KobeBryant_NDAPI      Listener(std::type_index type, const std::string& plugin);
     KobeBryant_NDAPI bool operator<(const Listener& rhs) const;
     KobeBryant_NDAPI bool operator==(const Listener& rhs) const;
 };
 
 class EventBus {
 protected:
-    KobeBryant_API void addListener(Listener const&, std::function<void(Event&)>, uint32_t);
-    KobeBryant_API void forEachListener(std::type_index, std::function<bool(std::function<void(Event&)> const&)>);
-    KobeBryant_API bool removeListener(std::string const&, Listener const&);
-    KobeBryant_API void printException(std::string const&);
+    KobeBryant_API void addListener(const Listener&, std::function<void(Event&)>, uint32_t);
+    KobeBryant_API void forEachListener(std::type_index, std::function<bool(const std::function<void(Event&)>&)>);
+    KobeBryant_API bool removeListener(const std::string&, const Listener&);
+    KobeBryant_API void printException(const std::string&);
 
 public:
     EventBus();
@@ -55,7 +55,7 @@ public:
         return listener;
     }
 
-    inline bool unsubscribe(Listener const& listener) {
+    inline bool unsubscribe(const Listener& listener) {
         auto plugin = utils::getCurrentPluginName();
         return removeListener(plugin, listener);
     }
@@ -63,7 +63,7 @@ public:
     template <std::derived_from<Event> T>
     inline void publish(T& ev) {
         auto type = std::type_index(typeid(T));
-        forEachListener(type, [&](std::function<void(Event&)> const& callback) -> bool {
+        forEachListener(type, [&](const std::function<void(Event&)>& callback) -> bool {
             callback(ev);
             return !ev.isPassingBlocked();
         });

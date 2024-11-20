@@ -16,7 +16,7 @@ private:
 
 public:
     KobeBryant_NDAPI
-    LangI18n(std::filesystem::path const& languageDirectory, std::string const& languageCode = "en_US");
+    LangI18n(const std::filesystem::path& languageDirectory, const std::string& languageCode = "en_US");
 
     LangI18n() = delete;
 
@@ -24,46 +24,46 @@ public:
     KobeBryant_API virtual ~LangI18n();
 
 public:
-    KobeBryant_API bool updateOrCreateLanguage(std::string const& languageCode, std::string const& language);
+    KobeBryant_API bool updateOrCreateLanguage(const std::string& languageCode, const std::string& language);
 
-    KobeBryant_API bool updateOrCreateLanguage(std::string const& languageCode, LangFile const& language);
+    KobeBryant_API bool updateOrCreateLanguage(const std::string& languageCode, const LangFile& language);
 
-    KobeBryant_API void appendLanguage(std::string const& languageCode, std::string const& language);
+    KobeBryant_API void appendLanguage(const std::string& languageCode, const std::string& language);
 
-    KobeBryant_API void appendLanguage(std::string const& languageCode, LangFile const& language);
+    KobeBryant_API void appendLanguage(const std::string& languageCode, const LangFile& language);
 
     KobeBryant_API void
-    forEachLangFile(std::function<void(std::string const& languageCode, LangLanguage const& language)> const& func);
+    forEachLangFile(const std::function<void(const std::string& languageCode, const LangLanguage& language)>& func);
 
     KobeBryant_API bool loadAllLanguages();
 
     KobeBryant_API void reloadAllLanguages();
 
-    KobeBryant_API bool chooseLanguage(std::string const& languageCode = "en_US");
+    KobeBryant_API bool chooseLanguage(const std::string& languageCode = "en_US");
 
-    KobeBryant_API void setDefaultLanguage(std::string const& languageCode = "en_US");
+    KobeBryant_API void setDefaultLanguage(const std::string& languageCode = "en_US");
 
     KobeBryant_NDAPI std::string
-    translate(std::string const& key, std::vector<std::string> const& params = {}, std::string const& data = "%0$s");
+    translate(const std::string& key, const std::vector<std::string>& params = {}, const std::string& data = "%0$s");
 
     KobeBryant_NDAPI std::string translate(
-        std::string const&              key,
-        std::string const&              localLanguage,
-        std::vector<std::string> const& params = {},
-        std::string const&              data   = "%0$s"
+        const std::string&              key,
+        const std::string&              localLanguage,
+        const std::vector<std::string>& params = {},
+        const std::string&              data   = "%0$s"
     );
 
     KobeBryant_NDAPI std::string
-    get(std::string const& key, std::vector<std::string> const& params = {}, std::string const& data = "%0$s");
+    get(const std::string& key, const std::vector<std::string>& params = {}, const std::string& data = "%0$s");
 
     KobeBryant_NDAPI std::string
-                     get(std::string const&              key,
-                         std::string const&              localLanguage,
-                         std::vector<std::string> const& params = {},
-                         std::string const&              data   = "%0$s");
+                     get(const std::string&              key,
+                         const std::string&              localLanguage,
+                         const std::vector<std::string>& params = {},
+                         const std::string&              data   = "%0$s");
 
 private:
-    bool loadOrCreateLanguage(std::string const& languageCode, std::shared_ptr<LangLanguage> language);
+    bool loadOrCreateLanguage(const std::string& languageCode, std::shared_ptr<LangLanguage> language);
 };
 
 

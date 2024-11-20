@@ -11,8 +11,8 @@ public:
     std::string    mFromPlugin;
 
     KobeBryant_NDAPI CustomEvent(
-        std::string const&    eventName,
-        nlohmann::json const& eventData,
-        std::string const&    fromPlugin = utils::getCurrentPluginName()
+        const std::string&    eventName,
+        const nlohmann::json& eventData,
+        const std::string&    fromPlugin = utils::getCurrentPluginName()
     );
 };

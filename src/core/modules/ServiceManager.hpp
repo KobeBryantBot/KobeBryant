@@ -11,15 +11,15 @@ private:
 public:
     static ServiceManager& getInstance();
 
-    bool exportAnyFunc(std::string const& pluginName, std::string const& funcName, AnyFunc const& func);
+    bool exportAnyFunc(const std::string& pluginName, const std::string& funcName, AnyFunc const& func);
 
-    AnyFunc importAnyFunc(std::string const& pluginName, std::string const& funcName);
+    AnyFunc importAnyFunc(const std::string& pluginName, const std::string& funcName);
 
-    bool hasAnyFunc(std::string const& pluginName, std::string const& funcName);
+    bool hasAnyFunc(const std::string& pluginName, const std::string& funcName);
 
-    bool removeAnyFunc(std::string const& pluginName, std::string const& funcName);
+    bool removeAnyFunc(const std::string& pluginName, const std::string& funcName);
 
-    void removePluginFunc(std::string const& pluginName);
+    void removePluginFunc(const std::string& pluginName);
 
     void removeAllFunc();
 };

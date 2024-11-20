@@ -14,6 +14,6 @@
 
 extern std::atomic<bool> EXIST_FLAG;
 
-extern std::string tr(std::string const& key, std::vector<std::string> const& params = {});
+extern std::string tr(const std::string& key, const std::vector<std::string>& params = {});
 
 extern void backupLog();

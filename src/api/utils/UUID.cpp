@@ -49,7 +49,7 @@ std::string UUID::toString() const {
     return uuid;
 }
 
-UUID UUID::fromString(std::string const& str) {
+UUID UUID::fromString(const std::string& str) {
     auto result = UUID();
     try {
         if (str.length() != 36 || str[8] != '-' || str[13] != '-' || str[18] != '-' || str[23] != '-') {
@@ -73,7 +73,7 @@ bool UUID::isValid() const {
 
 bool UUID::operator==(const UUID& rhs) const { return (mHigh == rhs.mHigh) && (mLow == rhs.mLow); }
 
-UUID UUID::fromBinary(std::string const& str) {
+UUID UUID::fromBinary(const std::string& str) {
     auto first  = *reinterpret_cast<const uint64_t*>(str.data());
     auto second = *reinterpret_cast<const uint64_t*>(str.data() + 8);
     return UUID(first, second);

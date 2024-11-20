@@ -7,7 +7,7 @@
 
 namespace fs = std::filesystem;
 
-std::string tr(std::string const& key, std::vector<std::string> const& params) {
+std::string tr(const std::string& key, const std::vector<std::string>& params) {
     return KobeBryant::getInstance().getI18n().translate(key, params);
 }
 
@@ -101,7 +101,7 @@ void KobeBryant::init() {
 }
 
 void KobeBryant::subscribeLogin(std::function<void(bool, nlohmann::json)> const& callback) {
-    subscribeReceiveRawPacket([=](std::string const& text) {
+    subscribeReceiveRawPacket([=](const std::string& text) {
         try {
             if (callback) {
                 auto json = nlohmann::json::parse(text);
@@ -147,7 +147,7 @@ i18n::LangI18n& KobeBryant::getI18n() { return *mI18n; }
 
 WebSocketClient& KobeBryant::getWsClient() { return *mWsClient; }
 
-void KobeBryant::sendRawPacket(std::string const& input) {
+void KobeBryant::sendRawPacket(const std::string& input) {
     try {
         getWsClient().SendText(input);
     } catch (const std::exception& ex) {
@@ -158,7 +158,7 @@ void KobeBryant::sendRawPacket(std::string const& input) {
 
 bool KobeBryant::hasConnected() const { return mConnected; }
 
-uint64_t KobeBryant::subscribeReceiveRawPacket(std::function<void(std::string const&)> const& callback) {
+uint64_t KobeBryant::subscribeReceiveRawPacket(std::function<void(const std::string&)> const& callback) {
     mNextCallbackId++;
     mPacketCallback[mNextCallbackId] = std::move(callback);
     return mNextCallbackId;

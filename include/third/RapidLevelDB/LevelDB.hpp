@@ -12,10 +12,10 @@ private:
     enum CompressionType { kNoCompression = 0x0, kSnappyCompression = 0x1, kZstdCompression = 0x2 };
 
 public:
-    [[nodiscard]] explicit LevelDB(std::filesystem::path const& path);
+    [[nodiscard]] explicit LevelDB(const std::filesystem::path& path);
 
     [[nodiscard]] explicit LevelDB(
-        std::filesystem::path const& path,
+        const std::filesystem::path& path,
         bool                         createIfMiss,
         bool                         fixIfError,
         int                          bloomFilterBit  = 0,

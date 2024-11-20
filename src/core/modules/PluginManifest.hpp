@@ -12,7 +12,7 @@ struct PluginDependence {
     std::optional<Version> mMinVersion{};
     std::optional<Version> mMaxVersion{};
 
-    static std::vector<PluginDependence> fromJson(nlohmann::json const& json);
+    static std::vector<PluginDependence> fromJson(const nlohmann::json& json);
 };
 
 struct PluginManifest {
@@ -26,5 +26,5 @@ struct PluginManifest {
     std::vector<PluginDependence> mDependence{};
     std::vector<PluginDependence> mOptionalDependence{};
 
-    static std::optional<PluginManifest> readFrom(std::filesystem::path const& path);
+    static std::optional<PluginManifest> readFrom(const std::filesystem::path& path);
 };

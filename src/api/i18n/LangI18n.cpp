@@ -5,7 +5,7 @@
 
 namespace i18n {
 
-LangI18n::LangI18n(std::filesystem::path const& languageDirectory, std::string const& languageCode)
+LangI18n::LangI18n(const std::filesystem::path& languageDirectory, const std::string& languageCode)
 : mLanguageDirectory(languageDirectory),
   mLanguageCode(languageCode) {}
 
@@ -16,19 +16,19 @@ LangI18n::~LangI18n() {
     mAllLanguages.clear();
 }
 
-bool LangI18n::loadOrCreateLanguage(std::string const& languageCode, std::shared_ptr<LangLanguage> language) {
+bool LangI18n::loadOrCreateLanguage(const std::string& languageCode, std::shared_ptr<LangLanguage> language) {
     auto result                 = language->init();
     mAllLanguages[languageCode] = language;
     return result;
 }
 
-bool LangI18n::updateOrCreateLanguage(std::string const& languageCode, std::string const& language) {
+bool LangI18n::updateOrCreateLanguage(const std::string& languageCode, const std::string& language) {
     auto path = mLanguageDirectory / (languageCode + ".lang");
     auto lang = std::make_shared<LangLanguage>(path, language);
     return loadOrCreateLanguage(languageCode, lang);
 }
 
-bool LangI18n::updateOrCreateLanguage(std::string const& languageCode, LangFile const& language) {
+bool LangI18n::updateOrCreateLanguage(const std::string& languageCode, LangFile const& language) {
     auto path = mLanguageDirectory / (languageCode + ".lang");
     auto lang = std::make_shared<LangLanguage>(path, language);
     return loadOrCreateLanguage(languageCode, lang);
@@ -62,7 +62,7 @@ void LangI18n::reloadAllLanguages() {
     }
 }
 
-bool LangI18n::chooseLanguage(std::string const& languageCode) {
+bool LangI18n::chooseLanguage(const std::string& languageCode) {
     mLanguageCode = languageCode;
     if (mAllLanguages.contains(mLanguageCode)) {
         mLocalization = mAllLanguages[mLanguageCode];
@@ -71,10 +71,10 @@ bool LangI18n::chooseLanguage(std::string const& languageCode) {
     return false;
 }
 
-void LangI18n::setDefaultLanguage(std::string const& languageCode) { mDefaultLanguage = languageCode; }
+void LangI18n::setDefaultLanguage(const std::string& languageCode) { mDefaultLanguage = languageCode; }
 
 std::string
-LangI18n::translate(std::string const& key, std::vector<std::string> const& data, std::string const& translateKey) {
+LangI18n::translate(const std::string& key, const std::vector<std::string>& data, const std::string& translateKey) {
     if (!mLocalization) {
         chooseLanguage(mDefaultLanguage);
     }
@@ -92,10 +92,10 @@ LangI18n::translate(std::string const& key, std::vector<std::string> const& data
 }
 
 std::string LangI18n::translate(
-    std::string const&              key,
-    std::string const&              localLanguage,
-    std::vector<std::string> const& data,
-    std::string const&              translateKey
+    const std::string&              key,
+    const std::string&              localLanguage,
+    const std::vector<std::string>& data,
+    const std::string&              translateKey
 ) {
     if (mAllLanguages.contains(localLanguage)) {
         if (auto temp = mAllLanguages[localLanguage]) {
@@ -110,25 +110,25 @@ std::string LangI18n::translate(
 }
 
 std::string
-LangI18n::get(std::string const& key, std::vector<std::string> const& data, std::string const& translateKey) {
+LangI18n::get(const std::string& key, const std::vector<std::string>& data, const std::string& translateKey) {
     return translate(key, data, translateKey);
 }
 
 std::string LangI18n::get(
-    std::string const&              key,
-    std::string const&              localLanguage,
-    std::vector<std::string> const& data,
-    std::string const&              translateKey
+    const std::string&              key,
+    const std::string&              localLanguage,
+    const std::vector<std::string>& data,
+    const std::string&              translateKey
 ) {
     return translate(key, localLanguage, data, translateKey);
 }
 
-void LangI18n::appendLanguage(std::string const& languageCode, std::string const& language) {
+void LangI18n::appendLanguage(const std::string& languageCode, const std::string& language) {
     auto data = LangFile::parse(language);
     return appendLanguage(languageCode, data);
 }
 
-void LangI18n::appendLanguage(std::string const& languageCode, LangFile const& language) {
+void LangI18n::appendLanguage(const std::string& languageCode, LangFile const& language) {
     if (mAllLanguages.contains(languageCode)) {
         mAllLanguages[languageCode]->merge_patch(language);
     } else {
@@ -138,7 +138,7 @@ void LangI18n::appendLanguage(std::string const& languageCode, LangFile const& l
 }
 
 void LangI18n::forEachLangFile(
-    std::function<void(std::string const& languageCode, LangLanguage const& language)> const& func
+    std::function<void(const std::string& languageCode, LangLanguage const& language)> const& func
 ) {
     if (func) {
         for (auto& [code, data] : mAllLanguages) {

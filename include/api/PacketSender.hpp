@@ -27,7 +27,7 @@ public:
 
     KobeBryant_API Message& reply(int64_t msgId);
 
-    KobeBryant_API Message& text(std::string const& text);
+    KobeBryant_API Message& text(const std::string& text);
 
     template <typename... Args>
     inline Message& text(fmt::format_string<Args...> fmt, Args&&... args) {
@@ -37,15 +37,15 @@ public:
     KobeBryant_API Message& face(int id);
 
     KobeBryant_API Message&
-    image(std::string const& raw, ImageType type = ImageType::Path, std::optional<std::string> summary = {});
+    image(const std::string& raw, ImageType type = ImageType::Path, std::optional<std::string> summary = {});
 
     KobeBryant_API Message& avatar(int64_t target, uint16_t size = 640, bool isGroup = false);
 
     KobeBryant_API Message& avatar(int64_t target, bool isGroup);
 
-    KobeBryant_API Message& record(std::filesystem::path const& path);
+    KobeBryant_API Message& record(const std::filesystem::path& path);
 
-    KobeBryant_API Message& video(std::filesystem::path const& path);
+    KobeBryant_API Message& video(const std::filesystem::path& path);
 
     // 猜拳魔法表情
     KobeBryant_API Message& rps();
@@ -57,11 +57,11 @@ public:
 
     // KobeBryant_API Message& poke(int64_t type = 1, int64_t id = -1);
 
-    // KobeBryant_API Message& share(std::string const& url, std::optional<std::string> title = {});
+    // KobeBryant_API Message& share(const std::string& url, std::optional<std::string> title = {});
 
     KobeBryant_API Message& contact(uint64_t qq, bool isGroup = false);
 
-    KobeBryant_API Message& json(std::string const& json);
+    KobeBryant_API Message& json(const std::string& json);
 };
 
 class MessagePacket {
@@ -72,8 +72,8 @@ public:
     KobeBryant_NDAPI explicit MessagePacket(
         uint64_t           target,
         std::string        type,
-        Message const&     msg,
-        utils::UUID const& echo = utils::UUID::random()
+        const Message&     msg,
+        const utils::UUID& echo = utils::UUID::random()
     );
 
     KobeBryant_NDAPI nlohmann::json serialize() const;
@@ -91,31 +91,31 @@ public:
 
     KobeBryant_NDAPI static PacketSender& getInstance();
 
-    KobeBryant_API void sendRawPacket(std::string const& rawPacket);
+    KobeBryant_API void sendRawPacket(const std::string& rawPacket);
 
     KobeBryant_API void sendRawPacket(
-        std::string const&                         rawPacket,
-        std::function<void(nlohmann::json const&)> callback,
+        const std::string&                         rawPacket,
+        std::function<void(const nlohmann::json&)> callback,
         std::function<void()>                      timeoutCallback = {},
         uint64_t                                   seconds         = 5
     );
 
-    KobeBryant_API void sendRawPacket(nlohmann::json const& rawPacket);
+    KobeBryant_API void sendRawPacket(const nlohmann::json& rawPacket);
 
     KobeBryant_API void sendRawPacket(
-        nlohmann::json const&                      rawPacket,
-        std::function<void(nlohmann::json const&)> callback,
+        const nlohmann::json&                      rawPacket,
+        std::function<void(const nlohmann::json&)> callback,
         std::function<void()>                      timeoutCallback = {},
         uint64_t                                   seconds         = 5
     );
 
-    KobeBryant_API void sendGroupMessage(GroupId groupId, std::string const& msg);
+    KobeBryant_API void sendGroupMessage(GroupId groupId, const std::string& msg);
 
-    KobeBryant_API void sendGroupMessage(GroupId groupId, Message const& msg);
+    KobeBryant_API void sendGroupMessage(GroupId groupId, const Message& msg);
 
-    KobeBryant_API void sendPrivateMessage(UserId friendId, std::string const& msg);
+    KobeBryant_API void sendPrivateMessage(UserId friendId, const std::string& msg);
 
-    KobeBryant_API void sendPrivateMessage(UserId friendId, Message const& msg);
+    KobeBryant_API void sendPrivateMessage(UserId friendId, const Message& msg);
 
     KobeBryant_API void sendFriendPoke(UserId friendId);
 
@@ -133,39 +133,39 @@ public:
 
     KobeBryant_API void setGroupAdmin(GroupId groupId, UserId target, bool enable = true);
 
-    KobeBryant_API void setGroupCard(GroupId groupId, UserId target, std::string const& card);
+    KobeBryant_API void setGroupCard(GroupId groupId, UserId target, const std::string& card);
 
-    KobeBryant_API void setGroupName(GroupId groupId, std::string const& name);
+    KobeBryant_API void setGroupName(GroupId groupId, const std::string& name);
 
     KobeBryant_API void leaveGroup(GroupId groupId, bool dismiss = false);
 
-    KobeBryant_API void handleFriendAddRequest(bool approve, std::string const& flag, std::string const& remark = {});
+    KobeBryant_API void handleFriendAddRequest(bool approve, const std::string& flag, const std::string& remark = {});
 
     KobeBryant_API void
-    handleGroupAddRequest(bool approve, RequestSubType type, std::string const& flag, std::string const& reason = {});
+    handleGroupAddRequest(bool approve, RequestSubType type, const std::string& flag, const std::string& reason = {});
 
     KobeBryant_API void getMessage(
         int64_t                                    messageId,
-        std::function<void(nlohmann::json const&)> callback,
+        std::function<void(const nlohmann::json&)> callback,
         std::function<void()>                      timeoutCallback = {},
         uint64_t                                   seconds         = 5
     );
 
     KobeBryant_API void getGroupsListInfo(
-        std::function<void(nlohmann::json const&)> callback,
+        std::function<void(const nlohmann::json&)> callback,
         std::function<void()>                      timeoutCallback = {},
         uint64_t                                   seconds         = 5
     );
 
     KobeBryant_API void getForwardMessage(
         std::string                                messageId,
-        std::function<void(nlohmann::json const&)> callback,
+        std::function<void(const nlohmann::json&)> callback,
         std::function<void()>                      timeoutCallback = {},
         uint64_t                                   seconds         = 5
     );
 
     KobeBryant_API void getLoginInfo(
-        std::function<void(nlohmann::json const&)> callback,
+        std::function<void(const nlohmann::json&)> callback,
         std::function<void()>                      timeoutCallback = {},
         uint64_t                                   seconds         = 5
     );
@@ -173,26 +173,26 @@ public:
     KobeBryant_API void getStrangerInfo(
         UserId                                     target,
         bool                                       noCache,
-        std::function<void(nlohmann::json const&)> callback,
+        std::function<void(const nlohmann::json&)> callback,
         std::function<void()>                      timeoutCallback = {},
         uint64_t                                   seconds         = 5
     );
 
     KobeBryant_API void getStrangerInfo(
         UserId                                     target,
-        std::function<void(nlohmann::json const&)> callback,
+        std::function<void(const nlohmann::json&)> callback,
         std::function<void()>                      timeoutCallback = {},
         uint64_t                                   seconds         = 5
     );
 
     KobeBryant_API void getFriendsListInfo(
-        std::function<void(nlohmann::json const&)> callback,
+        std::function<void(const nlohmann::json&)> callback,
         std::function<void()>                      timeoutCallback = {},
         uint64_t                                   seconds         = 5
     );
 
     KobeBryant_API void getFriendsList(
-        std::function<void(std::vector<UserId> const&)> callback,
+        std::function<void(const std::vector<UserId>&)> callback,
         std::function<void()>                           timeoutCallback = {},
         uint64_t                                        seconds         = 5
     );
@@ -200,14 +200,14 @@ public:
     KobeBryant_API void getGroupInfo(
         GroupId                                    groupId,
         bool                                       noCache,
-        std::function<void(nlohmann::json const&)> callback,
+        std::function<void(const nlohmann::json&)> callback,
         std::function<void()>                      timeoutCallback = {},
         uint64_t                                   seconds         = 5
     );
 
     KobeBryant_API void getGroupInfo(
         GroupId                                    groupId,
-        std::function<void(nlohmann::json const&)> callback,
+        std::function<void(const nlohmann::json&)> callback,
         std::function<void()>                      timeoutCallback = {},
         uint64_t                                   seconds         = 5
     );
@@ -216,7 +216,7 @@ public:
         GroupId                                    groupId,
         UserId                                     target,
         bool                                       noCache,
-        std::function<void(nlohmann::json const&)> callback,
+        std::function<void(const nlohmann::json&)> callback,
         std::function<void()>                      timeoutCallback = {},
         uint64_t                                   seconds         = 5
     );
@@ -224,21 +224,21 @@ public:
     KobeBryant_API void getGroupMemberInfo(
         GroupId                                    groupId,
         UserId                                     target,
-        std::function<void(nlohmann::json const&)> callback,
+        std::function<void(const nlohmann::json&)> callback,
         std::function<void()>                      timeoutCallback = {},
         uint64_t                                   seconds         = 5
     );
 
     KobeBryant_API void getGroupMembersListInfo(
         GroupId                                    groupId,
-        std::function<void(nlohmann::json const&)> callback,
+        std::function<void(const nlohmann::json&)> callback,
         std::function<void()>                      timeoutCallback = {},
         uint64_t                                   seconds         = 5
     );
 
     KobeBryant_API void getGroupMembersList(
         GroupId                                         groupId,
-        std::function<void(std::vector<UserId> const&)> callback,
+        std::function<void(const std::vector<UserId>&)> callback,
         std::function<void()>                           timeoutCallback = {},
         uint64_t                                        seconds         = 5
     );
@@ -251,7 +251,7 @@ public:
     );
 
     KobeBryant_API void getGroupsList(
-        std::function<void(std::vector<GroupId> const&)> callback,
+        std::function<void(const std::vector<GroupId>&)> callback,
         std::function<void()>                            timeoutCallback = {},
         uint64_t                                         seconds         = 5
     );

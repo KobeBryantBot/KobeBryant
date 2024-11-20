@@ -1,6 +1,6 @@
 #include "api/event/CustomEvent.hpp"
 
-CustomEvent::CustomEvent(std::string const& eventName, nlohmann::json const& eventData, std::string const& fromPlugin)
+CustomEvent::CustomEvent(const std::string& eventName, const nlohmann::json& eventData, const std::string& fromPlugin)
 : mEventName(eventName),
   mEventData(eventData),
   mFromPlugin(fromPlugin) {}

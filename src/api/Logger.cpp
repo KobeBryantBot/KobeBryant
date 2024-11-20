@@ -19,13 +19,13 @@ std::string getLoggerPrefix(Logger::LogLevel level) {
     return map[(int)level];
 }
 
-Logger::Logger(std::string const& title) { mTitle = "[" + title + "]"; }
+Logger::Logger(const std::string& title) { mTitle = "[" + title + "]"; }
 
-void Logger::setTitle(std::string const& title) { mTitle = "[" + title + "]"; }
+void Logger::setTitle(const std::string& title) { mTitle = "[" + title + "]"; }
 
 void Logger::setLevel(LogLevel level) { mLogLevel = level; }
 
-bool Logger::setFile(std::filesystem::path const& path) {
+bool Logger::setFile(const std::filesystem::path& path) {
     if (!mFilePath) {
         mFilePath = path;
         if (!std::filesystem::exists(path.parent_path())) {
@@ -36,7 +36,7 @@ bool Logger::setFile(std::filesystem::path const& path) {
     return false;
 }
 
-void logToFile(std::filesystem::path const& path, std::string const& logStr) {
+void logToFile(const std::filesystem::path& path, const std::string& logStr) {
     KobeBryant::getInstance().getThreadPool().enqueue([=] {
         std::ofstream fileStream(path, std::ios::app);
         fileStream << logStr << std::endl;
@@ -123,14 +123,14 @@ void Logger::printStr(LogLevel level, std::string&& data) const noexcept {
 
 void Logger::printView(LogLevel level, std::string_view data) const noexcept { printStr(level, std::string(data)); }
 
-std::string Logger::translate(std::string_view data, std::vector<std::string> const& params) const {
+std::string Logger::translate(std::string_view data, const std::vector<std::string>& params) const {
     return tr(std::string(data), params);
 }
 
-void Logger::appendLanguage(std::string const& local, i18n::LangFile const& lang) {
+void Logger::appendLanguage(const std::string& local, const i18n::LangFile& lang) {
     KobeBryant::getInstance().getI18n().appendLanguage(local, lang);
 }
 
-void Logger::appendLanguage(std::string const& local, std::string const& lang) {
+void Logger::appendLanguage(const std::string& local, const std::string& lang) {
     KobeBryant::getInstance().getI18n().appendLanguage(local, lang);
 }

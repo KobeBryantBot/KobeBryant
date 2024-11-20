@@ -1,18 +1,18 @@
 #include "api/Service.hpp"
 #include "core/modules/ServiceManager.hpp"
 
-bool Service::exportAnyFunc(std::string const& pluginName, std::string const& funcName, Service::AnyFunc const& func) {
+bool Service::exportAnyFunc(const std::string& pluginName, const std::string& funcName, Service::AnyFunc const& func) {
     return ServiceManager::getInstance().exportAnyFunc(pluginName, funcName, func);
 }
 
-Service::AnyFunc Service::importAnyFunc(std::string const& pluginName, std::string const& funcName) {
+Service::AnyFunc Service::importAnyFunc(const std::string& pluginName, const std::string& funcName) {
     return ServiceManager::getInstance().importAnyFunc(pluginName, funcName);
 }
 
-bool Service::hasFunc(std::string const& pluginName, std::string const& funcName) {
+bool Service::hasFunc(const std::string& pluginName, const std::string& funcName) {
     return ServiceManager::getInstance().hasAnyFunc(pluginName, funcName);
 }
 
-bool Service::removeFunc(std::string const& pluginName, std::string const& funcName) {
+bool Service::removeFunc(const std::string& pluginName, const std::string& funcName) {
     return ServiceManager::getInstance().removeAnyFunc(pluginName, funcName);
 }

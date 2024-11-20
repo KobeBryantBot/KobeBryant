@@ -5,7 +5,7 @@
 
 class EventDispatcher {
 private:
-    std::unordered_map<utils::UUID, std::function<void(nlohmann::json const&)>> mCallbacks;
+    std::unordered_map<utils::UUID, std::function<void(const nlohmann::json&)>> mCallbacks;
     std::mutex                                                                  mMutex;
 
 public:
@@ -14,8 +14,8 @@ public:
     void init();
 
     void addCallback(
-        utils::UUID const&                                uuid,
-        std::function<void(nlohmann::json const&)> const& callback,
+        const utils::UUID&                                uuid,
+        std::function<void(const nlohmann::json&)> const& callback,
         std::function<void()>                             timeoutCallback,
         uint64_t                                          seconds
     );

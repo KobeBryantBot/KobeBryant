@@ -9,7 +9,7 @@ ServiceManager& ServiceManager::getInstance() {
     return *instance;
 }
 
-bool ServiceManager::exportAnyFunc(std::string const& pluginName, std::string const& funcName, AnyFunc const& func) {
+bool ServiceManager::exportAnyFunc(const std::string& pluginName, const std::string& funcName, AnyFunc const& func) {
     if (!hasAnyFunc(pluginName, funcName)) {
         mPluginFunctions[pluginName][funcName] = std::move(func);
         return true;
@@ -18,18 +18,18 @@ bool ServiceManager::exportAnyFunc(std::string const& pluginName, std::string co
 }
 
 std::function<std::any(std::vector<std::any> const&)>
-ServiceManager::importAnyFunc(std::string const& pluginName, std::string const& funcName) {
+ServiceManager::importAnyFunc(const std::string& pluginName, const std::string& funcName) {
     return mPluginFunctions[pluginName][funcName];
 }
 
-bool ServiceManager::hasAnyFunc(std::string const& pluginName, std::string const& funcName) {
+bool ServiceManager::hasAnyFunc(const std::string& pluginName, const std::string& funcName) {
     if (mPluginFunctions.contains(pluginName)) {
         return mPluginFunctions[pluginName].contains(funcName);
     }
     return false;
 }
 
-bool ServiceManager::removeAnyFunc(std::string const& pluginName, std::string const& funcName) {
+bool ServiceManager::removeAnyFunc(const std::string& pluginName, const std::string& funcName) {
     if (hasAnyFunc(pluginName, funcName)) {
         mPluginFunctions[pluginName].erase(funcName);
         return true;
@@ -37,7 +37,7 @@ bool ServiceManager::removeAnyFunc(std::string const& pluginName, std::string co
     return false;
 }
 
-void ServiceManager::removePluginFunc(std::string const& pluginName) {
+void ServiceManager::removePluginFunc(const std::string& pluginName) {
     if (mPluginFunctions.contains(pluginName)) {
         mPluginFunctions[pluginName].clear();
     }

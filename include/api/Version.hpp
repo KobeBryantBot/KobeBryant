@@ -11,17 +11,17 @@ protected:
     uint32_t mPatch;
 
 public:
-    KobeBryant_NDAPI static bool isValidVersionString(std::string const& version);
+    KobeBryant_NDAPI static bool isValidVersionString(const std::string& version);
 
-    KobeBryant_NDAPI static std::optional<Version> fromString(std::string const& version);
+    KobeBryant_NDAPI static std::optional<Version> fromString(const std::string& version);
 
-    KobeBryant_NDAPI static std::optional<Version> fromVector(std::vector<uint32_t> const& version);
+    KobeBryant_NDAPI static std::optional<Version> fromVector(const std::vector<uint32_t>& version);
 
     KobeBryant_NDAPI static Version getKobeBryantVersion();
 
     KobeBryant_NDAPI Version(uint32_t major, uint32_t minor, uint32_t patch);
 
-    KobeBryant_NDAPI bool isInRange(Version const& minVersion, Version const& maxVersion) const;
+    KobeBryant_NDAPI bool isInRange(const Version& minVersion, const Version& maxVersion) const;
 
     KobeBryant_NDAPI std::string toString(bool prefix = true) const;
 

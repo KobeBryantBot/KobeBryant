@@ -18,32 +18,32 @@ private:
 public:
     static PluginManager& getInstance();
 
-    bool hasPlugin(std::string const& name) const;
+    bool hasPlugin(const std::string& name) const;
 
-    bool isValidType(std::string const& type) const;
+    bool isValidType(const std::string& type) const;
 
-    bool registerPluginEngine(std::string const& handle, std::shared_ptr<IPluginEngine> engine);
+    bool registerPluginEngine(const std::string& handle, std::shared_ptr<IPluginEngine> engine);
 
-    void tryRemovePluginEngine(std::string const& handle);
+    void tryRemovePluginEngine(const std::string& handle);
 
     void loadAllPlugins();
 
     void loadAllPlugins(std::weak_ptr<IPluginEngine> engine, int& count);
 
-    bool loadPlugin(std::string const& name, bool force = false);
+    bool loadPlugin(const std::string& name, bool force = false);
 
     bool loadDependence(
-        std::string const&     name,
+        const std::string&     name,
         std::optional<Version> minVersion,
         std::optional<Version> maxVersion,
-        std::string const&     plugin
+        const std::string&     plugin
     );
 
-    bool loadPlugin(PluginManifest const& manifest, std::string const& type, int& count, bool force = false);
+    bool loadPlugin(PluginManifest const& manifest, const std::string& type, int& count, bool force = false);
 
     void unloadAllPlugins();
 
-    bool unloadPlugin(std::string const& name, bool force = false);
+    bool unloadPlugin(const std::string& name, bool force = false);
 
     std::vector<std::string> getAllPlugins();
 

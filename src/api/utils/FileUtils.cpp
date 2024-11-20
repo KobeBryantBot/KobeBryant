@@ -37,19 +37,19 @@ bool writeFile(fs::path const& filePath, std::string_view content, bool isBinary
     return true;
 }
 
-std::optional<std::vector<uint8_t>> readBinaryFile(std::filesystem::path const& filePath) {
+std::optional<std::vector<uint8_t>> readBinaryFile(const std::filesystem::path& filePath) {
     if (auto data = readFile(filePath, true)) {
         return utils::toBinaryArray(data.value());
     }
     return std::nullopt;
 }
 
-bool writeBinaryFile(std::filesystem::path const& filePath, std::vector<uint8_t> const& content) {
+bool writeBinaryFile(const std::filesystem::path& filePath, std::vector<uint8_t> const& content) {
     auto binary = utils::toBinaryString(content);
     return writeFile(filePath, binary, true);
 }
 
-std::vector<std::string> getAllFileFullNameInDirectory(std::filesystem::path const& path) {
+std::vector<std::string> getAllFileFullNameInDirectory(const std::filesystem::path& path) {
     std::vector<std::string> fileNames;
     for (const auto& entry : std::filesystem::directory_iterator(path)) {
         if (entry.is_regular_file()) {
@@ -59,7 +59,7 @@ std::vector<std::string> getAllFileFullNameInDirectory(std::filesystem::path con
     return fileNames;
 }
 
-std::vector<std::filesystem::path> getAllFileDirectories(std::filesystem::path const& path) {
+std::vector<std::filesystem::path> getAllFileDirectories(const std::filesystem::path& path) {
     std::vector<std::filesystem::path> result;
     for (const auto& entry : std::filesystem::directory_iterator(path)) {
         if (entry.is_directory()) {

@@ -14,9 +14,9 @@ public:
 
     KobeBryant_NDAPI static UUID random();
 
-    KobeBryant_NDAPI static UUID fromString(std::string const& str);
+    KobeBryant_NDAPI static UUID fromString(const std::string& str);
 
-    KobeBryant_NDAPI static UUID fromBinary(std::string const& str);
+    KobeBryant_NDAPI static UUID fromBinary(const std::string& str);
 
     KobeBryant_NDAPI std::string toString() const;
 

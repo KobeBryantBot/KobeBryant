@@ -74,7 +74,7 @@ std::string wstringtoString(std::wstring_view wstr, uint32_t codePage) {
     return str;
 }
 
-std::string getTimeStringFormatted(std::string const& format) {
+std::string getTimeStringFormatted(const std::string& format) {
     time_t    time_s = time(0);
     struct tm now_tm;
     localtime_s(&now_tm, &time_s);
@@ -83,7 +83,7 @@ std::string getTimeStringFormatted(std::string const& format) {
     return ss.str();
 }
 
-std::string trimString(std::string const& str) {
+std::string trimString(const std::string& str) {
     if (str.empty()) {
         return str;
     }
@@ -103,7 +103,7 @@ std::string trimString(std::string const& str) {
 
 std::string toBinaryString(std::vector<uint8_t> const& binary) { return std::string(binary.begin(), binary.end()); }
 
-std::vector<uint8_t> toBinaryArray(std::string const& binary) {
+std::vector<uint8_t> toBinaryArray(const std::string& binary) {
     return std::vector<uint8_t>(binary.begin(), binary.end());
 }
 

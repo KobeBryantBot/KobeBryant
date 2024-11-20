@@ -11,13 +11,13 @@ private:
     std::filesystem::path mFilePath;
 
 public:
-    KobeBryant_NDAPI LangLanguage(std::filesystem::path const& filePath, std::string const& defaultLanguage);
+    KobeBryant_NDAPI LangLanguage(const std::filesystem::path& filePath, const std::string& defaultLanguage);
 
-    KobeBryant_NDAPI LangLanguage(std::filesystem::path const& filePath, LangFile const& defaultLanguage);
+    KobeBryant_NDAPI LangLanguage(const std::filesystem::path& filePath, const LangFile& defaultLanguage);
 
     KobeBryant_NDAPI LangLanguage(
-        std::filesystem::path const&                        filePath,
-        std::unordered_map<std::string, std::string> const& defaultLanguage
+        const std::filesystem::path&                        filePath,
+        const std::unordered_map<std::string, std::string>& defaultLanguage
     );
 
 public:

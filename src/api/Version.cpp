@@ -3,12 +3,12 @@
 #include <fmt/format.h>
 #include <regex>
 
-bool Version::isValidVersionString(std::string const& version) {
+bool Version::isValidVersionString(const std::string& version) {
     std::regex pattern("(v)?(\\d+)\\.(\\d+)\\.(\\d+)");
     return std::regex_match(version, pattern);
 }
 
-std::optional<Version> Version::fromString(std::string const& version) {
+std::optional<Version> Version::fromString(const std::string& version) {
     if (isValidVersionString(version)) {
         std::istringstream iss(version);
         char               prefix;

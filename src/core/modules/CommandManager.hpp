@@ -4,7 +4,7 @@
 class CommandManager {
 protected:
     std::unordered_set<std::string> mProtectedCommands = {"stop", "reload", "plugins", "version"};
-    std::unordered_map<std::string, std::function<void(std::vector<std::string> const&)>> mCallbacks;
+    std::unordered_map<std::string, std::function<void(const std::vector<std::string>&)>> mCallbacks;
     std::unordered_map<std::string, std::unordered_set<std::string>>                      mPluginCommands;
 
 public:
@@ -12,19 +12,19 @@ public:
 
     void init();
 
-    void handleConsoleInput(std::string const& input);
+    void handleConsoleInput(const std::string& input);
 
     bool registerSimpleCommand(
-        std::string const&                                   plugin,
-        std::string const&                                   cmd,
-        std::function<void(std::vector<std::string> const&)> callback
+        const std::string&                                   plugin,
+        const std::string&                                   cmd,
+        std::function<void(const std::vector<std::string>&)> callback
     );
 
-    bool unregisterCommand(std::string const& plugin, std::string const& cmd);
+    bool unregisterCommand(const std::string& plugin, const std::string& cmd);
 
-    void unregisterPluginCommands(std::string const& plugin);
+    void unregisterPluginCommands(const std::string& plugin);
 
-    void handleCommand(std::string const& cmd, std::vector<std::string> const& params, std::string const& raw);
+    void handleCommand(const std::string& cmd, const std::vector<std::string>& params, const std::string& raw);
 
     void unregisterAllCommands();
 };

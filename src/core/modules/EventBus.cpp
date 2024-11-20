@@ -6,7 +6,7 @@ bool Listener::operator<(const Listener& rhs) const { return mId < rhs.mId; }
 
 bool Listener::operator==(const Listener& rhs) const { return mId == rhs.mId; }
 
-Listener::Listener(std::type_index type, std::string const& plugin) : mType(type), mPlugin(plugin) {
+Listener::Listener(std::type_index type, const std::string& plugin) : mType(type), mPlugin(plugin) {
     auto& impl = EventBusImpl::getInstance();
     impl.mNextEventId++;
     auto eventId = impl.mNextEventId;
@@ -31,7 +31,7 @@ EventBus& EventBus::getInstance() {
     return *instance;
 }
 
-void EventBus::addListener(Listener const& listener, std::function<void(Event&)> callback, uint32_t priority) {
+void EventBus::addListener(const Listener& listener, std::function<void(Event&)> callback, uint32_t priority) {
     auto& impl                       = EventBusImpl::getInstance();
     impl.mCallbacks[listener]        = std::move(callback);
     impl.mListenerPriority[listener] = priority;
@@ -55,7 +55,7 @@ void EventBus::forEachListener(std::type_index type, std::function<bool(std::fun
     }
 }
 
-bool EventBus::removeListener(std::string const& plugin, Listener const& listener) {
+bool EventBus::removeListener(const std::string& plugin, const Listener& listener) {
     if (listener.mPlugin == plugin) {
         auto& impl = EventBusImpl::getInstance();
         if (impl.mCallbacks.contains(listener)) {
@@ -69,7 +69,7 @@ bool EventBus::removeListener(std::string const& plugin, Listener const& listene
     return false;
 }
 
-void EventBusImpl::removePluginListeners(std::string const& plugin) {
+void EventBusImpl::removePluginListeners(const std::string& plugin) {
     for (auto& [listener, callback] : mCallbacks) {
         if (listener.mPlugin == plugin) {
             mCallbacks.erase(listener);
@@ -82,6 +82,6 @@ void EventBusImpl::removePluginListeners(std::string const& plugin) {
 
 void EventBusImpl::removeAllListeners() { mCallbacks.clear(); }
 
-void EventBus::printException(std::string const& ex) {
+void EventBus::printException(const std::string& ex) {
     return KobeBryant::getInstance().getLogger().error("bot.catch.exception", {ex});
 }

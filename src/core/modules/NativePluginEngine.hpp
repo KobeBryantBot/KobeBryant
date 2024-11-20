@@ -12,11 +12,11 @@ private:
 public:
     std::string getPluginType() const override;
 
-    bool loadPlugin(std::string const& name, std::filesystem::path const& entry) override;
+    bool loadPlugin(const std::string& name, const std::filesystem::path& entry) override;
 
-    bool unloadPlugin(std::string const& name) override;
+    bool unloadPlugin(const std::string& name) override;
 
     bool unloadPlugin(HMODULE hModule);
 
-    HMODULE getPluginHandle(std::string const& name);
+    HMODULE getPluginHandle(const std::string& name);
 };

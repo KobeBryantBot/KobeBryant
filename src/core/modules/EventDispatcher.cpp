@@ -21,7 +21,7 @@ EventDispatcher& EventDispatcher::getInstance() {
 }
 
 void EventDispatcher::init() {
-    KobeBryant::getInstance().subscribeReceiveRawPacket([&](std::string const& rawText) {
+    KobeBryant::getInstance().subscribeReceiveRawPacket([&](const std::string& rawText) {
         try {
             if (KobeBryant::getInstance().hasConnected()) {
                 auto& eventBus = EventBus::getInstance();
@@ -138,8 +138,8 @@ void EventDispatcher::init() {
 }
 
 void EventDispatcher::addCallback(
-    utils::UUID const&                                uuid,
-    std::function<void(nlohmann::json const&)> const& callback,
+    const utils::UUID&                                uuid,
+    std::function<void(const nlohmann::json&)> const& callback,
     std::function<void()>                             timeoutCallback,
     uint64_t                                          seconds
 ) {

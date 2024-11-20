@@ -14,20 +14,20 @@ public:
 
 protected:
     KobeBryant_NDAPI bool
-    registerSimpleCommand(std::string const&, std::string const&, std::function<void(std::vector<std::string> const&)>);
-    KobeBryant_NDAPI bool unregisterCommand(std::string const&, std::string const&);
+    registerSimpleCommand(const std::string&, const std::string&, std::function<void(const std::vector<std::string>&)>);
+    KobeBryant_NDAPI bool unregisterCommand(const std::string&, const std::string&);
 
 public:
     KobeBryant_NDAPI static CommandRegistry& getInstance();
 
     inline bool
-    registerSimpleCommand(std::string const& cmd, std::function<void(std::vector<std::string> const&)> callback) {
+    registerSimpleCommand(const std::string& cmd, std::function<void(const std::vector<std::string>&)> callback) {
         return registerSimpleCommand(utils::getCurrentPluginName(), cmd, callback);
     }
 
-    inline bool unregisterCommand(std::string const& cmd) {
+    inline bool unregisterCommand(const std::string& cmd) {
         return unregisterCommand(utils::getCurrentPluginName(), cmd);
     }
 
-    KobeBryant_API void executeCommand(std::string const& command);
+    KobeBryant_API void executeCommand(const std::string& command);
 };
