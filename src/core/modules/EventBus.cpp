@@ -80,7 +80,11 @@ void EventBusImpl::removePluginListeners(const std::string& plugin) {
     }
 }
 
-void EventBusImpl::removeAllListeners() { mCallbacks.clear(); }
+void EventBusImpl::removeAllListeners() {
+    mCallbacks.clear();
+    mListeners.clear();
+    mListenerPriority.clear();
+}
 
 void EventBus::printException(const std::string& ex) {
     return KobeBryant::getInstance().getLogger().error("bot.catch.exception", {ex});
