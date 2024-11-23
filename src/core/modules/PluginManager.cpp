@@ -148,9 +148,14 @@ bool PluginManager::loadPlugin(const PluginManifest& manifest, const std::string
                     }
                 }
                 for (auto& preload : manifest.mPreload) {
-                    std::filesystem::path preloadPath("./plugins/" + name);
-                    preloadPath /= preload;
-                    if (!LoadLibrary(preloadPath.wstring().c_str())) {
+                    std::filesystem::path preloadPath(preload);
+                    if (!fs::exists(preloadPath)) {
+                        preloadPath  = std::filesystem::path("./plugins/" + name);
+                        preloadPath /= preload;
+                    }
+                    if (auto handle = LoadLibrary(preloadPath.wstring().c_str())) {
+                        mPluginPreload[name].insert(handle);
+                    } else {
                         logger.error("plugin.preload.miss", {name, preload});
                         return false;
                     }
@@ -195,6 +200,7 @@ void PluginManager::unloadAllPlugins() {
             unloadPlugin(name, true);
         }
         mPluginsMap.clear();
+        mPluginPreload.clear();
         logger.info("bot.plugins.unloadedAll");
     } catch (...) {}
 }
@@ -222,6 +228,10 @@ bool PluginManager::unloadPlugin(const std::string& name, bool force) {
                         mPluginRely[plugin].erase(name_);
                     }
                     mPluginsMap.erase(name_);
+                    for (auto& preload : mPluginPreload[name_]) {
+                        FreeLibrary(preload);
+                    }
+                    mPluginPreload.erase(name_);
                     return true;
                 } else {
                     logger.error("bot.plugin.unload.error", {name});
