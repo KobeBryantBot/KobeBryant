@@ -12,7 +12,6 @@ private:
         Task                                  mTask;
         std::chrono::steady_clock::time_point mRunTime;
         std::chrono::milliseconds             mInterval;
-        std::atomic<bool>                     mCancelled{false};
 
         TaskInfo(Task task, std::chrono::steady_clock::time_point runTime, std::chrono::milliseconds interval)
         : mTask(std::move(task)),

@@ -11,17 +11,9 @@ Scheduler& Scheduler::getInstance() {
             while (EXIST_FLAG) {
                 std::unique_lock<std::mutex> lock(instance->mMtx);
                 instance->mCv.wait(lock, [&] { return !instance->mTasks.empty(); });
-
                 auto              now = std::chrono::high_resolution_clock::now();
                 std::vector<Task> readyTasks;
-
-                // Collect all tasks that are ready to run
                 for (auto& [id, task] : instance->mTasks) {
-                    if (task->mCancelled.load()) {
-                        instance->mTasks.erase(id);
-                        continue;
-                    }
-
                     if (task->mRunTime <= now) {
                         readyTasks.push_back(task->mTask);
                         if (task->mInterval.count() > 0) {
@@ -31,12 +23,10 @@ Scheduler& Scheduler::getInstance() {
                         }
                     }
                 }
-
-                // Notify the main thread to execute the collected tasks
                 lock.unlock();
                 for (auto& task : readyTasks) {
                     if (task) {
-                        task(); // Execute the task in the main thread
+                        task();
                     }
                 }
             }
@@ -71,7 +61,6 @@ Scheduler::TaskID Scheduler::addRepeatTask(std::chrono::milliseconds interval, c
 bool Scheduler::cancelTask(TaskID id) {
     std::lock_guard<std::mutex> lock(mMtx);
     if (mTasks.contains(id)) {
-        // mTasks[id]->mCancelled.store(true);
         mTasks.erase(id);
         return true;
     }
