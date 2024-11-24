@@ -6,9 +6,12 @@
 
 class NativePluginEngine : public IPluginEngine {
 private:
+#ifdef _WIN32
     std::unordered_map<std::string, HMODULE> mPluginsMap1;
     std::unordered_map<HMODULE, std::string> mPluginsMap2;
+#else
 
+#endif
 public:
     std::string getPluginType() const override;
 
@@ -17,6 +20,4 @@ public:
     bool unloadPlugin(const std::string& name) override;
 
     bool unloadPlugin(HMODULE hModule);
-
-    HMODULE getPluginHandle(const std::string& name);
 };

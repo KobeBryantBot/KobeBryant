@@ -5,6 +5,12 @@
 #include <sstream>
 #include <vector>
 
+#ifdef _WIN32
+#include <Windows.h>
+#else
+
+#endif
+
 namespace utils {
 
 std::string toCamelCase(std::string_view str) {
@@ -43,18 +49,7 @@ std::string toSnakeCase(std::string_view str) {
     return res;
 }
 
-/*
-std::wstring toWstring(const std::string& utf8) {
-    // 获取所需的缓冲区大小
-    int len = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, nullptr, 0);
-    // 分配缓冲区并进行转换
-    std::wstring utf16(len, L'\0');
-    len = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, &utf16[0], len);
-    // 去除末尾的空字符
-    utf16.resize(len - 1);
-    return utf16;
-}
-*/
+#ifdef _WIN32
 
 std::wstring stringtoWstring(std::string_view str, uint32_t codePage) {
     int          len = MultiByteToWideChar(codePage, 0, str.data(), (int)str.size(), nullptr, 0);
@@ -73,6 +68,10 @@ std::string wstringtoString(std::wstring_view wstr, uint32_t codePage) {
     WideCharToMultiByte(codePage, 0, wstr.data(), (int)wstr.size(), str.data(), (int)str.size(), nullptr, nullptr);
     return str;
 }
+
+#else
+
+#endif
 
 std::string getTimeStringFormatted(const std::string& format) {
     time_t    time_s = time(0);

@@ -1,7 +1,6 @@
 #pragma once
 #include "Macros.hpp"
 #include "api/utils/ModuleUtils.hpp"
-#include <Windows.h>
 #include <functional>
 #include <iostream>
 

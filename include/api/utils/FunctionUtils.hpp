@@ -1,8 +1,11 @@
 #pragma once
 #include "Macros.hpp"
-#include <Windows.h>
 #include <functional>
 #include <stdexcept>
+
+
+#ifdef _WIN32
+#include <Windows.h>
 
 namespace utils {
 
@@ -46,3 +49,7 @@ inline RetType CallFunction(LPCWSTR dllName, LPCSTR funcName, Args... args) {
 }
 
 } // namespace utils
+
+#else
+
+#endif

@@ -148,6 +148,7 @@ bool PluginManager::loadPlugin(const PluginManifest& manifest, const std::string
                     }
                 }
                 for (auto& preload : manifest.mPreload) {
+#ifdef _WIN32
                     std::filesystem::path preloadPath(preload);
                     if (!fs::exists(preloadPath)) {
                         preloadPath  = std::filesystem::path("./plugins/" + name);
@@ -159,6 +160,9 @@ bool PluginManager::loadPlugin(const PluginManifest& manifest, const std::string
                         logger.error("plugin.preload.miss", {name, preload});
                         return false;
                     }
+#else
+
+#endif
                 }
                 if (isValidType(type)) {
                     if (mTypesMap[type]->loadPlugin(name, entryPath)) {

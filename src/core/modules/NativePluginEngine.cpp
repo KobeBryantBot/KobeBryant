@@ -12,6 +12,8 @@ namespace fs = std::filesystem;
 
 std::string NativePluginEngine::getPluginType() const { return "native"; }
 
+#ifdef _WIN32
+
 std::string getErrorReason(unsigned long errorCode) {
     if (errorCode == 126) {
         return tr("bot.errorCode.126");
@@ -69,4 +71,6 @@ bool NativePluginEngine::unloadPlugin(HMODULE hModule) {
     return false;
 }
 
-HMODULE NativePluginEngine::getPluginHandle(const std::string& name) { return mPluginsMap1[name]; }
+#else
+
+#endif

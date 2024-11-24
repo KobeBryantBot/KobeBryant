@@ -2,7 +2,6 @@
 #include "Macros.hpp"
 #include "api/event/Event.hpp"
 #include "api/utils/ModuleUtils.hpp"
-#include <Windows.h>
 #include <concepts>
 #include <functional>
 #include <iostream>

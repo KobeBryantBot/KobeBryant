@@ -1,9 +1,11 @@
 #pragma once
 #include "Macros.hpp"
-#include <Windows.h>
 #include <iostream>
 #include <optional>
 #include <vector>
+
+#ifdef _WIN32
+#include <Windows.h>
 
 namespace utils {
 
@@ -42,3 +44,7 @@ KobeBryant_NDAPI std::string getPluginModuleName(HMODULE hModule);
 }
 
 } // namespace utils
+
+#else
+
+#endif

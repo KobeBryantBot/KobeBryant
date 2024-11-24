@@ -5,6 +5,8 @@
 
 namespace utils {
 
+#ifdef _WIN32
+
 std::optional<std::string> readResource(HMODULE hModule, int id, bool isBinary) {
     if (HRSRC hRes = FindResource(hModule, MAKEINTRESOURCE(id), isBinary ? L"BINFILE" : L"TEXTFILE")) {
         if (HGLOBAL resource = LoadResource(hModule, hRes)) {
@@ -39,5 +41,9 @@ std::string getPluginModuleName(HMODULE hModule) {
     }
     return pluginName;
 }
+
+#else
+
+#endif
 
 } // namespace utils

@@ -2,7 +2,6 @@
 #include "api/Logger.hpp"
 #include "api/utils/FileUtils.hpp"
 #include "nlohmann/json.hpp"
-#include <Windows.h>
 #include <atomic>
 #include <iostream>
 #include <thread>

@@ -7,6 +7,8 @@
 
 namespace utils {
 
+#ifdef _WIN32
+
 FARPROC GetFunctionAddress(LPCWSTR dllName, LPCSTR funcName) {
     if (HMODULE hModule = GetModuleHandle(dllName); hModule) {
         return GetProcAddress(hModule, funcName);
@@ -42,5 +44,9 @@ FARPROC GetFunctionAddress(LPCSTR funcName) {
     CloseHandle(hProcessSnap);
     return nullptr;
 }
+
+#else
+
+#endif
 
 } // namespace utils

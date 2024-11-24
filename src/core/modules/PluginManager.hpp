@@ -14,7 +14,11 @@ private:
     std::unordered_map<std::string, std::string>                     mHandleTypes;
     std::vector<std::shared_ptr<IPluginEngine>>                      mExtraEngines;
     std::unordered_map<std::string, std::unordered_set<std::string>> mPluginRely;
-    std::unordered_map<std::string, std::unordered_set<HMODULE>>     mPluginPreload;
+#ifdef _WIN32
+    std::unordered_map<std::string, std::unordered_set<HMODULE>> mPluginPreload;
+#else
+
+#endif
 
 public:
     static PluginManager& getInstance();

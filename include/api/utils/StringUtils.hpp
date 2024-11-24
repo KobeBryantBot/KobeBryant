@@ -2,7 +2,6 @@
 #include "Macros.hpp"
 #include <iostream>
 #include <vector>
-#include <windows.h>
 
 namespace utils {
 
@@ -66,6 +65,8 @@ KobeBryant_NDAPI std::string toCamelCase(std::string_view str);
 
 KobeBryant_NDAPI std::string toSnakeCase(std::string_view str);
 
+#ifdef _WIN32
+
 namespace CodePage {
 enum : uint32_t {
     DefaultACP = 0,  // default to ANSI code page
@@ -79,6 +80,10 @@ enum : uint32_t {
 KobeBryant_NDAPI std::wstring stringtoWstring(std::string_view str, uint32_t codePage = CodePage::UTF8);
 
 KobeBryant_NDAPI std::string wstringtoString(std::wstring_view wstr, uint32_t codePage = CodePage::UTF8);
+
+#else
+
+#endif
 
 KobeBryant_NDAPI std::string getTimeStringFormatted(const std::string& format = "%Y-%m-%d %H:%M:%S");
 
