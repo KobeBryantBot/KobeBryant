@@ -14,16 +14,6 @@ class Service {
     using FuncPtr = Ret (*)(Args...);
 
 public:
-    using ScriptTypeBase = std::variant<std::monostate, int64_t, double, std::string, bool>;
-    using ScriptType     = std::variant<
-            std::monostate,
-            int64_t,
-            double,
-            std::string,
-            bool,
-            std::vector<ScriptTypeBase>,
-            std::unordered_map<std::string, ScriptTypeBase>>;
-
     template <typename Ret, typename... Args>
     static inline bool exportFunc(const std::string& funcName, FuncPtr<Ret, Args...> func) {
         std::function<Ret(Args...)> function = func;
