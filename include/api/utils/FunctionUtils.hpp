@@ -1,8 +1,8 @@
 #pragma once
 #include "Macros.hpp"
+#include <expected>
+#include <format>
 #include <functional>
-#include <stdexcept>
-
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -11,6 +11,8 @@ namespace utils {
 
 template <typename RetType, typename... Args>
 using FunctionPtr = RetType (*)(Args...);
+template <typename T, typename E = std::string>
+using Expected = std::expected<T, E>;
 
 KobeBryant_NDAPI FARPROC GetFunctionAddress(LPCSTR funcName);
 
@@ -33,19 +35,19 @@ inline FunctionPtr<RetType, Args...> GetFunctionPtr(LPCWSTR dllName, LPCSTR func
 }
 
 template <typename RetType, typename... Args>
-inline RetType CallFunction(LPCSTR funcName, Args... args) {
+inline Expected<RetType> CallFunction(LPCSTR funcName, Args... args) {
     if (auto func = GetFunctionPtr<RetType, Args...>(funcName); func) {
         return func(std::forward<Args>(args)...);
     }
-    throw std::runtime_error("Failed to call function: " + funcName);
+    return std::unexpected(std::format("Failed to call function: {}", funcName));
 }
 
 template <typename RetType, typename... Args>
-inline RetType CallFunction(LPCWSTR dllName, LPCSTR funcName, Args... args) {
+inline Expected<RetType> CallFunction(LPCWSTR dllName, LPCSTR funcName, Args... args) {
     if (auto func = GetFunctionPtr<RetType, Args...>(dllName, funcName); func) {
         return func(std::forward<Args>(args)...);
     }
-    throw std::runtime_error("Failed to call function: " + funcName);
+    return std::unexpected(std::format("Failed to call function: {}", funcName));
 }
 
 } // namespace utils

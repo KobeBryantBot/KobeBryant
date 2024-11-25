@@ -63,8 +63,13 @@ public:
     inline void publish(T& ev) {
         auto type = std::type_index(typeid(T));
         forEachListener(type, [&](const std::function<void(Event&)>& callback) -> bool {
-            callback(ev);
-            return !ev.isPassingBlocked();
+            try {
+                callback(ev);
+                return !ev.isPassingBlocked();
+            } catch (const std::exception& e) {
+                printException(e.what());
+                return false;
+            }
         });
     }
 };

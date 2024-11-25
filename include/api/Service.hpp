@@ -2,6 +2,8 @@
 #include "Macros.hpp"
 #include "api/utils/ModuleUtils.hpp"
 #include <any>
+#include <expected>
+#include <format>
 #include <functional>
 #include <stdexcept>
 #include <unordered_map>
@@ -12,6 +14,8 @@ class Service {
     using AnyFunc = std::function<std::any(const std::vector<std::any>&)>;
     template <typename Ret, typename... Args>
     using FuncPtr = Ret (*)(Args...);
+    template <typename T, typename E = std::string>
+    using Expected = std::expected<T, E>;
 
 public:
     template <typename Ret, typename... Args>
@@ -40,19 +44,36 @@ public:
 
     template <typename Ret, typename... Args>
     static inline std::function<Ret(Args...)> importFunc(const std::string& pluginName, const std::string& funcName) {
-        auto func = importAnyFunc(pluginName, funcName);
-        if constexpr (std::is_void<Ret>::value) {
-            return [func](Args... args) {
-                std::vector<std::any> anyArgs = {std::any(args)...};
-                func(anyArgs);
-            };
-        } else {
-            return [func](Args... args) -> Ret {
-                std::vector<std::any> anyArgs = {std::any(args)...};
-                std::any              result  = func(anyArgs);
-                return cast_type<Ret>(result, "result");
-            };
+        if (hasFunc(pluginName, funcName)) {
+            auto func = importAnyFunc(pluginName, funcName);
+            if constexpr (std::is_void<Ret>::value) {
+                return [func](Args... args) {
+                    std::vector<std::any> anyArgs = {std::any(args)...};
+                    func(anyArgs);
+                };
+            } else {
+                return [func](Args... args) -> Ret {
+                    std::vector<std::any> anyArgs = {std::any(args)...};
+                    std::any              result  = func(anyArgs);
+                    return cast_type<Ret>(result, "result");
+                };
+            }
         }
+        return nullptr;
+    }
+
+    template <typename Ret, typename... Args>
+    static inline Expected<Ret> callFunc(const std::string& pluginName, const std::string& funcName, Args... args) {
+        if (auto func = importFunc<Ret, Args...>(pluginName, funcName)) {
+            try {
+                return func(std::forward<Args>(args)...);
+            } catch (const std::exception& e) {
+                return std::unexpected(
+                    std::format("Exception in calling function {}::{}: {}", pluginName, funcName, e.what())
+                );
+            }
+        }
+        return std::unexpected(std::format("Function {}::{} is not exported!", pluginName, funcName));
     }
 
     KobeBryant_NDAPI static bool hasFunc(const std::string& pluginName, const std::string& funcName);
@@ -68,7 +89,7 @@ protected:
         try {
             return std::any_cast<T>(any);
         } catch (const std::bad_any_cast&) {
-            throw std::runtime_error("Wrong type of " + info);
+            throw std::runtime_error(std::format("Wrong type of {}", info));
         }
     }
     template <typename... Args, std::size_t... Is>
