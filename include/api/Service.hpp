@@ -43,7 +43,8 @@ public:
     }
 
     template <typename Ret, typename... Args>
-    static inline std::function<Ret(Args...)> importFunc(const std::string& pluginName, const std::string& funcName) {
+    static inline Expected<std::function<Ret(Args...)>>
+    importFunc(const std::string& pluginName, const std::string& funcName) {
         if (hasFunc(pluginName, funcName)) {
             auto func = importAnyFunc(pluginName, funcName);
             if constexpr (std::is_void<Ret>::value) {
@@ -59,7 +60,7 @@ public:
                 };
             }
         }
-        return nullptr;
+        return std::unexpected(std::format("Service {}::{} is not exported!", pluginName, funcName));
     }
 
     template <typename Ret, typename... Args>
@@ -69,11 +70,13 @@ public:
                 return func(std::forward<Args>(args)...);
             } catch (const std::exception& e) {
                 return std::unexpected(
-                    std::format("Exception in calling function {}::{}: {}", pluginName, funcName, e.what())
+                    std::format("Fail to call Service: {}::{}\nException Caught: {}", pluginName, funcName, e.what())
                 );
+            } catch (...) {
+                return std::unexpected(std::format("Fail to call Service: {}::{}", pluginName, funcName));
             }
         }
-        return std::unexpected(std::format("Function {}::{} is not exported!", pluginName, funcName));
+        return std::unexpected(std::format("Service {}::{} is not exported!", pluginName, funcName));
     }
 
     KobeBryant_NDAPI static bool hasFunc(const std::string& pluginName, const std::string& funcName);
