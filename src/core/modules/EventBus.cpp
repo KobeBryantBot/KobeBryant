@@ -54,7 +54,9 @@ Listener EventBus::addListenerTemp(
     std::chrono::milliseconds   duration
 ) {
     auto listener = addListener(type, plugin, callback, priority);
-    ScheduleManager::getInstance().addDelayTask(plugin, duration, [=] { EventBus::removeListener(plugin, listener); });
+    ScheduleManager::getInstance().addDelayTask(plugin, duration, [=] {
+        EventBus::getInstance().removeListener(plugin, listener);
+    });
     return listener;
 }
 
@@ -65,19 +67,19 @@ Listener EventBus::addListenerTemp(
     uint32_t                    priority,
     size_t                      times
 ) {
-    Listener listener = addListener(
-        type,
-        plugin,
-        [=](Event& ev) {
-            callback(ev);
-            EventBusImpl::getInstance().mLeftTimes[listener]--;
-            if (EventBusImpl::getInstance().mLeftTimes[listener] <= 0) {
-                EventBus::removeListener(plugin, listener);
-            }
-        },
-        priority
-    );
-    EventBusImpl::getInstance().mLeftTimes[listener] = times;
+    auto  listener                   = Listener(type, plugin);
+    auto& impl                       = EventBusImpl::getInstance();
+    impl.mListenerPriority[listener] = priority;
+    impl.mListeners[priority].insert(listener);
+    impl.mLeftTimes[listener] = times;
+    impl.mCallbacks[listener] = [=](Event& ev) {
+        callback(ev);
+        auto& impl = EventBusImpl::getInstance();
+        impl.mLeftTimes[listener]--;
+        if (impl.mLeftTimes[listener] <= 0) {
+            EventBus::getInstance().removeListener(plugin, listener);
+        }
+    };
     return listener;
 }
 
@@ -89,20 +91,22 @@ Listener EventBus::addListenerTemp(
     std::chrono::milliseconds   duration,
     size_t                      times
 ) {
-    Listener listener = addListener(
-        type,
-        plugin,
-        [=](Event& ev) {
-            callback(ev);
-            EventBusImpl::getInstance().mLeftTimes[listener]--;
-            if (EventBusImpl::getInstance().mLeftTimes[listener] <= 0) {
-                EventBus::removeListener(plugin, listener);
-            }
-        },
-        priority
-    );
-    EventBusImpl::getInstance().mLeftTimes[listener] = times;
-    ScheduleManager::getInstance().addDelayTask(plugin, duration, [=] { EventBus::removeListener(plugin, listener); });
+    auto  listener                   = Listener(type, plugin);
+    auto& impl                       = EventBusImpl::getInstance();
+    impl.mListenerPriority[listener] = priority;
+    impl.mListeners[priority].insert(listener);
+    impl.mLeftTimes[listener] = times;
+    impl.mCallbacks[listener] = [=](Event& ev) {
+        callback(ev);
+        auto& impl = EventBusImpl::getInstance();
+        impl.mLeftTimes[listener]--;
+        if (impl.mLeftTimes[listener] <= 0) {
+            EventBus::getInstance().removeListener(plugin, listener);
+        }
+    };
+    ScheduleManager::getInstance().addDelayTask(plugin, duration, [=] {
+        EventBus::getInstance().removeListener(plugin, listener);
+    });
     return listener;
 }
 

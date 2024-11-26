@@ -43,7 +43,7 @@ public:
         return addListener(std::type_index(typeid(E)), utils::getCurrentPluginName(), EVENT_CALLBACK, priority);
     }
 
-    template <class T, class D, std::derived_from<Event> E>
+    template <std::derived_from<Event> E, class T, class D>
     inline Listener
     subscribeTemp(std::chrono::duration<T, D> duration, std::function<void(E&)> callback, uint32_t priority = 500) {
         return addListenerTemp(
@@ -66,7 +66,7 @@ public:
         );
     }
 
-    template <class T, class D, std::derived_from<Event> E>
+    template <std::derived_from<Event> E, class T, class D>
     inline Listener subscribeTemp(
         std::chrono::duration<T, D> duration,
         size_t                      times,
