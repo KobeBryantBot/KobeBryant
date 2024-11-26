@@ -76,7 +76,7 @@ protected:
             if (sizeof...(Args) != args.size()) {
                 throw std::runtime_error("Wrong arguments count");
             }
-            auto args_tuple = make_args<Args...>(args, std::index_sequence_for<Args...>{});
+            auto args_tuple = make_args<std::decay_t<Args>...>(args, std::index_sequence_for<std::decay_t<Args>...>{});
             if constexpr (std::is_void<Ret>::value) {
                 std::apply(func, args_tuple);
                 return std::any();
