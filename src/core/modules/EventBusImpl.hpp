@@ -8,6 +8,7 @@ public:
     std::map<uint32_t, std::set<Listener>>          mListeners;
     std::map<Listener, uint32_t>                    mListenerPriority;
     uint64_t                                        mNextEventId = 0;
+    std::map<Listener, size_t>                      mLeftTimes;
 
     static EventBusImpl& getInstance();
 

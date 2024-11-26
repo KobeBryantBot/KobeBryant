@@ -8,6 +8,18 @@
 #include <map>
 #include <typeindex>
 
+#define EVENT_CALLBACK                                                                                                 \
+    [=](Event& event) {                                                                                                \
+        try {                                                                                                          \
+            if (callback) {                                                                                            \
+                E& ev = dynamic_cast<E&>(event);                                                                       \
+                callback(ev);                                                                                          \
+            }                                                                                                          \
+        } catch (const std::exception& e) {                                                                            \
+            printException(e.what());                                                                                  \
+        }                                                                                                              \
+    }
+
 struct Listener {
     uint64_t              mId;
     std::type_index       mType;
@@ -18,12 +30,6 @@ struct Listener {
 };
 
 class EventBus {
-protected:
-    KobeBryant_API void addListener(const Listener&, std::function<void(Event&)>, uint32_t);
-    KobeBryant_API void forEachListener(std::type_index, std::function<bool(const std::function<void(Event&)>&)>);
-    KobeBryant_API bool removeListener(const std::string&, const Listener&);
-    KobeBryant_API void printException(const std::string&);
-
 public:
     EventBus();
 
@@ -32,37 +38,58 @@ public:
 
     KobeBryant_NDAPI static EventBus& getInstance();
 
-    template <std::derived_from<Event> T>
-    inline Listener subscribe(std::function<void(T&)> callback, uint32_t priority = 500) {
-        auto type     = std::type_index(typeid(T));
-        auto plugin   = utils::getCurrentPluginName();
-        auto listener = Listener(type, plugin);
-        addListener(
-            listener,
-            [=](Event& event) {
-                try {
-                    if (callback) {
-                        T& ev = dynamic_cast<T&>(event);
-                        callback(ev);
-                    }
-                } catch (const std::exception& e) {
-                    printException(e.what());
-                }
-            },
-            priority
+    template <std::derived_from<Event> E>
+    inline Listener subscribe(std::function<void(E&)> callback, uint32_t priority = 500) {
+        return addListener(std::type_index(typeid(E)), utils::getCurrentPluginName(), EVENT_CALLBACK, priority);
+    }
+
+    template <class T, class D, std::derived_from<Event> E>
+    inline Listener
+    subscribeTemp(std::chrono::duration<T, D> duration, std::function<void(E&)> callback, uint32_t priority = 500) {
+        return addListenerTemp(
+            std::type_index(typeid(E)),
+            utils::getCurrentPluginName(),
+            EVENT_CALLBACK,
+            priority,
+            std::chrono::duration_cast<std::chrono::milliseconds>(duration)
         );
-        return listener;
+    }
+
+    template <std::derived_from<Event> E>
+    inline Listener subscribeTemp(size_t times, std::function<void(E&)> callback, uint32_t priority = 500) {
+        return addListenerTemp(
+            std::type_index(typeid(E)),
+            utils::getCurrentPluginName(),
+            EVENT_CALLBACK,
+            priority,
+            times
+        );
+    }
+
+    template <class T, class D, std::derived_from<Event> E>
+    inline Listener subscribeTemp(
+        std::chrono::duration<T, D> duration,
+        size_t                      times,
+        std::function<void(E&)>     callback,
+        uint32_t                    priority = 500
+    ) {
+        return addListenerTemp(
+            std::type_index(typeid(E)),
+            utils::getCurrentPluginName(),
+            EVENT_CALLBACK,
+            priority,
+            std::chrono::duration_cast<std::chrono::milliseconds>(duration),
+            times
+        );
     }
 
     inline bool unsubscribe(const Listener& listener) {
-        auto plugin = utils::getCurrentPluginName();
-        return removeListener(plugin, listener);
+        return removeListener(utils::getCurrentPluginName(), listener);
     }
 
     template <std::derived_from<Event> T>
     inline void publish(T& ev) {
-        auto type = std::type_index(typeid(T));
-        forEachListener(type, [&](const std::function<void(Event&)>& callback) -> bool {
+        forEachListener(std::type_index(typeid(T)), [&](const std::function<void(Event&)>& callback) -> bool {
             try {
                 callback(ev);
                 return !ev.isPassingBlocked();
@@ -72,4 +99,27 @@ public:
             }
         });
     }
+
+protected:
+    KobeBryant_NDAPI Listener addListener(std::type_index, const std::string&, std::function<void(Event&)>, uint32_t);
+    KobeBryant_NDAPI Listener addListenerTemp(
+        std::type_index,
+        const std::string&,
+        std::function<void(Event&)>,
+        uint32_t,
+        std::chrono::milliseconds
+    );
+    KobeBryant_NDAPI Listener
+    addListenerTemp(std::type_index, const std::string&, std::function<void(Event&)>, uint32_t, size_t);
+    KobeBryant_NDAPI Listener addListenerTemp(
+        std::type_index,
+        const std::string&,
+        std::function<void(Event&)>,
+        uint32_t,
+        std::chrono::milliseconds,
+        size_t
+    );
+    KobeBryant_API void forEachListener(std::type_index, std::function<bool(const std::function<void(Event&)>&)>);
+    KobeBryant_API bool removeListener(const std::string&, const Listener&);
+    KobeBryant_API void printException(const std::string&);
 };
