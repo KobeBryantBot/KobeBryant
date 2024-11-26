@@ -31,20 +31,13 @@ struct Listener {
 
 class EventBus {
 public:
-    EventBus();
-
-    EventBus(const EventBus&)            = delete;
-    EventBus& operator=(const EventBus&) = delete;
-
-    KobeBryant_NDAPI static EventBus& getInstance();
-
     template <std::derived_from<Event> E>
-    inline Listener subscribe(std::function<void(E&)> callback, uint32_t priority = 500) {
+    static inline Listener subscribe(std::function<void(E&)> callback, uint32_t priority = 500) {
         return addListener(std::type_index(typeid(E)), utils::getCurrentPluginName(), EVENT_CALLBACK, priority);
     }
 
     template <std::derived_from<Event> E, class T, class D>
-    inline Listener
+    static inline Listener
     subscribeTemp(std::chrono::duration<T, D> duration, std::function<void(E&)> callback, uint32_t priority = 500) {
         return addListenerTemp(
             std::type_index(typeid(E)),
@@ -56,7 +49,7 @@ public:
     }
 
     template <std::derived_from<Event> E>
-    inline Listener subscribeTemp(size_t times, std::function<void(E&)> callback, uint32_t priority = 500) {
+    static inline Listener subscribeTemp(size_t times, std::function<void(E&)> callback, uint32_t priority = 500) {
         return addListenerTemp(
             std::type_index(typeid(E)),
             utils::getCurrentPluginName(),
@@ -67,7 +60,7 @@ public:
     }
 
     template <std::derived_from<Event> E, class T, class D>
-    inline Listener subscribeTemp(
+    static inline Listener subscribeTemp(
         std::chrono::duration<T, D> duration,
         size_t                      times,
         std::function<void(E&)>     callback,
@@ -83,12 +76,12 @@ public:
         );
     }
 
-    inline bool unsubscribe(const Listener& listener) {
+    static inline bool unsubscribe(const Listener& listener) {
         return removeListener(utils::getCurrentPluginName(), listener);
     }
 
     template <std::derived_from<Event> T>
-    inline void publish(T& ev) {
+    static inline void publish(T& ev) {
         forEachListener(std::type_index(typeid(T)), [&](const std::function<void(Event&)>& callback) -> bool {
             try {
                 callback(ev);
@@ -101,17 +94,18 @@ public:
     }
 
 protected:
-    KobeBryant_NDAPI Listener addListener(std::type_index, const std::string&, std::function<void(Event&)>, uint32_t);
-    KobeBryant_NDAPI Listener addListenerTemp(
+    KobeBryant_NDAPI static Listener
+    addListener(std::type_index, const std::string&, std::function<void(Event&)>, uint32_t);
+    KobeBryant_NDAPI static Listener addListenerTemp(
         std::type_index,
         const std::string&,
         std::function<void(Event&)>,
         uint32_t,
         std::chrono::milliseconds
     );
-    KobeBryant_NDAPI Listener
+    KobeBryant_NDAPI static Listener
     addListenerTemp(std::type_index, const std::string&, std::function<void(Event&)>, uint32_t, size_t);
-    KobeBryant_NDAPI Listener addListenerTemp(
+    KobeBryant_NDAPI static Listener addListenerTemp(
         std::type_index,
         const std::string&,
         std::function<void(Event&)>,
@@ -119,7 +113,8 @@ protected:
         std::chrono::milliseconds,
         size_t
     );
-    KobeBryant_API void forEachListener(std::type_index, std::function<bool(const std::function<void(Event&)>&)>);
-    KobeBryant_API bool removeListener(const std::string&, const Listener&);
-    KobeBryant_API void printException(const std::string&);
+    KobeBryant_API static void
+        forEachListener(std::type_index, std::function<bool(const std::function<void(Event&)>&)>);
+    KobeBryant_API static bool removeListener(const std::string&, const Listener&);
+    KobeBryant_API static void printException(const std::string&);
 };

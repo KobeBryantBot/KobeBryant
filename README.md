@@ -195,7 +195,7 @@ KobeBryant在加载插件时，是先读取插件文件夹里面的 `manifest.js
 // 此处写插件加载时执行的操作
 void onEnable() {
     // 运行插件
-    EventBus::getInstance().subscribe<MessageEvent>([&](const MessageEvent& ev) {
+    EventBus::subscribe<MessageEvent>([&](const MessageEvent& ev) {
         if (ev.mType == MessageType::Group && ev.mSubType == MessageSubType::Normal) {
             if (ev.mRawMessage.find("man") != std::string::npos) {
                 auto& sender = PacketSender::getInstance();

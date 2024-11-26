@@ -22,16 +22,6 @@ EventBusImpl& EventBusImpl::getInstance() {
     return *instance;
 }
 
-EventBus::EventBus() {}
-
-EventBus& EventBus::getInstance() {
-    static std::unique_ptr<EventBus> instance;
-    if (!instance) {
-        instance = std::make_unique<EventBus>();
-    }
-    return *instance;
-}
-
 Listener EventBus::addListener(
     std::type_index             type,
     const std::string&          plugin,
@@ -54,9 +44,7 @@ Listener EventBus::addListenerTemp(
     std::chrono::milliseconds   duration
 ) {
     auto listener = addListener(type, plugin, callback, priority);
-    ScheduleManager::getInstance().addDelayTask(plugin, duration, [=] {
-        EventBus::getInstance().removeListener(plugin, listener);
-    });
+    ScheduleManager::getInstance().addDelayTask(plugin, duration, [=] { EventBus::removeListener(plugin, listener); });
     return listener;
 }
 
@@ -77,7 +65,7 @@ Listener EventBus::addListenerTemp(
         auto& impl = EventBusImpl::getInstance();
         impl.mLeftTimes[listener]--;
         if (impl.mLeftTimes[listener] <= 0) {
-            EventBus::getInstance().removeListener(plugin, listener);
+            EventBus::removeListener(plugin, listener);
         }
     };
     return listener;
@@ -101,12 +89,10 @@ Listener EventBus::addListenerTemp(
         auto& impl = EventBusImpl::getInstance();
         impl.mLeftTimes[listener]--;
         if (impl.mLeftTimes[listener] <= 0) {
-            EventBus::getInstance().removeListener(plugin, listener);
+            EventBus::removeListener(plugin, listener);
         }
     };
-    ScheduleManager::getInstance().addDelayTask(plugin, duration, [=] {
-        EventBus::getInstance().removeListener(plugin, listener);
-    });
+    ScheduleManager::getInstance().addDelayTask(plugin, duration, [=] { EventBus::removeListener(plugin, listener); });
     return listener;
 }
 

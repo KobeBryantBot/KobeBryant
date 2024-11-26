@@ -24,10 +24,9 @@ void EventDispatcher::init() {
     KobeBryant::getInstance().subscribeReceiveRawPacket([&](const std::string& rawText) {
         try {
             if (KobeBryant::getInstance().hasConnected()) {
-                auto& eventBus = EventBus::getInstance();
-                auto  packet   = nlohmann::json::parse(rawText);
-                auto  event    = PacketEvent(packet);
-                eventBus.publish(event);
+                auto packet = nlohmann::json::parse(rawText);
+                auto event  = PacketEvent(packet);
+                EventBus::publish(event);
                 // 解析事件
                 if (packet.contains("post_type")) {
                     std::string type = packet["post_type"];
@@ -35,7 +34,7 @@ void EventDispatcher::init() {
                     case utils::doHash("meta_event"): { // 元事件
                         MetaEventType type = ENUM_CAST(MetaEventType, "meta_event_type");
                         MetaEvent     ev(type, packet);
-                        return eventBus.publish(ev);
+                        return EventBus::publish(ev);
                     }
                     case utils::doHash("message"): { // 消息
                         MessageType    type       = ENUM_CAST(MessageType, "message_type");
@@ -54,7 +53,7 @@ void EventDispatcher::init() {
                             group = packet["group_id"];
                         }
                         MessageEvent ev(type, subType, self, group, sender, rawMessage, messageId, packet);
-                        return eventBus.publish(ev);
+                        return EventBus::publish(ev);
                     }
                     case utils::doHash("notice"): { // 通知
                         NoticeType                   type = ENUM_CAST(NoticeType, "notice_type");
@@ -79,7 +78,7 @@ void EventDispatcher::init() {
                             target = packet["target_id"];
                         }
                         NoticeEvent ev(type, subType, group, sender, self, target, packet);
-                        return eventBus.publish(ev);
+                        return EventBus::publish(ev);
                     }
                     case utils::doHash("request"): { // 请求
                         RequestType                   type    = ENUM_CAST(RequestType, "request_type");
@@ -96,7 +95,7 @@ void EventDispatcher::init() {
                             group = packet["group_id"];
                         }
                         RequestEvent ev(type, subType, sender, self, comment, flag, group, packet);
-                        return eventBus.publish(ev);
+                        return EventBus::publish(ev);
                     }
                     default: {
                         // 其它暂时视为非法信息，不解析
