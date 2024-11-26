@@ -62,6 +62,19 @@ public:
         uint64_t                     times
     );
 
+    size_t addConditionTask(
+        const std::string&           plugin,
+        const std::function<void()>& task,
+        const std::function<bool()>& condition
+    );
+
+    size_t addConditionTask(
+        const std::string&           plugin,
+        const std::function<void()>& task,
+        const std::function<bool()>& condition,
+        size_t                       times
+    );
+
     bool cancelTask(const std::string& plugin, size_t id);
 
     void removePluginTasks(const std::string& plugin);

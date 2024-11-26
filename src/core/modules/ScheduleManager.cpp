@@ -25,7 +25,10 @@ Scheduler& Scheduler::getInstance() {
                 lock.unlock();
                 for (auto& task : readyTasks) {
                     if (task) {
-                        task();
+                        try {
+                            task();
+                        }
+                        CATCH
                     }
                 }
             }
@@ -86,10 +89,13 @@ size_t ScheduleManager::addDelayTask(
     std::chrono::milliseconds    delay,
     const std::function<void()>& task
 ) {
-    auto id = Scheduler::getInstance().addDelayTask(delay, task);
-    mPluginTasks[plugin].insert(id);
-    mTaskIdMap[id] = plugin;
-    return id;
+    if (task) {
+        auto id = Scheduler::getInstance().addDelayTask(delay, task);
+        mPluginTasks[plugin].insert(id);
+        mTaskIdMap[id] = plugin;
+        return id;
+    }
+    return -1;
 }
 
 size_t ScheduleManager::addRepeatTask(
@@ -97,10 +103,13 @@ size_t ScheduleManager::addRepeatTask(
     std::chrono::milliseconds    interval,
     const std::function<void()>& task
 ) {
-    auto id = Scheduler::getInstance().addRepeatTask(interval, task);
-    mPluginTasks[plugin].insert(id);
-    mTaskIdMap[id] = plugin;
-    return id;
+    if (task) {
+        auto id = Scheduler::getInstance().addRepeatTask(interval, task);
+        mPluginTasks[plugin].insert(id);
+        mTaskIdMap[id] = plugin;
+        return id;
+    }
+    return -1;
 }
 
 size_t ScheduleManager::addRepeatTask(
@@ -110,19 +119,60 @@ size_t ScheduleManager::addRepeatTask(
     uint64_t                     times
 ) {
 
-    size_t id      = Scheduler::getInstance().addRepeatTask(interval, [=] {
-        if (task) {
-            task();
-        }
-        mTaskTimes[id]--;
-        if (mTaskTimes[id] <= 0) {
-            ScheduleManager::getInstance().cancelTask(plugin, id);
-        }
-    });
-    mTaskTimes[id] = times;
-    mPluginTasks[plugin].insert(id);
-    mTaskIdMap[id] = plugin;
-    return id;
+    if (task) {
+        size_t id      = Scheduler::getInstance().addRepeatTask(interval, [=] {
+            try {
+                task();
+                mTaskTimes[id]--;
+                if (mTaskTimes[id] <= 0) {
+                    ScheduleManager::getInstance().cancelTask(plugin, id);
+                }
+            }
+            CATCH
+        });
+        mTaskTimes[id] = times;
+        mPluginTasks[plugin].insert(id);
+        mTaskIdMap[id] = plugin;
+        return id;
+    }
+    return -1;
+}
+
+size_t ScheduleManager::addConditionTask(
+    const std::string&           plugin,
+    const std::function<void()>& task,
+    const std::function<bool()>& condition
+) {
+    if (task && condition) {
+        return addRepeatTask(plugin, std::chrono::seconds(1), [=] {
+            if (condition()) {
+                task();
+            }
+        });
+    }
+    return -1;
+}
+
+size_t ScheduleManager::addConditionTask(
+    const std::string&           plugin,
+    const std::function<void()>& task,
+    const std::function<bool()>& condition,
+    size_t                       times
+) {
+    if (task && condition) {
+        size_t id      = addRepeatTask(plugin, std::chrono::seconds(1), [=] {
+            if (condition()) {
+                task();
+                mTaskTimes[id]--;
+                if (mTaskTimes[id] <= 0) {
+                    ScheduleManager::getInstance().cancelTask(plugin, id);
+                }
+            }
+        });
+        mTaskTimes[id] = times;
+        return id;
+    }
+    return -1;
 }
 
 bool ScheduleManager::cancelTask(const std::string& owner, size_t id) {
