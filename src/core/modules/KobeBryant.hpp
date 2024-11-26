@@ -1,5 +1,5 @@
 #pragma once
-#include "api/ThreadPool.hpp"
+#include "ThreadPoolBase.hpp"
 #include "api/i18n/LangI18n.hpp"
 #include "api/utils/FileUtils.hpp"
 #include "api/utils/UUID.hpp"
@@ -20,7 +20,7 @@ private:
     std::map<uint64_t, std::function<void(const std::string&)>> mPacketCallback;
     bool                                                        mColorLog = true;
     std::optional<std::filesystem::path>                        mLogPath;
-    std::optional<ThreadPool<>>                                 mThreadPool;
+    std::optional<ThreadPoolBase<>>                             mThreadPool;
 
 public:
     KobeBryant();
@@ -55,7 +55,7 @@ public:
 
     void printVersion();
 
-    ThreadPool<>& getThreadPool();
+    ThreadPoolBase<>& getThreadPool();
 };
 
 #define CATCH_END                                                                                                      \

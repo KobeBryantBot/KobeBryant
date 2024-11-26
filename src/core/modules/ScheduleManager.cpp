@@ -1,5 +1,4 @@
 #include "ScheduleManager.hpp"
-#include "api/ThreadPool.hpp"
 
 Scheduler::~Scheduler() { mTasks.clear(); }
 

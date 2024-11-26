@@ -193,4 +193,4 @@ void KobeBryant::printVersion() {
     getLogger().info("Copyright © 2024 KobeBryantBot. All rights reserved.");
 }
 
-ThreadPool<>& KobeBryant::getThreadPool() { return *mThreadPool; }
+ThreadPoolBase<>& KobeBryant::getThreadPool() { return *mThreadPool; }
