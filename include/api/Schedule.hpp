@@ -10,43 +10,32 @@ public:
     using Task   = std::function<void()>;
 
 protected:
-    KobeBryant_NDAPI static TaskID addDelay(const std::string&, std::chrono::milliseconds, const Task&);
-    KobeBryant_NDAPI static TaskID addRepeat(const std::string&, std::chrono::milliseconds, const Task&);
-    KobeBryant_NDAPI static TaskID addRepeat(const std::string&, std::chrono::milliseconds, const Task&, uint64_t);
+    KobeBryant_NDAPI static TaskID addDelay(const std::string&, std::chrono::milliseconds, Task&&);
+    KobeBryant_NDAPI static TaskID addRepeat(const std::string&, std::chrono::milliseconds, Task&&, bool);
+    KobeBryant_NDAPI static TaskID addRepeat(const std::string&, std::chrono::milliseconds, Task&&, bool, size_t);
     KobeBryant_NDAPI static bool   cancel(const std::string&, TaskID);
 
 public:
     template <class T, class D>
-    static inline TaskID addDelayTask(std::chrono::duration<T, D> duration, const Task& task) {
+    static inline TaskID addDelayTask(std::chrono::duration<T, D> duration, Task&& task) {
         auto time   = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
         auto plugin = utils::getCurrentPluginName();
-        return addDelay(plugin, time, task);
+        return addDelay(plugin, time, std::move(task));
+    }
+
+    template <class T, class D>
+    static inline TaskID addRepeatTask(std::chrono::duration<T, D> duration, Task&& task, bool immediately = false) {
+        auto time   = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
+        auto plugin = utils::getCurrentPluginName();
+        return addRepeat(plugin, time, std::move(task), immediately);
     }
 
     template <class T, class D>
     static inline TaskID
-    addRepeatTask(std::chrono::duration<T, D> duration, const Task& task, bool immediately = false) {
-        if (immediately && task) {
-            task();
-        }
+    addRepeatTask(std::chrono::duration<T, D> duration, Task&& task, bool immediately, size_t times) {
         auto time   = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
         auto plugin = utils::getCurrentPluginName();
-        return addRepeat(plugin, time, task);
-    }
-
-    template <class T, class D>
-    static inline TaskID
-    addRepeatTask(std::chrono::duration<T, D> duration, const Task& task, bool immediately, uint64_t times) {
-        if (immediately && task) {
-            task();
-            times--;
-        }
-        if (times >= 1) {
-            auto time   = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
-            auto plugin = utils::getCurrentPluginName();
-            return addRepeat(plugin, time, task, times);
-        }
-        return -1;
+        return addRepeat(plugin, time, std::move(task), immediately, times);
     }
 
     static inline bool cancelTask(TaskID id) {
