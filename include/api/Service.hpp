@@ -20,8 +20,7 @@ class Service {
 public:
     template <typename Ret, typename... Args>
     static inline bool exportFunc(const std::string& funcName, FuncPtr<Ret, Args...> func) {
-        std::function<Ret(Args...)> function = func;
-        return _exportFunc(funcName, function);
+        return _exportFunc(funcName, func);
     }
 
     template <typename Ret, typename... Args>

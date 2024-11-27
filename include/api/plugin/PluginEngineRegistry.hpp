@@ -12,8 +12,6 @@ protected:
 public:
     template <std::derived_from<IPluginEngine> T, typename... Args>
     static inline bool registerPluginEngine(Args... args) {
-        auto engine = std::make_shared<T>(std::forward<Args>(args)...);
-        auto handle = utils::getCurrentPluginName();
-        return registerPluginEngine(handle, std::move(engine));
+        return registerPluginEngine(utils::getCurrentPluginName(), std::make_shared<T>(std::forward<Args>(args)...));
     }
 };
