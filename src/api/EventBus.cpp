@@ -1,6 +1,6 @@
-#include "KobeBryant.hpp"
 #include "api/Logger.hpp"
 #include "core/modules/EventBusImpl.hpp"
+#include "core/modules/KobeBryant.hpp"
 #include "core/modules/ScheduleManager.hpp"
 
 bool Listener::operator<(const Listener& rhs) const { return mId < rhs.mId; }
