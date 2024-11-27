@@ -60,11 +60,11 @@ public:
 
 #define CATCH_END                                                                                                      \
     catch (...) {                                                                                                      \
-        KobeBryant::getInstance().getLogger().error("bot.catch.unknownEception");                                      \
+        Logger().error("C++ SEH Exception Caught: Unknown Error");                                                     \
     }
 
 #define CATCH                                                                                                          \
     catch (const std::exception& e) {                                                                                  \
-        KobeBryant::getInstance().getLogger().error("bot.catch.exception", {e.what()});                                \
+        Logger().error("C++ SEH Exception Caught!\n  Error: {}", e.what());                                            \
     }                                                                                                                  \
     CATCH_END

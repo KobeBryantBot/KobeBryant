@@ -197,8 +197,10 @@ size_t ScheduleManager::addCronTask(
             mCornTime[id] = getNextCornTime(cron);
             return id;
         }
+    } catch (const std::exception& e) {
+        Logger().error("C++ SEH Exception Caught!\n  Error: {}\n\n  At plugin: {}", e.what(), plugin);
     }
-    CATCH
+    CATCH_END
     return -1;
 }
 
@@ -225,8 +227,10 @@ size_t ScheduleManager::addCronTask(
             mTaskTimes[id] = times;
             return id;
         }
+    } catch (const std::exception& e) {
+        Logger().error("C++ SEH Exception Caught!\n  Error: {}\n\n  At plugin: {}", e.what(), plugin);
     }
-    CATCH
+    CATCH_END
     return -1;
 }
 
