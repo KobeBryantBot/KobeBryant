@@ -38,8 +38,9 @@ Scheduler& Scheduler::getInstance() {
     return *instance;
 }
 
-void Scheduler::_addDelayTask(TaskID id, std::chrono::milliseconds delay, const Task& task) {
+Scheduler::TaskID Scheduler::addDelayTask(std::chrono::milliseconds delay, const Task& task) {
     std::lock_guard<std::mutex> lock(mMtx);
+    TaskID                      id       = mNextTaskID++;
     auto                        taskInfo = std::make_unique<TaskInfo>(
         std::move(task),
         std::chrono::steady_clock::now() + delay,
@@ -47,11 +48,6 @@ void Scheduler::_addDelayTask(TaskID id, std::chrono::milliseconds delay, const 
     );
     mTasks[id] = std::move(taskInfo);
     mCv.notify_one();
-}
-
-Scheduler::TaskID Scheduler::addDelayTask(std::chrono::milliseconds delay, const Task& task) {
-    TaskID id = mNextTaskID++;
-    _addDelayTask(id, delay, std::move(task));
     return id;
 }
 
@@ -61,12 +57,6 @@ Scheduler::TaskID Scheduler::addRepeatTask(std::chrono::milliseconds interval, c
     auto taskInfo = std::make_unique<TaskInfo>(std::move(task), std::chrono::steady_clock::now() + interval, interval);
     mTasks[id]    = std::move(taskInfo);
     mCv.notify_one();
-    return id;
-}
-
-Scheduler::TaskID Scheduler::addCronTask(const std::string& cron, const Task& task) {
-    TaskID id = mNextTaskID++;
-    //
     return id;
 }
 
@@ -185,12 +175,68 @@ size_t ScheduleManager::addConditionTask(
     return -1;
 }
 
+std::time_t getNextCornTime(const cron::cronexpr& cron) {
+    std::time_t now = std::time(0);
+    return cron::cron_next(cron, now);
+}
+
+size_t ScheduleManager::addCronTask(
+    const std::string&           plugin,
+    const std::string&           cron_str,
+    const std::function<void()>& task
+) {
+    try {
+        if (task) {
+            auto   cron   = cron::make_cron(cron_str);
+            size_t id     = addRepeatTask(plugin, std::chrono::seconds(1), [=] {
+                if (std::time(0) == mCornTime[id]) {
+                    mCornTime[id] = getNextCornTime(cron);
+                    task();
+                }
+            });
+            mCornTime[id] = getNextCornTime(cron);
+            return id;
+        }
+    }
+    CATCH
+    return -1;
+}
+
+size_t ScheduleManager::addCronTask(
+    const std::string&           plugin,
+    const std::string&           cron_str,
+    const std::function<void()>& task,
+    size_t                       times
+) {
+    try {
+        if (task) {
+            auto   cron    = cron::make_cron(cron_str);
+            size_t id      = addRepeatTask(plugin, std::chrono::seconds(1), [=] {
+                if (std::time(0) == mCornTime[id]) {
+                    mCornTime[id] = getNextCornTime(cron);
+                    task();
+                    mTaskTimes[id]--;
+                    if (mTaskTimes[id] <= 0) {
+                        ScheduleManager::getInstance().cancelTask(plugin, id);
+                    }
+                }
+            });
+            mCornTime[id]  = getNextCornTime(cron);
+            mTaskTimes[id] = times;
+            return id;
+        }
+    }
+    CATCH
+    return -1;
+}
+
 bool ScheduleManager::cancelTask(const std::string& owner, size_t id) {
     auto plugin = getTaskOwner(id);
     if (owner == plugin) {
         mPluginTasks[plugin].erase(id);
         mTaskIdMap.erase(id);
         mTaskTimes.erase(id);
+        mCornTime.erase(id);
         return Scheduler::getInstance().cancelTask(id);
     }
     return false;
@@ -210,4 +256,5 @@ void ScheduleManager::removeAllTasks() {
     mTaskIdMap.clear();
     mPluginTasks.clear();
     mTaskTimes.clear();
+    mCornTime.clear();
 }

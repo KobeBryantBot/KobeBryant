@@ -39,6 +39,15 @@ Schedule::addCondition(const std::string& plugin, Task&& task, std::function<boo
     return ScheduleManager::getInstance().addConditionTask(plugin, std::move(task), std::move(condition), times);
 }
 
+Schedule::TaskID Schedule::addCron(const std::string& plugin, const std::string& cron, Schedule::Task&& task) {
+    return ScheduleManager::getInstance().addCronTask(plugin, cron, std::move(task));
+}
+
+Schedule::TaskID
+Schedule::addCron(const std::string& plugin, const std::string& cron, Schedule::Task&& task, size_t times) {
+    return ScheduleManager::getInstance().addCronTask(plugin, cron, std::move(task), times);
+}
+
 bool Schedule::cancel(const std::string& plugin, TaskID id) {
     return ScheduleManager::getInstance().cancelTask(plugin, id);
 }

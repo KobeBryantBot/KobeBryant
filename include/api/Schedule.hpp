@@ -48,13 +48,13 @@ public:
         return addCondition(utils::getCurrentPluginName(), std::move(task), std::move(condition), times);
     }
 
-    // static inline TaskID addCronTask(const std::string& cron, Task&& task) {
-    //     return addCron(utils::getCurrentPluginName(), cron, std::move(task));
-    // }
+    static inline TaskID addCronTask(const std::string& cron, Task&& task) {
+        return addCron(utils::getCurrentPluginName(), cron, std::move(task));
+    }
 
-    // static inline TaskID addCronTask(const std::string& cron, Task&& task, size_t times) {
-    //     return addCron(utils::getCurrentPluginName(), cron, std::move(task), times);
-    // }
+    static inline TaskID addCronTask(const std::string& cron, Task&& task, size_t times) {
+        return addCron(utils::getCurrentPluginName(), cron, std::move(task), times);
+    }
 
     static inline bool cancelTask(TaskID id) { return cancel(utils::getCurrentPluginName(), id); }
 
@@ -64,7 +64,7 @@ protected:
     KobeBryant_NDAPI static TaskID addRepeat(const std::string&, std::chrono::milliseconds, Task&&, bool, size_t);
     KobeBryant_NDAPI static TaskID addCondition(const std::string&, Task&&, std::function<bool()>&&);
     KobeBryant_NDAPI static TaskID addCondition(const std::string&, Task&&, std::function<bool()>&&, size_t);
-    // KobeBryant_NDAPI static TaskID addCron(const std::string&, const std::string&, Task&&);
-    // KobeBryant_NDAPI static TaskID addCron(const std::string&, const std::string&, Task&&, size_t);
-    KobeBryant_NDAPI static bool cancel(const std::string&, TaskID);
+    KobeBryant_NDAPI static TaskID addCron(const std::string&, const std::string&, Task&&);
+    KobeBryant_NDAPI static TaskID addCron(const std::string&, const std::string&, Task&&, size_t);
+    KobeBryant_NDAPI static bool   cancel(const std::string&, TaskID);
 };

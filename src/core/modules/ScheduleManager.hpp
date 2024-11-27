@@ -1,5 +1,6 @@
 #pragma once
 #include "KobeBryant.hpp"
+#include "croncpp/croncpp.h"
 #include <unordered_set>
 
 class Scheduler {
@@ -32,13 +33,9 @@ public:
 
     static Scheduler& getInstance();
 
-    void _addDelayTask(TaskID id, std::chrono::milliseconds delay, const Task& task);
-
     TaskID addDelayTask(std::chrono::milliseconds delay, const Task& task);
 
     TaskID addRepeatTask(std::chrono::milliseconds delay, const Task& task);
-
-    TaskID addCronTask(const std::string& cron, const Task& task);
 
     bool cancelTask(TaskID id);
 };
@@ -48,6 +45,7 @@ private:
     std::unordered_map<std::string, std::unordered_set<size_t>> mPluginTasks;
     std::unordered_map<size_t, std::string>                     mTaskIdMap;
     std::unordered_map<size_t, uint64_t>                        mTaskTimes;
+    std::unordered_map<size_t, time_t>                          mCornTime;
 
 public:
     static ScheduleManager& getInstance();
@@ -78,6 +76,11 @@ public:
         const std::function<bool()>& condition,
         size_t                       times
     );
+
+    size_t addCronTask(const std::string& plugin, const std::string& cron, const std::function<void()>& task);
+
+    size_t
+    addCronTask(const std::string& plugin, const std::string& cron, const std::function<void()>& task, size_t times);
 
     bool cancelTask(const std::string& plugin, size_t id);
 
