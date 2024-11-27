@@ -184,16 +184,6 @@ MessagePacket::MessagePacket(uint64_t target, std::string type, const Message& m
 
 nlohmann::json MessagePacket::serialize() const { return mSerializedPacket; }
 
-PacketSender::PacketSender() {}
-
-PacketSender& PacketSender::getInstance() {
-    static std::unique_ptr<PacketSender> instance;
-    if (!instance) {
-        instance = std::make_unique<PacketSender>();
-    }
-    return *instance;
-}
-
 void PacketSender::sendRawPacket(const std::string& rawPacket) {
     if (KobeBryant::getInstance().hasConnected()) {
         KobeBryant::getInstance().sendRawPacket(rawPacket);

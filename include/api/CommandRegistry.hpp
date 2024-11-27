@@ -4,6 +4,7 @@
 #include <functional>
 #include <iostream>
 
+// TODO: 完全重写此类
 class CommandRegistry {
 public:
     CommandRegistry();
