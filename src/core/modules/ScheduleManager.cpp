@@ -38,9 +38,8 @@ Scheduler& Scheduler::getInstance() {
     return *instance;
 }
 
-Scheduler::TaskID Scheduler::addDelayTask(std::chrono::milliseconds delay, const Task& task) {
+void Scheduler::_addDelayTask(TaskID id, std::chrono::milliseconds delay, const Task& task) {
     std::lock_guard<std::mutex> lock(mMtx);
-    TaskID                      id       = mNextTaskID++;
     auto                        taskInfo = std::make_unique<TaskInfo>(
         std::move(task),
         std::chrono::steady_clock::now() + delay,
@@ -48,6 +47,11 @@ Scheduler::TaskID Scheduler::addDelayTask(std::chrono::milliseconds delay, const
     );
     mTasks[id] = std::move(taskInfo);
     mCv.notify_one();
+}
+
+Scheduler::TaskID Scheduler::addDelayTask(std::chrono::milliseconds delay, const Task& task) {
+    TaskID id = mNextTaskID++;
+    _addDelayTask(id, delay, std::move(task));
     return id;
 }
 
@@ -57,6 +61,12 @@ Scheduler::TaskID Scheduler::addRepeatTask(std::chrono::milliseconds interval, c
     auto taskInfo = std::make_unique<TaskInfo>(std::move(task), std::chrono::steady_clock::now() + interval, interval);
     mTasks[id]    = std::move(taskInfo);
     mCv.notify_one();
+    return id;
+}
+
+Scheduler::TaskID Scheduler::addCronTask(const std::string& cron, const Task& task) {
+    TaskID id = mNextTaskID++;
+    //
     return id;
 }
 

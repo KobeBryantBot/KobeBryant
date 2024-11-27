@@ -13,7 +13,7 @@ private:
         std::chrono::steady_clock::time_point mRunTime;
         std::chrono::milliseconds             mInterval;
 
-        TaskInfo(Task task, std::chrono::steady_clock::time_point runTime, std::chrono::milliseconds interval)
+        TaskInfo(const Task& task, std::chrono::steady_clock::time_point runTime, std::chrono::milliseconds interval)
         : mTask(std::move(task)),
           mRunTime(runTime),
           mInterval(interval) {}
@@ -32,9 +32,13 @@ public:
 
     static Scheduler& getInstance();
 
+    void _addDelayTask(TaskID id, std::chrono::milliseconds delay, const Task& task);
+
     TaskID addDelayTask(std::chrono::milliseconds delay, const Task& task);
 
     TaskID addRepeatTask(std::chrono::milliseconds delay, const Task& task);
+
+    TaskID addCronTask(const std::string& cron, const Task& task);
 
     bool cancelTask(TaskID id);
 };
