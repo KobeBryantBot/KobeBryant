@@ -33,9 +33,11 @@ public:
 
     static Scheduler& getInstance();
 
-    TaskID addDelayTask(std::chrono::milliseconds delay, const Task& task);
+    TaskID getNextID();
 
-    TaskID addRepeatTask(std::chrono::milliseconds delay, const Task& task);
+    void addDelayTask(TaskID id, std::chrono::milliseconds delay, const Task& task);
+
+    void addRepeatTask(TaskID id, std::chrono::milliseconds delay, const Task& task);
 
     bool cancelTask(TaskID id);
 };

@@ -76,10 +76,11 @@ void KobeBryant::init() {
                     getLogger().error("bot.error.lostConnection", {S(code)});
                 }
                 mConnected = false;
-                Scheduler::getInstance().addDelayTask(std::chrono::milliseconds(10000), [&] {
-                    getLogger().info("bot.main.reconnecting");
-                    connect();
-                });
+                Scheduler::getInstance()
+                    .addDelayTask(Scheduler::getInstance().getNextID(), std::chrono::milliseconds(10000), [&] {
+                        getLogger().info("bot.main.reconnecting");
+                        connect();
+                    });
             } catch (const std::exception& ex) {
                 getLogger().error("bot.error.reconnecting", {ex.what()});
             }
@@ -132,10 +133,11 @@ void KobeBryant::connect() {
             getWsClient().Connect(mUrl, mToken);
         } catch (const std::exception& ex) {
             getLogger().error("bot.error.connect", {ex.what()});
-            Scheduler::getInstance().addDelayTask(std::chrono::milliseconds(10000), [&] {
-                getLogger().info("bot.main.reconnecting");
-                connect();
-            });
+            Scheduler::getInstance()
+                .addDelayTask(Scheduler::getInstance().getNextID(), std::chrono::milliseconds(10000), [&] {
+                    getLogger().info("bot.main.reconnecting");
+                    connect();
+                });
         }
         CATCH_END
     });

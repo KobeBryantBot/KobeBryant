@@ -38,9 +38,8 @@ Scheduler& Scheduler::getInstance() {
     return *instance;
 }
 
-Scheduler::TaskID Scheduler::addDelayTask(std::chrono::milliseconds delay, const Task& task) {
+void Scheduler::addDelayTask(TaskID id, std::chrono::milliseconds delay, const Task& task) {
     std::lock_guard<std::mutex> lock(mMtx);
-    TaskID                      id       = mNextTaskID++;
     auto                        taskInfo = std::make_unique<TaskInfo>(
         std::move(task),
         std::chrono::steady_clock::now() + delay,
@@ -48,17 +47,16 @@ Scheduler::TaskID Scheduler::addDelayTask(std::chrono::milliseconds delay, const
     );
     mTasks[id] = std::move(taskInfo);
     mCv.notify_one();
-    return id;
 }
 
-Scheduler::TaskID Scheduler::addRepeatTask(std::chrono::milliseconds interval, const Task& task) {
+void Scheduler::addRepeatTask(TaskID id, std::chrono::milliseconds interval, const Task& task) {
     std::lock_guard<std::mutex> lock(mMtx);
-    TaskID                      id = mNextTaskID++;
     auto taskInfo = std::make_unique<TaskInfo>(std::move(task), std::chrono::steady_clock::now() + interval, interval);
     mTasks[id]    = std::move(taskInfo);
     mCv.notify_one();
-    return id;
 }
+
+Scheduler::TaskID Scheduler::getNextID() { return mNextTaskID++; }
 
 bool Scheduler::cancelTask(TaskID id) {
     std::lock_guard<std::mutex> lock(mMtx);
@@ -90,9 +88,10 @@ size_t ScheduleManager::addDelayTask(
     const std::function<void()>& task
 ) {
     if (task) {
-        auto id = Scheduler::getInstance().addDelayTask(delay, task);
+        auto id = Scheduler::getInstance().getNextID();
         mPluginTasks[plugin].insert(id);
         mTaskIdMap[id] = plugin;
+        Scheduler::getInstance().addDelayTask(id, delay, task);
         return id;
     }
     return -1;
@@ -104,9 +103,10 @@ size_t ScheduleManager::addRepeatTask(
     const std::function<void()>& task
 ) {
     if (task) {
-        auto id = Scheduler::getInstance().addRepeatTask(interval, task);
+        auto id = Scheduler::getInstance().getNextID();
         mPluginTasks[plugin].insert(id);
         mTaskIdMap[id] = plugin;
+        Scheduler::getInstance().addRepeatTask(id, interval, task);
         return id;
     }
     return -1;
@@ -120,7 +120,11 @@ size_t ScheduleManager::addRepeatTask(
 ) {
 
     if (task) {
-        size_t id      = Scheduler::getInstance().addRepeatTask(interval, [=] {
+        size_t id      = Scheduler::getInstance().getNextID();
+        mTaskTimes[id] = times;
+        mPluginTasks[plugin].insert(id);
+        mTaskIdMap[id] = plugin;
+        Scheduler::getInstance().addRepeatTask(id, interval, [=] {
             try {
                 task();
                 mTaskTimes[id]--;
@@ -130,9 +134,6 @@ size_t ScheduleManager::addRepeatTask(
             }
             CATCH
         });
-        mTaskTimes[id] = times;
-        mPluginTasks[plugin].insert(id);
-        mTaskIdMap[id] = plugin;
         return id;
     }
     return -1;
@@ -144,11 +145,15 @@ size_t ScheduleManager::addConditionTask(
     const std::function<bool()>& condition
 ) {
     if (task && condition) {
-        return addRepeatTask(plugin, std::chrono::seconds(1), [=] {
+        size_t id = Scheduler::getInstance().getNextID();
+        mPluginTasks[plugin].insert(id);
+        mTaskIdMap[id] = plugin;
+        Scheduler::getInstance().addRepeatTask(id, std::chrono::seconds(1), [=] {
             if (condition()) {
                 task();
             }
         });
+        return id;
     }
     return -1;
 }
@@ -160,7 +165,11 @@ size_t ScheduleManager::addConditionTask(
     size_t                       times
 ) {
     if (task && condition) {
-        size_t id      = addRepeatTask(plugin, std::chrono::seconds(1), [=] {
+        size_t id = Scheduler::getInstance().getNextID();
+        mPluginTasks[plugin].insert(id);
+        mTaskIdMap[id] = plugin;
+        mTaskTimes[id] = times;
+        Scheduler::getInstance().addRepeatTask(id, std::chrono::seconds(1), [=] {
             if (condition()) {
                 task();
                 mTaskTimes[id]--;
@@ -169,7 +178,6 @@ size_t ScheduleManager::addConditionTask(
                 }
             }
         });
-        mTaskTimes[id] = times;
         return id;
     }
     return -1;
@@ -187,14 +195,17 @@ size_t ScheduleManager::addCronTask(
 ) {
     try {
         if (task) {
-            auto   cron   = cron::make_cron(cron_str);
-            size_t id     = addRepeatTask(plugin, std::chrono::seconds(1), [=] {
+            auto   cron = cron::make_cron(cron_str);
+            size_t id   = Scheduler::getInstance().getNextID();
+            mPluginTasks[plugin].insert(id);
+            mTaskIdMap[id] = plugin;
+            mCornTime[id]  = getNextCornTime(cron);
+            Scheduler::getInstance().addRepeatTask(id, std::chrono::seconds(1), [=] {
                 if (std::time(0) == mCornTime[id]) {
                     mCornTime[id] = getNextCornTime(cron);
                     task();
                 }
             });
-            mCornTime[id] = getNextCornTime(cron);
             return id;
         }
     } catch (const std::exception& e) {
@@ -212,8 +223,13 @@ size_t ScheduleManager::addCronTask(
 ) {
     try {
         if (task) {
-            auto   cron    = cron::make_cron(cron_str);
-            size_t id      = addRepeatTask(plugin, std::chrono::seconds(1), [=] {
+            auto   cron = cron::make_cron(cron_str);
+            size_t id   = Scheduler::getInstance().getNextID();
+            mPluginTasks[plugin].insert(id);
+            mTaskIdMap[id] = plugin;
+            mCornTime[id]  = getNextCornTime(cron);
+            mTaskTimes[id] = times;
+            Scheduler::getInstance().addRepeatTask(id, std::chrono::seconds(1), [=] {
                 if (std::time(0) == mCornTime[id]) {
                     mCornTime[id] = getNextCornTime(cron);
                     task();
@@ -223,8 +239,6 @@ size_t ScheduleManager::addCronTask(
                     }
                 }
             });
-            mCornTime[id]  = getNextCornTime(cron);
-            mTaskTimes[id] = times;
             return id;
         }
     } catch (const std::exception& e) {

@@ -143,11 +143,15 @@ void EventDispatcher::addCallback(
     uint64_t                                          seconds
 ) {
     mCallbacks[uuid] = std::move(callback);
-    Scheduler::getInstance().addDelayTask(std::chrono::milliseconds(1000 * seconds), [this, uuid, timeoutCallback] {
-        std::lock_guard lock{mMutex};
-        if (mCallbacks.contains(uuid) && timeoutCallback) {
-            timeoutCallback();
+    Scheduler::getInstance().addDelayTask(
+        Scheduler::getInstance().getNextID(),
+        std::chrono::milliseconds(1000 * seconds),
+        [this, uuid, timeoutCallback] {
+            std::lock_guard lock{mMutex};
+            if (mCallbacks.contains(uuid) && timeoutCallback) {
+                timeoutCallback();
+            }
+            mCallbacks.erase(uuid);
         }
-        mCallbacks.erase(uuid);
-    });
+    );
 }
