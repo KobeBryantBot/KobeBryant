@@ -34,8 +34,8 @@ public:
     /**
      * 订阅一个事件
      * @param callback 事件发生时要执行的回调函数
-     * @param priority 回调函数的优先级，默认为500
-     * @return 返回订阅者的标识符
+     * @param priority 监听事件的优先级，默认为500
+     * @return 返回创建的监听器
      */
     template <std::derived_from<Event> E>
     static inline Listener subscribe(std::function<void(E&)> callback, uint32_t priority = 500) {
@@ -43,11 +43,11 @@ public:
     }
 
     /**
-     * 订阅一个事件
-     * @param duration 事件发生后的延迟时间
+     * 临时订阅一个事件
+     * @param duration 事件监听的持续时间，超时后取消订阅
      * @param callback 事件发生时要执行的回调函数
-     * @param priority 回调函数的优先级，默认为500
-     * @return 返回订阅者的标识符
+     * @param priority 监听事件的优先级，默认为500
+     * @return 返回创建的监听器
      */
     template <std::derived_from<Event> E, class T, class D>
     static inline Listener
@@ -62,11 +62,11 @@ public:
     }
 
     /**
-     * 订阅一个事件
-     * @param times 事件发生后的重复次数
+     * 临时订阅一个事件
+     * @param times 事件监听后的监听次数，事件触发超过此数后取消订阅
      * @param callback 事件发生时要执行的回调函数
-     * @param priority 回调函数的优先级，默认为500
-     * @return 返回订阅者的标识符
+     * @param priority 监听事件的优先级，默认为500
+     * @return 返回创建的监听器
      */
     template <std::derived_from<Event> E>
     static inline Listener subscribeTemp(size_t times, std::function<void(E&)> callback, uint32_t priority = 500) {
@@ -80,12 +80,12 @@ public:
     }
 
     /**
-     * 订阅一个事件
-     * @param duration 事件发生后的延迟时间
-     * @param times 事件发生后的重复次数
+     * 临时订阅一个事件
+     * @param duration 事件监听的持续时间，超时后取消订阅
+     * @param times 事件监听后的监听次数，事件触发超过此数后取消订阅
      * @param callback 事件发生时要执行的回调函数
-     * @param priority 回调函数的优先级，默认为500
-     * @return 返回订阅者的标识符
+     * @param priority 监听事件的优先级，默认为500
+     * @return 返回创建的监听器
      */
     template <std::derived_from<Event> E, class T, class D>
     static inline Listener subscribeTemp(

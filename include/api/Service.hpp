@@ -18,11 +18,23 @@ class Service {
     using Expected = std::expected<T, E>;
 
 public:
+    /**
+     * 导出一个函数
+     * @param funcName 函数名
+     * @param func 函数指针
+     * @return 是否导出成功
+     */
     template <typename Ret, typename... Args>
     static inline bool exportFunc(const std::string& funcName, FuncPtr<Ret, Args...> func) {
         return _exportFunc(funcName, func);
     }
 
+    /**
+     * 导入一个函数
+     * @param pluginName 插件名
+     * @param funcName 函数名
+     * @return 导入的函数
+     */
     template <typename Ret, typename... Args>
     static inline Expected<std::function<Ret(Args...)>>
     importFunc(const std::string& pluginName, const std::string& funcName) {
@@ -44,6 +56,13 @@ public:
         return std::unexpected(std::format("Service {}::{} is not exported!", pluginName, funcName));
     }
 
+    /**
+     * 调用一个函数
+     * @param pluginName 插件名
+     * @param funcName 函数名
+     * @param args 函数参数
+     * @return 函数返回值
+     */
     template <typename Ret, typename... Args>
     static inline Expected<Ret> callFunc(const std::string& pluginName, const std::string& funcName, Args... args) {
         if (auto func = importFunc<Ret, Args...>(pluginName, funcName)) {
@@ -60,8 +79,20 @@ public:
         return std::unexpected(std::format("Service {}::{} is not exported!", pluginName, funcName));
     }
 
+    /**
+     * 检查一个函数是否导出
+     * @param pluginName 插件名
+     * @param funcName 函数名
+     * @return 是否导出
+     */
     KobeBryant_NDAPI static bool hasFunc(const std::string& pluginName, const std::string& funcName);
 
+    /**
+     * 移除一个函数
+     * @param pluginName 插件名
+     * @param funcName 函数名
+     * @return 是否移除成功
+     */
     static inline bool removeFunc(const std::string& funcName) {
         auto pluginName = utils::getCurrentPluginName();
         return removeFunc(pluginName, funcName);

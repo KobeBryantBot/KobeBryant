@@ -9,6 +9,12 @@ public:
     using TaskID = size_t;
     using Task   = std::function<void()>;
 
+    /**
+     * 添加一个延迟任务
+     * @param duration 延迟时间
+     * @param task 需要执行的任务
+     * @return 任务ID
+     */
     template <class T, class D>
     static inline TaskID addDelayTask(std::chrono::duration<T, D> duration, Task&& task) {
         return addDelay(
@@ -18,6 +24,12 @@ public:
         );
     }
 
+    /**
+     * 添加一个重复任务
+     * @param duration 重复时间
+     * @param task 需要执行的任务
+     * @return 任务ID
+     */
     template <class T, class D>
     static inline TaskID addRepeatTask(std::chrono::duration<T, D> duration, Task&& task, bool immediately = false) {
         return addRepeat(
@@ -28,6 +40,13 @@ public:
         );
     }
 
+    /**
+     * 添加一个重复任务
+     * @param duration 重复时间
+     * @param task 需要执行的任务
+     * @param times 任务重复次数
+     * @return 任务ID
+     */
     template <class T, class D>
     static inline TaskID
     addRepeatTask(std::chrono::duration<T, D> duration, Task&& task, bool immediately, size_t times) {
@@ -40,22 +59,53 @@ public:
         );
     }
 
+    /**
+     * 添加一个条件任务
+     * @param task 需要执行的任务
+     * @param condition 任务执行条件
+     * @return 任务ID
+     */
     static inline TaskID addConditionTask(Task&& task, std::function<bool()>&& condition) {
         return addCondition(utils::getCurrentPluginName(), std::move(task), std::move(condition));
     }
 
+    /**
+     * 添加一个条件任务
+     * @param task 需要执行的任务
+     * @param condition 任务执行条件
+     * @param times 任务重复次数
+     * @return 任务ID
+     */
     static inline TaskID addConditionTask(Task&& task, std::function<bool()>&& condition, size_t times) {
         return addCondition(utils::getCurrentPluginName(), std::move(task), std::move(condition), times);
     }
 
+    /**
+     * 添加一个cron任务
+     * @param cron 时间表达式
+     * @param task 需要执行的任务
+     * @return 任务ID
+     */
     static inline TaskID addCronTask(const std::string& cron, Task&& task) {
         return addCron(utils::getCurrentPluginName(), cron, std::move(task));
     }
 
+    /**
+     * 添加一个cron任务
+     * @param cron 时间表达式
+     * @param task 需要执行的任务
+     * @param times 任务重复次数
+     * @return 任务ID
+     */
     static inline TaskID addCronTask(const std::string& cron, Task&& task, size_t times) {
         return addCron(utils::getCurrentPluginName(), cron, std::move(task), times);
     }
 
+    /**
+     * 取消一个任务
+     * @param id 任务ID
+     * @return 取消成功返回 true，否则返回 false
+     */
     static inline bool cancelTask(TaskID id) { return cancel(utils::getCurrentPluginName(), id); }
 
 protected:
