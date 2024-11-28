@@ -85,7 +85,7 @@ KobeBryant_NDAPI std::string wstringtoString(std::wstring_view wstr, uint32_t co
 
 #endif
 
-KobeBryant_NDAPI std::string getTimeStringFormatted(const std::string& format = "%Y-%m-%d %H:%M:%S");
+KobeBryant_NDAPI std::string getTimeStringFormatted(const std::string& format = "%Y-%M-%D %H:%M:%S");
 
 KobeBryant_NDAPI std::string trimString(const std::string& str);
 
