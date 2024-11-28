@@ -26,7 +26,7 @@ public:
      */
     template <typename Ret, typename... Args>
     static inline bool exportFunc(const std::string& funcName, FuncPtr<Ret, Args...> func) {
-        return _exportFunc(funcName, func);
+        return _exportFunc(funcName, (std::function<Ret(Args...)>)func);
     }
 
     /**
