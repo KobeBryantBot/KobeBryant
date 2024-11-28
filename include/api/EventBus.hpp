@@ -31,11 +31,24 @@ struct Listener {
 
 class EventBus {
 public:
+    /**
+     * 订阅一个事件
+     * @param callback 事件发生时要执行的回调函数
+     * @param priority 回调函数的优先级，默认为500
+     * @return 返回订阅者的标识符
+     */
     template <std::derived_from<Event> E>
     static inline Listener subscribe(std::function<void(E&)> callback, uint32_t priority = 500) {
         return addListener(std::type_index(typeid(E)), utils::getCurrentPluginName(), EVENT_CALLBACK, priority);
     }
 
+    /**
+     * 订阅一个事件
+     * @param duration 事件发生后的延迟时间
+     * @param callback 事件发生时要执行的回调函数
+     * @param priority 回调函数的优先级，默认为500
+     * @return 返回订阅者的标识符
+     */
     template <std::derived_from<Event> E, class T, class D>
     static inline Listener
     subscribeTemp(std::chrono::duration<T, D> duration, std::function<void(E&)> callback, uint32_t priority = 500) {
@@ -48,6 +61,13 @@ public:
         );
     }
 
+    /**
+     * 订阅一个事件
+     * @param times 事件发生后的重复次数
+     * @param callback 事件发生时要执行的回调函数
+     * @param priority 回调函数的优先级，默认为500
+     * @return 返回订阅者的标识符
+     */
     template <std::derived_from<Event> E>
     static inline Listener subscribeTemp(size_t times, std::function<void(E&)> callback, uint32_t priority = 500) {
         return addListenerTemp(
@@ -59,6 +79,14 @@ public:
         );
     }
 
+    /**
+     * 订阅一个事件
+     * @param duration 事件发生后的延迟时间
+     * @param times 事件发生后的重复次数
+     * @param callback 事件发生时要执行的回调函数
+     * @param priority 回调函数的优先级，默认为500
+     * @return 返回订阅者的标识符
+     */
     template <std::derived_from<Event> E, class T, class D>
     static inline Listener subscribeTemp(
         std::chrono::duration<T, D> duration,
@@ -76,10 +104,19 @@ public:
         );
     }
 
+    /**
+     * 取消订阅一个事件
+     * @param listener 要取消订阅的监听器对象
+     * @return 如果成功取消订阅返回 true，否则返回 false
+     */
     static inline bool unsubscribe(const Listener& listener) {
         return removeListener(utils::getCurrentPluginName(), listener);
     }
 
+    /**
+     * 发布一个事件
+     * @param ev 要发布的事件对象
+     */
     template <std::derived_from<Event> T>
     static inline void publish(T& ev) {
         forEachListener(std::type_index(typeid(T)), [&](const std::function<void(Event&)>& callback) -> bool {
