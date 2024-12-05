@@ -1,6 +1,7 @@
-#pragma warning(disable : 4245)
 #include "api/Schedule.hpp"
 #include "core/modules/ScheduleManager.hpp"
+
+#pragma warning(disable : 4245)
 
 Schedule::TaskID Schedule::addDelay(const std::string& plugin, std::chrono::milliseconds delay, Task&& task) {
     return ScheduleManager::getInstance().addDelayTask(plugin, delay, std::move(task));

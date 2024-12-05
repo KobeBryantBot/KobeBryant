@@ -1,5 +1,6 @@
-#pragma warning(disable : 4245)
 #include "ScheduleManager.hpp"
+
+#pragma warning(disable : 4245)
 
 Scheduler::~Scheduler() { mTasks.clear(); }
 

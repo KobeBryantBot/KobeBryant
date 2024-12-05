@@ -1,10 +1,11 @@
-#pragma warning(disable : 4100)
 #include "KobeBryant.hpp"
 #include "ScheduleManager.hpp"
 #include "api/utils/ModuleUtils.hpp"
 #include "api/utils/StringUtils.hpp"
 #include "core/Version.hpp"
 #include "fmt/format.h"
+
+#pragma warning(disable : 4100)
 
 namespace fs = std::filesystem;
 
