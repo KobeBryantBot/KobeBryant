@@ -12,6 +12,10 @@ add_compile_options(
     /Gy
     /favor:blend
     /Qpar
+    /Zc:inline
+    /D NDEBUG
+    /guard:cf
+    /GS
     /W4
     /Ox
 )
@@ -24,6 +28,10 @@ add_compile_definitions(
 
 add_link_options(
     /LTCG
+    /OPT:REF
+    /OPT:ICF
+    /DYNAMICBASE
+    /HIGHENTROPYVA
 )
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
