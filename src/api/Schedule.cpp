@@ -1,3 +1,4 @@
+#pragma warning(disable : 4245)
 #include "api/Schedule.hpp"
 #include "core/modules/ScheduleManager.hpp"
 

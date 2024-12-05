@@ -7,7 +7,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED 23)
 add_compile_options(
     /EHa
     /utf-8
-    -DNDEBUG
+    /GL
+    /GF
+    /Gy
+    /favor:blend
+    /Qpar
+    /W4
     /O2
 )
 
@@ -17,7 +22,9 @@ add_compile_definitions(
     KobeBryant_EXPORTS
 )
 
-add_link_options(/DEBUG)
+add_link_options(
+    /LTCG
+)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 

@@ -1,3 +1,4 @@
+#pragma warning(disable : 4100)
 #include "KobeBryant.hpp"
 #include "ScheduleManager.hpp"
 #include "api/utils/ModuleUtils.hpp"

@@ -50,7 +50,7 @@ void PluginManager::loadAllPlugins(std::weak_ptr<IPluginEngine> engine, int& cou
                         auto name = manifest->mName;
                         if (!hasPlugin(name)) {
                             if (path.filename().string() == name) {
-                                if (loadPlugin(manifest.value(), type, count)) {
+                                if (loadPlugin(manifest.value(), count)) {
                                     count++;
                                 }
                             } else {
@@ -72,8 +72,8 @@ bool PluginManager::loadPlugin(const std::string& name, bool force) {
                 if (auto manifest = PluginManifest::readFrom("./plugins/" + name + "/manifest.json")) {
                     if (name == manifest->mName) {
                         int temp = 0;
-                        if (!manifest->mPassive) {
-                            return loadPlugin(*manifest, manifest->mType, temp);
+                        if (!manifest->mPassive || force) {
+                            return loadPlugin(*manifest, temp);
                         }
                     } else {
                         KobeBryant::getInstance().getLogger().error(
@@ -103,7 +103,7 @@ bool PluginManager::loadDependence(
                         int temp = 0;
                         if (!((minVersion && manifest->mVersion < *minVersion)
                               || (maxVersion && manifest->mVersion > *maxVersion))) {
-                            return loadPlugin(*manifest, manifest->mType, temp, true);
+                            return loadPlugin(*manifest, temp, true);
                         }
                         KobeBryant::getInstance().getLogger().error(
                             "plugin.dependence.versionMismatch",
@@ -123,7 +123,7 @@ bool PluginManager::loadDependence(
     return false;
 }
 
-bool PluginManager::loadPlugin(const PluginManifest& manifest, const std::string& type, int& count, bool force) {
+bool PluginManager::loadPlugin(const PluginManifest& manifest, int& count, bool force) {
     try {
         if (!manifest.mPassive || force) {
             auto                  type      = manifest.mType;

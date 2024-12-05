@@ -1,5 +1,6 @@
 #include "api/PacketSender.hpp"
 #include "api/utils/Base64Utils.hpp"
+#include "api/utils/RandomUtils.hpp"
 #include "api/utils/StringUtils.hpp"
 #include "core/Global.hpp"
 #include "core/modules/EventDispatcher.hpp"
@@ -568,11 +569,8 @@ void PacketSender::chooseRandomGroupMember(
         groupId,
         [=](const std::vector<uint64_t>& list) {
             if (callback) {
-                std::random_device              rd;
-                std::mt19937                    gen(rd());
-                std::uniform_int_distribution<> dis(0, list.size() - 1);
-                auto                            index  = dis(gen);
-                auto                            target = list[index];
+                auto index  = utils::Random::nextInt(0, (int)(list.size() - 1));
+                auto target = list[index];
                 callback(target);
             }
         },

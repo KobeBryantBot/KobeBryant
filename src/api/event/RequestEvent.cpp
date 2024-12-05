@@ -12,7 +12,7 @@ RequestEvent::RequestEvent(
 )
 : PacketEvent(packet),
   mType(type),
-  mSubType(mSubType),
+  mSubType(subType),
   mSender(sender),
   mSelf(self),
   mComment(comment),

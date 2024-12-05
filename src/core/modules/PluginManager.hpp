@@ -44,7 +44,7 @@ public:
         const std::string&     plugin
     );
 
-    bool loadPlugin(const PluginManifest& manifest, const std::string& type, int& count, bool force = false);
+    bool loadPlugin(const PluginManifest& manifest, int& count, bool force = false);
 
     void unloadAllPlugins();
 

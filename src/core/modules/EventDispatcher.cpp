@@ -29,8 +29,8 @@ void EventDispatcher::init() {
                 EventBus::publish(event);
                 // 解析事件
                 if (packet.contains("post_type")) {
-                    std::string type = packet["post_type"];
-                    switch (utils::doHash(type)) {
+                    std::string post_type = packet["post_type"];
+                    switch (utils::doHash(post_type)) {
                     case utils::doHash("meta_event"): { // 元事件
                         MetaEventType type = ENUM_CAST(MetaEventType, "meta_event_type");
                         MetaEvent     ev(type, packet);

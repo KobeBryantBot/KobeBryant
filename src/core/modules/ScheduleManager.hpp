@@ -1,6 +1,9 @@
 #pragma once
 #include "KobeBryant.hpp"
+#pragma warning(push)
+#pragma warning(disable : 4505)
 #include "croncpp/croncpp.h"
+#pragma warning(pop)
 #include <unordered_set>
 
 class Scheduler {

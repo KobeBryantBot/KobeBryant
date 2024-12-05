@@ -279,7 +279,7 @@ namespace cron
          int hour = 0;
          int minute = 0;
          int second = 0;
-         sscanf(time.data(), "%d-%d-%d %d:%d:%d", &year, &month, &day, &hour, &minute, &second);
+         sscanf_s(time.data(), "%d-%d-%d %d:%d:%d", &year, &month, &day, &hour, &minute, &second);
          result.tm_year = year - 1900;
          result.tm_mon = month - 1;
          result.tm_mday = day;
