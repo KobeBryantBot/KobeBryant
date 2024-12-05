@@ -13,7 +13,7 @@ add_compile_options(
     /favor:blend
     /Qpar
     /W4
-    /O2
+    /Ox
 )
 
 add_compile_definitions(
